@@ -2,7 +2,7 @@ import { useState } from "react";
 
 const LoginPage = () => {
     const [formData, setFormData] = useState({
-        email: "",
+        username: "",
         password: "",
     });
     const [error, setError] = useState("");
@@ -54,20 +54,20 @@ const LoginPage = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                     <label
-                        htmlFor="email"
+                        htmlFor="username"
                         className="block text-sm font-medium text-gray-700 mb-2"
                     >
-                        Email Address
+                        Username
                     </label>
                     <input
-                        id="email"
-                        name="email"
-                        type="email"
+                        id="username"
+                        name="username"
+                        type="username"
                         required
-                        value={formData.email}
+                        value={formData.username}
                         onChange={handleChange}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
-                        placeholder="you@example.com"
+                        placeholder="John Doe"
                     />
                 </div>
 
