@@ -3,21 +3,21 @@ import { useState } from "react";
 const LoginPage = () => {
     const [formData, setFormData] = useState({
         username: "",
-        password: "",
+        password: ""
     });
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
-    const handleChange = (e) => {
+    const handleChange = e => {
         const { name, value } = e.target;
-        setFormData((prev) => ({
+        setFormData(prev => ({
             ...prev,
-            [name]: value,
+            [name]: value
         }));
         setError("");
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async e => {
         e.preventDefault();
         setError("");
         setIsLoading(true);
@@ -26,9 +26,9 @@ const LoginPage = () => {
             const response = await fetch("/api/auth/login", {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json",
+                    "Content-Type": "application/json"
                 },
-                body: JSON.stringify(formData),
+                body: JSON.stringify(formData)
             });
 
             const data = await response.json();

@@ -4,7 +4,7 @@ const Header = ({ title = "Task Management System" }) => {
             style={{
                 backgroundColor: "white",
                 borderBottom: "2px solid black",
-                padding: "1rem 1.5rem",
+                padding: "1rem 1.5rem"
             }}
         >
             <div style={{ textAlign: "left" }}>
@@ -12,7 +12,7 @@ const Header = ({ title = "Task Management System" }) => {
                     style={{
                         fontSize: "1.875rem",
                         fontWeight: "bold",
-                        color: "#111827",
+                        color: "#111827"
                     }}
                 >
                     {title}
