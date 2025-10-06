@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const LoginPage = () => {
+const LoginPage = ({ onLoginSuccess }) => {
     const [formData, setFormData] = useState({
         username: "",
         password: ""
@@ -40,7 +40,10 @@ const LoginPage = () => {
                 throw new Error(data.message || "Login failed");
             }
 
-            console.log("Login successful:", data);
+            localStorage.setItem("token", data.data.token);
+            localStorage.setItem("user", JSON.stringify(data.data.user));
+
+            onLoginSuccess();
         } catch (err) {
             setError(err.message);
         } finally {
@@ -65,7 +68,7 @@ const LoginPage = () => {
                     <input
                         id="username"
                         name="username"
-                        type="username"
+                        type="text"
                         required
                         value={formData.username}
                         onChange={handleChange}
