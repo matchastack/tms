@@ -2,7 +2,7 @@ import { useState } from "react";
 
 const LoginPage = ({ onLoginSuccess }) => {
     const [formData, setFormData] = useState({
-        email: "",
+        username: "",
         password: ""
     });
     const [error, setError] = useState("");
@@ -31,7 +31,7 @@ const LoginPage = ({ onLoginSuccess }) => {
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        username: formData.email,
+                        username: formData.username,
                         password: formData.password
                     })
                 }
@@ -124,13 +124,13 @@ const LoginPage = ({ onLoginSuccess }) => {
                                     marginBottom: "0.5rem"
                                 }}
                             >
-                                Email
+                                Username
                             </label>
                             <input
-                                type="email"
-                                name="email"
+                                type="text"
+                                name="username"
                                 placeholder="Value"
-                                value={formData.email}
+                                value={formData.username}
                                 onChange={handleChange}
                                 required
                                 style={{
