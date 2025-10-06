@@ -15,16 +15,7 @@ function App() {
         return <HomePage />;
     }
 
-    return (
-        <>
-            <div id="header">
-                <Header />
-            </div>
-            <div id="login_form">
-                <LoginPage onLoginSuccess={handleLoginSuccess} />
-            </div>
-        </>
-    );
+    return <LoginPage onLoginSuccess={handleLoginSuccess} />;
 }
 
 export default App;
