@@ -61,12 +61,14 @@ const LoginPage = ({ onLoginSuccess }) => {
 
             <div className="flex flex-col items-center justify-center min-h-[80vh] px-4">
                 <div className="text-center mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900">Login</h1>
+                    <h1 className="mb-10 text-3xl font-bold text-gray-900">
+                        Login
+                    </h1>
                     <form onSubmit={handleSubmit} className="space-y-6 w-100">
                         <div>
                             <label
                                 htmlFor="username"
-                                className="block text-sm font-medium text-gray-700 mb-2"
+                                className="block text-sm text-left font-medium text-gray-700 mb-2"
                             >
                                 Username
                             </label>
@@ -85,7 +87,7 @@ const LoginPage = ({ onLoginSuccess }) => {
                         <div>
                             <label
                                 htmlFor="password"
-                                className="block text-sm font-medium text-gray-700 mb-2"
+                                className="block text-sm text-left font-medium text-gray-700 mb-2"
                             >
                                 Password
                             </label>
