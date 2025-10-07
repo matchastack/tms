@@ -1,4 +1,4 @@
-const Header = ({ title = "Task Management System" }) => {
+const Header = () => {
     return (
         <header
             style={{
