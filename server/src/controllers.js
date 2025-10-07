@@ -1,4 +1,4 @@
-import * as authService from "./services.js";
+import * as services from "./services.js";
 
 export const login = async (req, res, next) => {
     try {
@@ -11,7 +11,7 @@ export const login = async (req, res, next) => {
             });
         }
 
-        const result = await authService.loginUser(username, password);
+        const result = await services.loginUser(username, password);
 
         res.json({
             success: true,
@@ -32,7 +32,7 @@ export const logout = (req, res) => {
 
 export const getAccounts = async (req, res, next) => {
     try {
-        const accounts = await authService.getAllAccounts();
+        const accounts = await services.getAllAccounts();
         res.json({
             success: true,
             data: accounts,
