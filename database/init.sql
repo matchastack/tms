@@ -7,10 +7,11 @@ CREATE TABLE IF NOT EXISTS accounts (
     username VARCHAR(100) NOT NULL,
     password VARCHAR(255) NOT NULL,
     email VARCHAR(100) NOT NULL,
+    userGroup VARCHAR(50) NOT NULL,
     isActive TINYINT(1) DEFAULT 1
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8; 
 
-INSERT INTO accounts (username, password, email, isActive) VALUES
-("test", "test", "test@test.com", 1);
-INSERT INTO accounts (username, password, email, isActive) VALUES
-("admin", "admin", "admin@m.com", 1);
+INSERT INTO accounts (username, password, email, userGroup, isActive) VALUES
+("test", "test", "test@test.com", "dev", 1);
+INSERT INTO accounts (username, password, email, userGroup, isActive) VALUES
+("admin", "admin", "admin@m.com", "admin", 1);
