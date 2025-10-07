@@ -7,5 +7,5 @@ export const config = {
     jwtSecret: process.env.JWT_SECRET || "your-secret-key",
     jwtExpiration: process.env.JWT_EXPIRATION || "24h",
     bcryptRounds: parseInt(process.env.BCRYPT_ROUNDS) || 10,
-    nodeEnv: process.env.NODE_ENV || "development",
+    nodeEnv: process.env.NODE_ENV || "development"
 };

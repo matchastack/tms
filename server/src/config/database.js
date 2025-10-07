@@ -10,7 +10,7 @@ const pool = mysql.createPool({
     database: process.env.DB_NAME || "nodelogin",
     waitForConnections: true,
     connectionLimit: 10,
-    queueLimit: 0,
+    queueLimit: 0
 });
 
 export const query = async (sql, params) => {

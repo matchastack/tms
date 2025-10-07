@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { config } from "../config/config.js";
-import { findUserByName } from "../models/userModel.js";
+import { config } from "./config/config.js";
+import { findUserByName } from "./userModel.js";
 
 export const loginUser = async (username, password) => {
     const user = await findUserByName(username);

@@ -1,4 +1,4 @@
-import * as authService from "../services/authService.js";
+import * as authService from "./authService.js";
 
 export const login = async (req, res, next) => {
     try {
@@ -7,7 +7,7 @@ export const login = async (req, res, next) => {
         if (!username || !password) {
             return res.status(400).json({
                 success: false,
-                message: "Please provide username and password",
+                message: "Please provide username and password"
             });
         }
 
@@ -16,7 +16,7 @@ export const login = async (req, res, next) => {
         res.json({
             success: true,
             message: "Login successful",
-            data: result,
+            data: result
         });
     } catch (error) {
         next(error);
@@ -26,6 +26,19 @@ export const login = async (req, res, next) => {
 export const logout = (req, res) => {
     res.json({
         success: true,
-        message: "Logout successful",
+        message: "Logout successful"
     });
+};
+
+export const getAccounts = async (req, res, next) => {
+    try {
+        const accounts = await authService.getAllAccounts();
+        res.json({
+            success: true,
+            data: accounts,
+            message: "Accounts retrieved successfully"
+        });
+    } catch (error) {
+        next(error);
+    }
 };
