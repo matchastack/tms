@@ -28,12 +28,12 @@ export const loginUser = async (username, password) => {
         user: {
             id: user.id,
             email: user.email,
-            name: user.name,
-        },
+            name: user.username
+        }
     };
 };
 
-export const verifyToken = (token) => {
+export const verifyToken = token => {
     try {
         return jwt.verify(token, config.jwtSecret);
     } catch (error) {
