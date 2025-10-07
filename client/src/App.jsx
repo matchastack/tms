@@ -17,6 +17,12 @@ function App() {
         setIsLoggedIn(true);
     };
 
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        setIsLoggedIn(false);
+    };
+
     return (
         <BrowserRouter>
             <Routes>
@@ -33,7 +39,11 @@ function App() {
                 <Route
                     path="/home"
                     element={
-                        isLoggedIn ? <HomePage /> : <Navigate to="/" replace />
+                        isLoggedIn ? (
+                            <HomePage onLogout={handleLogout} />
+                        ) : (
+                            <Navigate to="/" replace />
+                        )
                     }
                 />
                 <Route path="*" element={<Navigate to="/" replace />} />

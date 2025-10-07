@@ -1,6 +1,6 @@
 import Header from "./Header";
 
-const HomePage = () => {
+const HomePage = ({ onLogout }) => {
     const applications = [
         { id: 1, name: "Application #1" },
         { id: 2, name: "Application #2" },
@@ -9,7 +9,7 @@ const HomePage = () => {
 
     return (
         <div style={{ minHeight: "100vh", backgroundColor: "#f9fafb" }}>
-            <Header />
+            <Header onLogout={onLogout} showLogout={true} />
 
             <main style={{ padding: "3rem 2rem" }}>
                 <h2
