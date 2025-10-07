@@ -18,7 +18,7 @@ export const loginUser = async (username, password) => {
     }
 
     const token = jwt.sign(
-        { id: user.id, email: user.email },
+        { id: user.id, email: user.email, group: user.userGroup },
         config.jwtSecret,
         { expiresIn: config.jwtExpiration }
     );
