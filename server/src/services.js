@@ -1,10 +1,10 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { config } from "./config/config.js";
-import { findUserByName } from "./userModel.js";
+import * as userModel from "./userModel.js";
 
 export const loginUser = async (username, password) => {
-    const user = await findUserByName(username);
+    const user = await userModel.findUserByName(username);
 
     if (!user) {
         throw new Error("User does not exist");
@@ -28,7 +28,9 @@ export const loginUser = async (username, password) => {
         user: {
             id: user.id,
             name: user.username,
-            email: user.email
+            email: user.email,
+            group: user.userGroup,
+            isActive: user.isActive
         }
     };
 };
