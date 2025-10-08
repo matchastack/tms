@@ -41,15 +41,28 @@ export const authenticateToken = (req, res, next) => {
         req.user = decoded;
         next();
     } catch (error) {
+        if (error.name === "TokenExpiredError") {
+            return res.status(401).json({
+                success: false,
+                message: "Token expired"
+            });
+        }
         return res.status(403).json({
             success: false,
-            message: "Invalid or expired token"
+            message: "Invalid token"
         });
     }
 };
 
 export const requireAdmin = (req, res, next) => {
-    if (req.user.group !== "admin") {
+    if (!req.user) {
+        return res.status(401).json({
+            success: false,
+            message: "Authentication required"
+        });
+    }
+
+    if (req.user.group?.toLowerCase() !== "admin") {
         return res.status(403).json({
             success: false,
             message: "Admin access required"
@@ -57,4 +70,29 @@ export const requireAdmin = (req, res, next) => {
     }
 
     next();
+};
+
+export const requireRole = (...allowedRoles) => {
+    return (req, res, next) => {
+        if (!req.user) {
+            return res.status(401).json({
+                success: false,
+                message: "Authentication required"
+            });
+        }
+
+        const userRole = req.user.group?.toLowerCase();
+        const hasPermission = allowedRoles.some(
+            role => role.toLowerCase() === userRole
+        );
+
+        if (!hasPermission) {
+            return res.status(403).json({
+                success: false,
+                message: "Insufficient permissions"
+            });
+        }
+
+        next();
+    };
 };
