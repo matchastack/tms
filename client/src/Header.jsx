@@ -122,7 +122,7 @@ const getMenuOptions = userGroup => {
         },
         users: {
             label: "Users Management",
-            path: "/users",
+            path: "/user/accounts",
             icon: (
                 <svg
                     width="16"

@@ -49,7 +49,7 @@ function App() {
                 />
                 <Route path="*" element={<Navigate to="/" replace />} />
                 <Route
-                    path="/manage/accounts"
+                    path="/user/accounts"
                     element={<UsersManagementPage onLogout={handleLogout} />}
                 />
             </Routes>
