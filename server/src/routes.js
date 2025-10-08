@@ -9,8 +9,8 @@ router.post("/logout", controllers.logout);
 
 router.get(
     "/accounts",
-    // validations.authenticateToken,
-    // validations.requireAdmin,
+    validations.authenticateToken,
+    validations.requireAdmin,
     controllers.getAccounts
 );
 
