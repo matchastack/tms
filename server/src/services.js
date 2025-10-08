@@ -34,3 +34,7 @@ export const loginUser = async (username, password) => {
         }
     };
 };
+
+export const getAllAccounts = async () => {
+    return await userModel.getAllAccounts();
+};

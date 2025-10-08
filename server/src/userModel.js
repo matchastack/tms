@@ -7,6 +7,6 @@ export const findUserByName = async name => {
 };
 
 export const getAllAccounts = async () => {
-    const sql = "SELECT * FROM accounts";
+    const sql = "SELECT id, username, email, userGroup, isActive FROM accounts";
     return await query(sql);
 };
