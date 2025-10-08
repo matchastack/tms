@@ -34,11 +34,3 @@ export const loginUser = async (username, password) => {
         }
     };
 };
-
-export const verifyToken = token => {
-    try {
-        return jwt.verify(token, config.jwtSecret);
-    } catch (error) {
-        throw new Error("Invalid token");
-    }
-};
