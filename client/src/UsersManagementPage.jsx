@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
+import { useAuth } from "./AuthContext";
 import Header from "./Header";
 
-const UsersManagement = ({ onLogout }) => {
+const UsersManagement = () => {
+    const { logout, token } = useAuth();
     const [users, setUsers] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
@@ -15,14 +17,11 @@ const UsersManagement = ({ onLogout }) => {
 
     const fetchUsers = async () => {
         try {
-            const response = await fetch(
-                "http://localhost:8080/api/auth/accounts",
-                {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem("token")}`
-                    }
+            const response = await fetch("http://localhost:8080/api/accounts", {
+                headers: {
+                    Authorization: `Bearer ${token}`
                 }
-            );
+            });
 
             if (!response.ok) {
                 throw new Error("Failed to fetch users");
@@ -83,7 +82,7 @@ const UsersManagement = ({ onLogout }) => {
     if (isLoading) {
         return (
             <div className="min-h-screen bg-gray-50">
-                <Header onLogout={onLogout} showLogout={true} />
+                <Header onLogout={logout} showLogout={true} />
                 <div className="p-12 text-center">Loading...</div>
             </div>
         );
@@ -92,7 +91,7 @@ const UsersManagement = ({ onLogout }) => {
     return (
         <div className="min-h-screen bg-gray-50">
             <Header
-                onLogout={onLogout}
+                onLogout={logout}
                 showLogout={true}
                 title="Users Management"
             />

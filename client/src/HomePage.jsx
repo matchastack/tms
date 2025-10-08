@@ -1,6 +1,9 @@
+import { useAuth } from "./AuthContext";
 import Header from "./Header";
 
-const HomePage = ({ onLogout }) => {
+const HomePage = () => {
+    const { logout } = useAuth();
+
     const applications = [
         { id: 1, name: "Application #1" },
         { id: 2, name: "Application #2" },
@@ -9,7 +12,7 @@ const HomePage = ({ onLogout }) => {
 
     return (
         <div style={{ minHeight: "100vh", backgroundColor: "#f9fafb" }}>
-            <Header onLogout={onLogout} showLogout={true} />
+            <Header onLogout={logout} showLogout={true} />
 
             <main style={{ padding: "3rem 2rem" }}>
                 <h2

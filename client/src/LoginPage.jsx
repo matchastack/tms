@@ -1,15 +1,23 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "./AuthContext";
 import Header from "./Header";
 
-const LoginPage = ({ onLoginSuccess }) => {
+const LoginPage = () => {
     const navigate = useNavigate();
+    const { login, isAuthenticated } = useAuth();
     const [formData, setFormData] = useState({
         username: "",
         password: ""
     });
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate("/home", { replace: true });
+        }
+    }, [isAuthenticated, navigate]);
 
     const handleChange = e => {
         const { name, value } = e.target;
@@ -43,10 +51,7 @@ const LoginPage = ({ onLoginSuccess }) => {
                 throw new Error(data.message || "Login failed");
             }
 
-            localStorage.setItem("token", data.data.token);
-            localStorage.setItem("user", JSON.stringify(data.data.user));
-
-            onLoginSuccess();
+            login(data.data.user, data.data.token);
             navigate("/home");
         } catch (err) {
             setError(err.message);
@@ -112,7 +117,7 @@ const LoginPage = ({ onLoginSuccess }) => {
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full bg-indigo-60 py-3 rounded-lg font-medium hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-200 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full !bg-gray-200 text-black py-3 rounded-lg font-medium hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-200 transition disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {isLoading ? "Signing in..." : "Sign In"}
                         </button>
