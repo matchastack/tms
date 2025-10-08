@@ -4,8 +4,8 @@ import * as validations from "./validations.js";
 
 const router = express.Router();
 
-router.post("/login", validations.validateLogin, controllers.login);
-router.post("/logout", controllers.logout);
+router.post("/auth/login", validations.validateLogin, controllers.login);
+router.post("/auth/logout", controllers.logout);
 
 router.get(
     "/accounts",
