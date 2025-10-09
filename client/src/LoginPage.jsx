@@ -51,7 +51,8 @@ const LoginPage = () => {
                 throw new Error(data.message || "Login failed");
             }
 
-            login(data.data.user, data.data.token);
+            login(data.data.user, data.data.accessToken);
+
             navigate("/home");
         } catch (err) {
             setError(err.message);

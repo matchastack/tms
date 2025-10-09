@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext(null);
 
@@ -6,6 +7,7 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [token, setToken] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const storedToken = localStorage.getItem("token");
@@ -32,13 +34,33 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem("user");
     };
 
+    const fetchWithAuth = async (url, options = {}) => {
+        const currentToken = token || localStorage.getItem("token");
+
+        const headers = {
+            ...options.headers,
+            Authorization: `Bearer ${currentToken}`
+        };
+
+        const response = await fetch(url, { ...options, headers });
+
+        if (response.status === 401) {
+            logout();
+            navigate("/");
+            throw new Error("Session expired. Please login again.");
+        }
+
+        return response;
+    };
+
     const value = {
         user,
         token,
         isAuthenticated: !!token,
         isLoading,
         login,
-        logout
+        logout,
+        fetchWithAuth
     };
 
     return (
