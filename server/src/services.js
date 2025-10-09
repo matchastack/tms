@@ -17,14 +17,20 @@ export const loginUser = async (username, password) => {
         throw new Error("Invalid credentials");
     }
 
-    const token = jwt.sign(
-        { id: user.id, email: user.email, group: user.userGroup },
-        config.jwtSecret,
-        { expiresIn: config.jwtExpiration }
-    );
+    const accessToken = generateAccessToken({
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        group: user.userGroup
+    });
+
+    const refreshToken = generateRefreshToken({
+        id: user.id
+    });
 
     return {
-        token,
+        accessToken,
+        refreshToken,
         user: {
             id: user.id,
             name: user.username,
@@ -37,4 +43,16 @@ export const loginUser = async (username, password) => {
 
 export const getAllAccounts = async () => {
     return await userModel.getAllAccounts();
+};
+
+const generateAccessToken = payload => {
+    return jwt.sign(payload, config.jwtSecret, {
+        expiresIn: config.jwtExpiration
+    });
+};
+
+const generateRefreshToken = payload => {
+    return jwt.sign(payload, config.jwtRefreshSecret, {
+        expiresIn: config.jwtRefreshExpiration
+    });
 };
