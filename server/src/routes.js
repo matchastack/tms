@@ -27,4 +27,11 @@ router.post(
     controllers.createAccount
 );
 
+router.put(
+    "/accounts/:id",
+    validations.authenticateToken,
+    validations.requireAdmin,
+    controllers.updateAccount
+);
+
 export default router;

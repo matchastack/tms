@@ -80,3 +80,20 @@ export const createAccount = async accountData => {
         isActive: 1
     });
 };
+
+export const updateAccount = async (id, accountData) => {
+    const { username, email, password, userGroup, isActive } = accountData;
+
+    const updateData = {
+        username,
+        email,
+        userGroup,
+        isActive
+    };
+
+    if (password) {
+        updateData.password = await bcrypt.hash(password, config.bcryptRounds);
+    }
+
+    return await userModel.updateAccount(id, updateData);
+};

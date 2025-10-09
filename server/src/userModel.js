@@ -44,3 +44,31 @@ export const createAccount = async accountData => {
         isActive
     };
 };
+
+export const updateAccount = async (id, accountData) => {
+    const { username, email, password, userGroup, isActive } = accountData;
+
+    let sql = `
+        UPDATE accounts 
+        SET username = ?, email = ?, userGroup = ?, isActive = ?
+    `;
+    const params = [username, email, userGroup, isActive];
+
+    if (password) {
+        sql += ", password = ?";
+        params.push(password);
+    }
+
+    sql += " WHERE id = ?";
+    params.push(id);
+
+    await query(sql, params);
+
+    return {
+        id,
+        username,
+        email,
+        userGroup,
+        isActive
+    };
+};

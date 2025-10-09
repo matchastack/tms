@@ -108,3 +108,26 @@ export const createAccount = async (req, res, next) => {
         next(error);
     }
 };
+
+export const updateAccount = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const { username, email, password, userGroup, isActive } = req.body;
+
+        const result = await services.updateAccount(id, {
+            username,
+            email,
+            password,
+            userGroup,
+            isActive
+        });
+
+        res.json({
+            success: true,
+            message: "Account updated successfully",
+            data: result
+        });
+    } catch (error) {
+        next(error);
+    }
+};
