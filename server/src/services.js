@@ -23,13 +23,8 @@ export const loginUser = async (username, password) => {
         group: user.userGroup
     });
 
-    const refreshToken = generateRefreshToken({
-        id: user.id
-    });
-
     return {
         accessToken,
-        refreshToken,
         user: {
             id: user.id,
             name: user.username,
@@ -43,12 +38,6 @@ export const loginUser = async (username, password) => {
 const generateAccessToken = payload => {
     return jwt.sign(payload, config.jwtSecret, {
         expiresIn: config.jwtExpiration
-    });
-};
-
-const generateRefreshToken = payload => {
-    return jwt.sign(payload, config.jwtRefreshSecret, {
-        expiresIn: config.jwtRefreshExpiration
     });
 };
 

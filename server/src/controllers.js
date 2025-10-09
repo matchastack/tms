@@ -23,32 +23,6 @@ export const login = async (req, res, next) => {
     }
 };
 
-export const refreshToken = async (req, res, next) => {
-    try {
-        const { refreshToken } = req.body;
-
-        if (!refreshToken) {
-            return res.status(400).json({
-                success: false,
-                message: "Refresh token required"
-            });
-        }
-
-        const result = await services.refreshAccessToken(refreshToken);
-
-        res.json({
-            success: true,
-            message: "Token refreshed successfully",
-            data: result
-        });
-    } catch (error) {
-        return res.status(401).json({
-            success: false,
-            message: error.message
-        });
-    }
-};
-
 export const logout = (req, res) => {
     res.json({
         success: true,
