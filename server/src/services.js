@@ -10,8 +10,7 @@ export const loginUser = async (username, password) => {
         throw new Error("User does not exist");
     }
 
-    const isPasswordValid = password === user.password;
-    // const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
         throw new Error("Invalid credentials");
