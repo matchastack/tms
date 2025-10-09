@@ -41,10 +41,6 @@ export const loginUser = async (username, password) => {
     };
 };
 
-export const getAllAccounts = async () => {
-    return await userModel.getAllAccounts();
-};
-
 const generateAccessToken = payload => {
     return jwt.sign(payload, config.jwtSecret, {
         expiresIn: config.jwtExpiration
@@ -54,5 +50,33 @@ const generateAccessToken = payload => {
 const generateRefreshToken = payload => {
     return jwt.sign(payload, config.jwtRefreshSecret, {
         expiresIn: config.jwtRefreshExpiration
+    });
+};
+
+export const getAllAccounts = async () => {
+    return await userModel.getAllAccounts();
+};
+
+export const createAccount = async accountData => {
+    const { username, email, password, userGroup } = accountData;
+
+    const existingUser = await userModel.findUserByName(username);
+    if (existingUser) {
+        throw new Error("Username already exists");
+    }
+
+    const existingEmail = await userModel.findUserByEmail(email);
+    if (existingEmail) {
+        throw new Error("Email already exists");
+    }
+
+    const hashedPassword = await bcrypt.hash(password, config.bcryptRounds);
+
+    return await userModel.createAccount({
+        username,
+        email,
+        password: hashedPassword,
+        userGroup,
+        isActive: 1
     });
 };

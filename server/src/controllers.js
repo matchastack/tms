@@ -80,3 +80,31 @@ export const getAccounts = async (req, res, next) => {
         next(error);
     }
 };
+
+export const createAccount = async (req, res, next) => {
+    try {
+        const { username, email, password, userGroup } = req.body;
+
+        if (!username || !email || !password || !userGroup) {
+            return res.status(400).json({
+                success: false,
+                message: "All fields are required"
+            });
+        }
+
+        const result = await services.createAccount({
+            username,
+            email,
+            password,
+            userGroup
+        });
+
+        res.status(201).json({
+            success: true,
+            message: "Account created successfully",
+            data: result
+        });
+    } catch (error) {
+        next(error);
+    }
+};

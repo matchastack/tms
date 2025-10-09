@@ -20,4 +20,11 @@ router.get(
     controllers.getAccounts
 );
 
+router.post(
+    "/accounts",
+    validations.authenticateToken,
+    validations.requireAdmin,
+    controllers.createAccount
+);
+
 export default router;
