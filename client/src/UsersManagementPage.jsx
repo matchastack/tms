@@ -7,13 +7,34 @@ const UsersManagement = () => {
     const [users, setUsers] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
-    const [hasChanges, setHasChanges] = useState(false);
+    const [editedRows, setEditedRows] = useState(new Set());
 
     const userGroups = ["Project Lead", "Project Manager", "Dev Team", "Admin"];
 
     useEffect(() => {
         fetchUsers();
     }, []);
+
+    useEffect(() => {
+        if (users.length > 0 && !users[0].isNew) {
+            const newUsers = [
+                {
+                    id: null,
+                    username: "",
+                    email: "",
+                    userGroup: "Dev Team",
+                    password: "",
+                    isActive: 1,
+                    isNew: true
+                },
+                ...users
+            ];
+            setUsers(newUsers);
+            const newEditedRows = new Set(editedRows);
+            newEditedRows.add(0);
+            setEditedRows(newEditedRows);
+        }
+    }, [users.length]);
 
     const fetchUsers = async () => {
         try {
@@ -46,7 +67,10 @@ const UsersManagement = () => {
         const updatedUsers = [...users];
         updatedUsers[index] = { ...updatedUsers[index], [field]: value };
         setUsers(updatedUsers);
-        setHasChanges(true);
+
+        const newEditedRows = new Set(editedRows);
+        newEditedRows.add(index);
+        setEditedRows(newEditedRows);
     };
 
     const handleActiveToggle = index => {
@@ -56,13 +80,19 @@ const UsersManagement = () => {
             isActive: updatedUsers[index].isActive === 1 ? 0 : 1
         };
         setUsers(updatedUsers);
-        setHasChanges(true);
+
+        const newEditedRows = new Set(editedRows);
+        newEditedRows.add(index);
+        setEditedRows(newEditedRows);
     };
 
-    const addNewRow = () => {
-        setUsers([
-            ...users,
-            {
+    const handleSaveRow = async index => {
+        const user = users[index];
+        console.log("Saving user:", user);
+
+        if (user.isNew) {
+            const updatedUsers = [...users];
+            updatedUsers[0] = {
                 id: null,
                 username: "",
                 email: "",
@@ -70,14 +100,13 @@ const UsersManagement = () => {
                 password: "",
                 isActive: 1,
                 isNew: true
-            }
-        ]);
-        setHasChanges(true);
-    };
+            };
+            setUsers(updatedUsers);
+        }
 
-    const handleSaveChanges = async () => {
-        console.log("Saving changes:", users);
-        setHasChanges(false);
+        const newEditedRows = new Set(editedRows);
+        newEditedRows.delete(index);
+        setEditedRows(newEditedRows);
     };
 
     if (isLoading) {
@@ -97,47 +126,54 @@ const UsersManagement = () => {
                 title="Users Management"
             />
 
-            <main className="p-12 px-8">
+            <main className="p-8">
+                <div className="mb-6">
+                    <h2 className="text-xl font-semibold text-gray-800">
+                        User Management
+                    </h2>
+                </div>
+
                 {error && (
                     <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-6">
                         {error}
                     </div>
                 )}
 
-                <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+                <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
                     <table className="w-full border-collapse">
                         <thead>
-                            <tr className="bg-gray-50 border-b border-gray-200">
-                                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            <tr className="bg-gray-50">
+                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider border-b border-gray-200">
                                     User ID
                                 </th>
-                                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider border-b border-gray-200">
                                     Username
                                 </th>
-                                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider border-b border-gray-200">
                                     User Group
                                 </th>
-                                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider border-b border-gray-200">
                                     Email
                                 </th>
-                                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider border-b border-gray-200">
                                     Password
                                 </th>
-                                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider border-b border-gray-200">
                                     Active
                                 </th>
+                                <th className="px-4 py-3 border-b border-gray-200"></th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="bg-white">
                             {users.map((user, index) => (
                                 <tr
                                     key={user.id || `new-${index}`}
-                                    className="border-b border-gray-200"
+                                    className="border-b border-gray-100"
                                 >
-                                    <td className="px-4 py-3 text-sm text-gray-900">
-                                        {user.id || "-"}
+                                    <td className="px-4 py-3 text-sm text-gray-700">
+                                        {user.id || "—"}
                                     </td>
-                                    <td className="px-4 py-3 text-sm text-gray-900">
+                                    <td className="px-4 py-3">
                                         <input
                                             type="text"
                                             value={user.username}
@@ -148,10 +184,13 @@ const UsersManagement = () => {
                                                     e.target.value
                                                 )
                                             }
-                                            className="w-full px-2 py-2 border border-gray-300 rounded-md text-sm outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                            placeholder={
+                                                user.isNew ? "new username" : ""
+                                            }
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                                         />
                                     </td>
-                                    <td className="px-4 py-3 text-sm text-gray-900">
+                                    <td className="px-4 py-3">
                                         <select
                                             value={user.userGroup}
                                             onChange={e =>
@@ -161,7 +200,7 @@ const UsersManagement = () => {
                                                     e.target.value
                                                 )
                                             }
-                                            className="w-full px-2 py-2 border border-gray-300 rounded-md text-sm outline-none bg-white cursor-pointer appearance-none bg-[url('data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%2212%22%20height=%2212%22%20viewBox=%220%200%2012%2012%22%3E%3Cpath%20fill=%22%236b7280%22%20d=%22M10.293%203.293L6%207.586%201.707%203.293A1%201%200%2000.293%204.707l5%205a1%201%200%20001.414%200l5-5a1%201%200%2010-1.414-1.414z%22/%3E%3C/svg%3E')] bg-no-repeat bg-[right_0.5rem_center] pr-8 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm outline-none bg-white cursor-pointer focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                                         >
                                             {userGroups.map(group => (
                                                 <option
@@ -173,7 +212,7 @@ const UsersManagement = () => {
                                             ))}
                                         </select>
                                     </td>
-                                    <td className="px-4 py-3 text-sm text-gray-900">
+                                    <td className="px-4 py-3">
                                         <input
                                             type="email"
                                             value={user.email}
@@ -184,10 +223,15 @@ const UsersManagement = () => {
                                                     e.target.value
                                                 )
                                             }
-                                            className="w-full px-2 py-2 border border-gray-300 rounded-md text-sm outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                            placeholder={
+                                                user.isNew
+                                                    ? "user@example.com"
+                                                    : ""
+                                            }
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                                         />
                                     </td>
-                                    <td className="px-4 py-3 text-sm text-gray-900">
+                                    <td className="px-4 py-3">
                                         <input
                                             type="password"
                                             value={user.password || ""}
@@ -199,49 +243,65 @@ const UsersManagement = () => {
                                                 )
                                             }
                                             placeholder={
-                                                user.isNew ? "" : "••••••••"
+                                                user.isNew
+                                                    ? "8-10 chars only"
+                                                    : "(leave blank to keep)"
                                             }
-                                            className="w-full px-2 py-2 border border-gray-300 rounded-md text-sm outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                                         />
                                     </td>
-                                    <td className="px-4 py-3 text-sm text-gray-900 text-center">
-                                        <input
-                                            type="checkbox"
-                                            checked={user.isActive === 1}
-                                            onChange={() =>
-                                                handleActiveToggle(index)
-                                            }
-                                            className="w-[18px] h-[18px] cursor-pointer accent-indigo-600"
-                                        />
+                                    <td className="px-4 py-3 text-center">
+                                        <label className="inline-flex items-center cursor-pointer">
+                                            <div className="relative">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={
+                                                        user.isActive === 1
+                                                    }
+                                                    onChange={() =>
+                                                        handleActiveToggle(
+                                                            index
+                                                        )
+                                                    }
+                                                    className="sr-only peer"
+                                                />
+                                                <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-colors"></div>
+                                                <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform peer-checked:translate-x-5"></div>
+                                            </div>
+                                        </label>
+                                    </td>
+                                    <td className="px-4 py-3 text-right">
+                                        {index === 0 && user.isNew ? (
+                                            <button
+                                                onClick={() =>
+                                                    handleSaveRow(index)
+                                                }
+                                                className="px-6 py-2 text-gray-500 rounded-md text-sm font-medium hover:bg-green-500 transition-colors"
+                                            >
+                                                Add User
+                                            </button>
+                                        ) : (
+                                            <button
+                                                onClick={() =>
+                                                    handleSaveRow(index)
+                                                }
+                                                disabled={
+                                                    !editedRows.has(index)
+                                                }
+                                                className={`px-8 py-2 rounded-md text-sm font-medium transition-colors ${
+                                                    editedRows.has(index)
+                                                        ? "bg-blue-500 text-white hover:bg-blue-600 cursor-pointer"
+                                                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                                }`}
+                                            >
+                                                Save
+                                            </button>
+                                        )}
                                     </td>
                                 </tr>
                             ))}
-                            <tr>
-                                <td colSpan="6" className="px-3 py-3">
-                                    <button
-                                        onClick={addNewRow}
-                                        className="bg-transparent text-indigo-600 border-none cursor-pointer text-sm font-medium hover:text-indigo-700"
-                                    >
-                                        + Add New User
-                                    </button>
-                                </td>
-                            </tr>
                         </tbody>
                     </table>
-                </div>
-
-                <div className="mt-6 flex justify-end">
-                    <button
-                        onClick={handleSaveChanges}
-                        disabled={!hasChanges}
-                        className={`px-8 py-3 rounded-lg border-none text-sm font-semibold text-white transition-colors ${
-                            hasChanges
-                                ? "bg-green-500 hover:bg-green-600 cursor-pointer"
-                                : "bg-gray-300 cursor-not-allowed"
-                        }`}
-                    >
-                        Save Changes
-                    </button>
                 </div>
             </main>
         </div>
