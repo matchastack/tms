@@ -120,11 +120,7 @@ const UsersManagement = () => {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <Header
-                onLogout={logout}
-                showLogout={true}
-                title="Users Management"
-            />
+            <Header onLogout={logout} showLogout={true} />
 
             <main className="p-8">
                 <div className="mb-6">
@@ -276,7 +272,7 @@ const UsersManagement = () => {
                                                 onClick={() =>
                                                     handleSaveRow(index)
                                                 }
-                                                className="px-6 py-2 text-gray-500 rounded-md text-sm font-medium hover:bg-green-500 transition-colors"
+                                                className="px-6 py-2 !bg-emerald-500 text-white rounded-md text-sm font-medium hover:bg-green-500 transition-colors block w-full"
                                             >
                                                 Add User
                                             </button>
@@ -288,9 +284,9 @@ const UsersManagement = () => {
                                                 disabled={
                                                     !editedRows.has(index)
                                                 }
-                                                className={`px-8 py-2 rounded-md text-sm font-medium transition-colors ${
+                                                className={`block w-full px-8 py-2 rounded-md text-sm font-medium transition-colors ${
                                                     editedRows.has(index)
-                                                        ? "bg-blue-500 text-white hover:bg-blue-600 cursor-pointer"
+                                                        ? "!bg-blue-500 text-white hover:bg-blue-600 cursor-pointer"
                                                         : "bg-gray-300 text-gray-500 cursor-not-allowed"
                                                 }`}
                                             >
