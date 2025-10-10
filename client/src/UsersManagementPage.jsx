@@ -9,7 +9,7 @@ const UsersManagement = () => {
     const [error, setError] = useState("");
     const [hasChanges, setHasChanges] = useState(false);
 
-    const userGroups = ["Project Lead", "Project Manager", "Dev Team"];
+    const userGroups = ["Project Lead", "Project Manager", "Dev Team", "Admin"];
 
     useEffect(() => {
         fetchUsers();
@@ -18,6 +18,7 @@ const UsersManagement = () => {
     const fetchUsers = async () => {
         try {
             const response = await fetch("http://localhost:8080/api/accounts", {
+                method: "GET",
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
