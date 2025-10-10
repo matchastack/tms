@@ -9,7 +9,7 @@ const UsersManagement = () => {
     const [error, setError] = useState("");
     const [editedRows, setEditedRows] = useState(new Set());
 
-    const userGroups = ["Project Lead", "Project Manager", "Dev Team", "Admin"];
+    const userGroups = ["project lead", "project manager", "dev team", "admin"];
 
     useEffect(() => {
         fetchUsers();
@@ -22,7 +22,7 @@ const UsersManagement = () => {
                     id: null,
                     username: "",
                     email: "",
-                    userGroup: "Dev Team",
+                    userGroup: "dev team",
                     password: "",
                     isActive: 1,
                     isNew: true
@@ -96,7 +96,7 @@ const UsersManagement = () => {
                 id: null,
                 username: "",
                 email: "",
-                userGroup: "Dev Team",
+                userGroup: "dev team",
                 password: "",
                 isActive: 1,
                 isNew: true
