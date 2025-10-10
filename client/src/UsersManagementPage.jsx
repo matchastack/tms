@@ -88,25 +88,77 @@ const UsersManagement = () => {
 
     const handleSaveRow = async index => {
         const user = users[index];
-        console.log("Saving user:", user);
 
-        if (user.isNew) {
-            const updatedUsers = [...users];
-            updatedUsers[0] = {
-                id: null,
-                username: "",
-                email: "",
-                userGroup: "dev team",
-                password: "",
-                isActive: 1,
-                isNew: true
-            };
-            setUsers(updatedUsers);
+        try {
+            if (user.isNew) {
+                if (
+                    !user.username ||
+                    !user.email ||
+                    !user.password ||
+                    !user.userGroup
+                ) {
+                    setError("All fields are required for new user");
+                    return;
+                }
+
+                const response = await fetch(
+                    "http://localhost:8080/api/accounts",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            username: user.username,
+                            email: user.email,
+                            password: user.password,
+                            userGroup: user.userGroup
+                        })
+                    }
+                );
+
+                if (!response.ok) {
+                    const data = await response.json();
+                    throw new Error(data.message || "Failed to create user");
+                }
+
+                await fetchUsers();
+                setError("");
+            } else {
+                const response = await fetch(
+                    `http://localhost:8080/api/accounts/${user.id}`,
+                    {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            username: user.username,
+                            email: user.email,
+                            password: user.password || undefined,
+                            userGroup: user.userGroup,
+                            isActive: user.isActive
+                        })
+                    }
+                );
+
+                if (!response.ok) {
+                    const data = await response.json();
+                    throw new Error(data.message || "Failed to update user");
+                }
+
+                await fetchUsers();
+                setError("");
+            }
+
+            const newEditedRows = new Set(editedRows);
+            newEditedRows.delete(index);
+            setEditedRows(newEditedRows);
+        } catch (err) {
+            setError(err.message);
         }
-
-        const newEditedRows = new Set(editedRows);
-        newEditedRows.delete(index);
-        setEditedRows(newEditedRows);
     };
 
     if (isLoading) {
