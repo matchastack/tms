@@ -101,28 +101,19 @@ const UsersManagement = () => {
                 setError("");
                 await fetchUsers();
             } else {
-                const response = await fetch(
+                const { data } = await axios.put(
                     `http://localhost:8080/api/accounts/${user.id}`,
                     {
-                        method: "PUT",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${token}`
-                        },
-                        body: JSON.stringify({
-                            username: user.username,
-                            email: user.email,
-                            password: user.password || undefined,
-                            userGroup: user.userGroup,
-                            isActive: user.isActive
-                        })
+                        username: user.username,
+                        email: user.email,
+                        password: user.password || undefined,
+                        userGroup: user.userGroup,
+                        isActive: user.isActive
+                    },
+                    {
+                        headers: { Authorization: `Bearer ${token}` }
                     }
                 );
-
-                if (!response.ok) {
-                    const data = await response.json();
-                    throw new Error(data.message || "Failed to update user");
-                }
 
                 setError("");
                 const newEditedRows = new Set(editedRows);
