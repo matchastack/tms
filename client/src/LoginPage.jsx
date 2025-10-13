@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
+import axios from "axios";
 import Header from "./Header";
 
 const LoginPage = () => {
@@ -34,22 +35,10 @@ const LoginPage = () => {
         setIsLoading(true);
 
         try {
-            const response = await fetch(
+            const { data } = await axios.post(
                 "http://localhost:8080/api/auth/login",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(formData)
-                }
+                formData
             );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message || "Login failed");
-            }
 
             login(data.data.user, data.data.accessToken);
 

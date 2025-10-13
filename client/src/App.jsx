@@ -22,7 +22,7 @@ function App() {
                     <Route
                         path="/user/accounts"
                         element={
-                            <ProtectedRoute>
+                            <ProtectedRoute allowedRoles={["admin"]}>
                                 <UsersManagementPage />
                             </ProtectedRoute>
                         }
