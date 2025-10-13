@@ -136,11 +136,7 @@ const UsersManagement = () => {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <Header
-                onLogout={logout}
-                showLogout={true}
-                title="Users Management"
-            />
+            <Header onLogout={logout} showLogout={true} />
 
             <main className="p-8">
                 <div className="mb-6">
