@@ -13,6 +13,13 @@ export const login = async (req, res, next) => {
 
         const result = await services.loginUser(username, password);
 
+        res.cookie("accessToken", result.accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+            maxAge: 24 * 60 * 60 * 1000
+        });
+
         res.json({
             success: true,
             message: "Login successful",
@@ -24,6 +31,12 @@ export const login = async (req, res, next) => {
 };
 
 export const logout = (req, res) => {
+    res.clearCookie("accessToken", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax"
+    });
+
     res.json({
         success: true,
         message: "Logout successful"
