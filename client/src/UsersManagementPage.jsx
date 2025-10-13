@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "./AuthContext";
+import axios from "axios";
 import Header from "./Header";
 
 const UsersManagement = () => {
@@ -17,18 +18,12 @@ const UsersManagement = () => {
 
     const fetchUsers = async () => {
         try {
-            const response = await fetch("http://localhost:8080/api/accounts", {
-                method: "GET",
-                headers: {
-                    Authorization: `Bearer ${token}`
+            const { data } = await axios.get(
+                "http://localhost:8080/api/accounts",
+                {
+                    headers: { Authorization: `Bearer ${token}` }
                 }
-            });
-
-            if (!response.ok) {
-                throw new Error("Failed to fetch users");
-            }
-
-            const data = await response.json();
+            );
             const fetchedUsers = data.data.map(user => ({
                 ...user,
                 originalActive: user.isActive
@@ -90,27 +85,18 @@ const UsersManagement = () => {
                     return;
                 }
 
-                const response = await fetch(
+                const { data } = await axios.post(
                     "http://localhost:8080/api/accounts",
                     {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${token}`
-                        },
-                        body: JSON.stringify({
-                            username: user.username,
-                            email: user.email,
-                            password: user.password,
-                            userGroup: user.userGroup
-                        })
+                        username: user.username,
+                        email: user.email,
+                        password: user.password,
+                        userGroup: user.userGroup
+                    },
+                    {
+                        headers: { Authorization: `Bearer ${token}` }
                     }
                 );
-
-                if (!response.ok) {
-                    const data = await response.json();
-                    throw new Error(data.message || "Failed to create user");
-                }
 
                 setError("");
                 await fetchUsers();
