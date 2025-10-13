@@ -47,18 +47,6 @@ const Header = ({
 
                     {showMenu && (
                         <div className="absolute top-full right-0 mt-2 bg-white rounded-lg shadow-lg min-w-[200px] z-50">
-                            <div className="px-4 py-3 border-b border-gray-200">
-                                <p className="text-sm font-semibold text-gray-900 m-0">
-                                    {user?.name || "User"}
-                                </p>
-                                <p className="text-xs text-gray-500 mt-1 mb-0">
-                                    {user?.email || ""}
-                                </p>
-                                <p className="text-xs text-gray-400 mt-1 mb-0">
-                                    {user?.group || ""}
-                                </p>
-                            </div>
-
                             <div className="py-1">
                                 {menuOptions.map(option => (
                                     <button
@@ -130,7 +118,7 @@ const getMenuOptions = userGroup => {
         },
         profile: {
             label: "Profile",
-            path: "/profile",
+            path: "/user/profile",
             icon: (
                 <svg
                     width="16"
