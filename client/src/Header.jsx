@@ -170,7 +170,7 @@ const getMenuOptions = userGroup => {
             return [allOptions.home, allOptions.profile];
 
         case "dev team":
-            return [allOptions.home, allOptions.tasks, allOptions.profile];
+            return [allOptions.home, allOptions.profile];
 
         default:
             return [allOptions.home, allOptions.profile];
