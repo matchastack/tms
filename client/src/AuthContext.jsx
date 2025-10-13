@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const AuthContext = createContext(null);
 
@@ -27,30 +28,24 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem("user", JSON.stringify(userData));
     };
 
-    const logout = () => {
-        setUser(null);
-        setToken(null);
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-    };
-
-    const fetchWithAuth = async (url, options = {}) => {
-        const currentToken = token || localStorage.getItem("token");
-
-        const headers = {
-            ...options.headers,
-            Authorization: `Bearer ${currentToken}`
-        };
-
-        const response = await fetch(url, { ...options, headers });
-
-        if (response.status === 401) {
-            logout();
+    const logout = async () => {
+        try {
+            await axios.post(
+                "http://localhost:8080/api/auth/logout",
+                {},
+                {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            );
+        } catch (error) {
+            console.error("Logout error:", error);
+        } finally {
+            setUser(null);
+            setToken(null);
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
             navigate("/");
-            throw new Error("Session expired. Please login again.");
         }
-
-        return response;
     };
 
     const value = {
@@ -59,8 +54,7 @@ export const AuthProvider = ({ children }) => {
         isAuthenticated: !!token,
         isLoading,
         login,
-        logout,
-        fetchWithAuth
+        logout
     };
 
     return (
