@@ -15,27 +15,6 @@ const UsersManagement = () => {
         fetchUsers();
     }, []);
 
-    useEffect(() => {
-        if (users.length > 0 && !users[0].isNew) {
-            const newUsers = [
-                {
-                    id: null,
-                    username: "",
-                    email: "",
-                    userGroup: "dev team",
-                    password: "",
-                    isActive: 1,
-                    isNew: true
-                },
-                ...users
-            ];
-            setUsers(newUsers);
-            const newEditedRows = new Set(editedRows);
-            newEditedRows.add(0);
-            setEditedRows(newEditedRows);
-        }
-    }, [users.length]);
-
     const fetchUsers = async () => {
         try {
             const response = await fetch("http://localhost:8080/api/accounts", {
@@ -50,12 +29,22 @@ const UsersManagement = () => {
             }
 
             const data = await response.json();
-            setUsers(
-                data.data.map(user => ({
-                    ...user,
-                    originalActive: user.isActive
-                }))
-            );
+            const fetchedUsers = data.data.map(user => ({
+                ...user,
+                originalActive: user.isActive
+            }));
+
+            const newUserRow = {
+                id: null,
+                username: "",
+                email: "",
+                userGroup: "dev team",
+                password: "",
+                isActive: 1,
+                isNew: true
+            };
+
+            setUsers([newUserRow, ...fetchedUsers]);
         } catch (err) {
             setError(err.message);
         } finally {
@@ -123,8 +112,8 @@ const UsersManagement = () => {
                     throw new Error(data.message || "Failed to create user");
                 }
 
-                await fetchUsers();
                 setError("");
+                await fetchUsers();
             } else {
                 const response = await fetch(
                     `http://localhost:8080/api/accounts/${user.id}`,
@@ -149,13 +138,11 @@ const UsersManagement = () => {
                     throw new Error(data.message || "Failed to update user");
                 }
 
-                await fetchUsers();
                 setError("");
+                const newEditedRows = new Set(editedRows);
+                newEditedRows.delete(index);
+                setEditedRows(newEditedRows);
             }
-
-            const newEditedRows = new Set(editedRows);
-            newEditedRows.delete(index);
-            setEditedRows(newEditedRows);
         } catch (err) {
             setError(err.message);
         }
@@ -172,7 +159,11 @@ const UsersManagement = () => {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <Header onLogout={logout} showLogout={true} />
+            <Header
+                onLogout={logout}
+                showLogout={true}
+                title="Users Management"
+            />
 
             <main className="p-8">
                 <div className="mb-6">
@@ -324,7 +315,7 @@ const UsersManagement = () => {
                                                 onClick={() =>
                                                     handleSaveRow(index)
                                                 }
-                                                className="px-6 py-2 !bg-emerald-500 text-white rounded-md text-sm font-medium hover:bg-green-500 transition-colors block w-full"
+                                                className="px-6 py-2 !bg-emerald-500 text-white rounded-md text-sm font-medium hover:bg-green-500 transition-colors"
                                             >
                                                 Add User
                                             </button>
@@ -336,7 +327,7 @@ const UsersManagement = () => {
                                                 disabled={
                                                     !editedRows.has(index)
                                                 }
-                                                className={`block w-full px-8 py-2 rounded-md text-sm font-medium transition-colors ${
+                                                className={`px-8 py-2 rounded-md text-sm font-medium transition-colors ${
                                                     editedRows.has(index)
                                                         ? "!bg-blue-500 text-white hover:bg-blue-600 cursor-pointer"
                                                         : "bg-gray-300 text-gray-500 cursor-not-allowed"
