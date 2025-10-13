@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 import axios from "axios";
-import Header from "./Header";
 
 const LoginPage = () => {
     const navigate = useNavigate();
