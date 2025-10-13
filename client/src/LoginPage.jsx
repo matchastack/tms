@@ -52,8 +52,6 @@ const LoginPage = () => {
 
     return (
         <div className="bg-white rounded-2xl p-4">
-            <Header />
-
             <div className="flex flex-col items-center justify-center min-h-[80vh] px-4">
                 <div className="text-center mb-8">
                     <h1 className="mb-10 text-3xl font-bold text-gray-900">
