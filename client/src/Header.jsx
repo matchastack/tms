@@ -9,24 +9,12 @@ const Header = ({
 }) => {
     const [showMenu, setShowMenu] = useState(false);
     const navigate = useNavigate();
-    const { user, token } = useAuth();
+    const { user } = useAuth();
 
     const menuOptions = getMenuOptions(user?.group);
 
     const handleLogout = async () => {
-        try {
-            await fetch("http://localhost:8080/api/auth/logout", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`
-                }
-            });
-        } catch (error) {
-            console.error("Logout error:", error);
-        } finally {
-            onLogout();
-        }
+        await onLogout();
     };
 
     const handleMenuClick = path => {

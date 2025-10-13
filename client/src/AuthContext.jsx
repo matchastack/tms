@@ -4,54 +4,57 @@ import axios from "axios";
 
 const AuthContext = createContext(null);
 
+axios.defaults.baseURL = "http://localhost:8080/api";
+axios.defaults.withCredentials = true;
+
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
-    const [token, setToken] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const navigate = useNavigate();
 
     useEffect(() => {
-        const storedToken = localStorage.getItem("token");
-        const storedUser = localStorage.getItem("user");
-
-        if (storedToken && storedUser) {
-            setToken(storedToken);
-            setUser(JSON.parse(storedUser));
-        }
-        setIsLoading(false);
+        checkAuthStatus();
     }, []);
 
-    const login = (userData, authToken) => {
-        setUser(userData);
-        setToken(authToken);
-        localStorage.setItem("token", authToken);
-        localStorage.setItem("user", JSON.stringify(userData));
+    const checkAuthStatus = async () => {
+        try {
+            const { data } = await axios.get("/profile");
+            if (data.success) {
+                setUser(data.data);
+            }
+        } catch (error) {
+            setUser(null);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const login = async (username, password) => {
+        const { data } = await axios.post("/auth/login", {
+            username,
+            password
+        });
+
+        if (data.success) {
+            setUser(data.data.user);
+            return data.data.user;
+        }
     };
 
     const logout = async () => {
         try {
-            await axios.post(
-                "http://localhost:8080/api/auth/logout",
-                {},
-                {
-                    headers: { Authorization: `Bearer ${token}` }
-                }
-            );
+            await axios.post("/auth/logout");
         } catch (error) {
             console.error("Logout error:", error);
         } finally {
             setUser(null);
-            setToken(null);
-            localStorage.removeItem("token");
-            localStorage.removeItem("user");
             navigate("/");
         }
     };
 
     const value = {
         user,
-        token,
-        isAuthenticated: !!token,
+        isAuthenticated: !!user,
         isLoading,
         login,
         logout

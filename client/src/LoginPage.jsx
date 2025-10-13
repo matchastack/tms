@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
-import axios from "axios";
 
 const LoginPage = () => {
     const navigate = useNavigate();
@@ -34,16 +33,12 @@ const LoginPage = () => {
         setIsLoading(true);
 
         try {
-            const { data } = await axios.post(
-                "http://localhost:8080/api/auth/login",
-                formData
-            );
-
-            login(data.data.user, data.data.accessToken);
-
+            await login(formData.username, formData.password);
             navigate("/home");
         } catch (err) {
-            setError(err.message);
+            setError(
+                err.response?.data?.message || err.message || "Login failed"
+            );
         } finally {
             setIsLoading(false);
         }

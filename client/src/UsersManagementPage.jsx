@@ -18,12 +18,7 @@ const UsersManagement = () => {
 
     const fetchUsers = async () => {
         try {
-            const { data } = await axios.get(
-                "http://localhost:8080/api/accounts",
-                {
-                    headers: { Authorization: `Bearer ${token}` }
-                }
-            );
+            const { data } = await axios.get("/accounts");
             const fetchedUsers = data.data.map(user => ({
                 ...user,
                 originalActive: user.isActive
@@ -41,7 +36,7 @@ const UsersManagement = () => {
 
             setUsers([newUserRow, ...fetchedUsers]);
         } catch (err) {
-            setError(err.message);
+            setError(err.response?.data?.message || err.message);
         } finally {
             setIsLoading(false);
         }
@@ -85,35 +80,23 @@ const UsersManagement = () => {
                     return;
                 }
 
-                const { data } = await axios.post(
-                    "http://localhost:8080/api/accounts",
-                    {
-                        username: user.username,
-                        email: user.email,
-                        password: user.password,
-                        userGroup: user.userGroup
-                    },
-                    {
-                        headers: { Authorization: `Bearer ${token}` }
-                    }
-                );
+                const { data } = await axios.post("/accounts", {
+                    username: user.username,
+                    email: user.email,
+                    password: user.password,
+                    userGroup: user.userGroup
+                });
 
                 setError("");
                 await fetchUsers();
             } else {
-                const { data } = await axios.put(
-                    `http://localhost:8080/api/accounts/${user.id}`,
-                    {
-                        username: user.username,
-                        email: user.email,
-                        password: user.password || undefined,
-                        userGroup: user.userGroup,
-                        isActive: user.isActive
-                    },
-                    {
-                        headers: { Authorization: `Bearer ${token}` }
-                    }
-                );
+                const { data } = await axios.put(`/accounts/${user.id}`, {
+                    username: user.username,
+                    email: user.email,
+                    password: user.password || undefined,
+                    userGroup: user.userGroup,
+                    isActive: user.isActive
+                });
 
                 setError("");
                 const newEditedRows = new Set(editedRows);
@@ -121,7 +104,7 @@ const UsersManagement = () => {
                 setEditedRows(newEditedRows);
             }
         } catch (err) {
-            setError(err.message);
+            setError(err.response?.data?.message || err.message);
         }
     };
 
