@@ -4,6 +4,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import LoginPage from "./LoginPage";
 import HomePage from "./HomePage";
 import UsersManagementPage from "./UsersManagementPage";
+import ProfilePage from "./ProfilePage";
 
 function App() {
     return (
@@ -16,6 +17,14 @@ function App() {
                         element={
                             <ProtectedRoute>
                                 <HomePage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/user/profile"
+                        element={
+                            <ProtectedRoute>
+                                <ProfilePage />
                             </ProtectedRoute>
                         }
                     />
