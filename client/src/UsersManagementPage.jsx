@@ -4,7 +4,7 @@ import axios from "axios";
 import Header from "./Header";
 
 const UsersManagement = () => {
-    const { logout, token } = useAuth();
+    const { logout } = useAuth();
     const [users, setUsers] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
