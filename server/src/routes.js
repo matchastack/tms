@@ -29,7 +29,7 @@ router.post(
 router.put(
     "/accounts/:id",
     validations.authenticateToken,
-    validations.requireAdmin,
+    validations.requireSelfOrAdmin,
     controllers.updateAccount
 );
 

@@ -95,3 +95,22 @@ export const requireRole = (...allowedRoles) => {
         next();
     };
 };
+
+export const requireSelfOrAdmin = (req, res, next) => {
+    if (!req.user) {
+        return res.status(401).json({
+            success: false,
+            message: "Authentication required"
+        });
+    }
+
+    const isAdmin = req.user.group?.toLowerCase() === "admin";
+    const isSelf = parseInt(req.params.id, 10) === req.user.id;
+    if (!isAdmin && !isSelf) {
+        return res.status(403).json({
+            success: false,
+            message: "Access denied"
+        });
+    }
+    next();
+};
