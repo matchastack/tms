@@ -19,7 +19,6 @@ const UsersManagementPage = () => {
             setIsLoading(true);
             const { data } = await axios.get("/accounts");
             setUsers([
-                ...data.data,
                 {
                     username: "",
                     email: "",
@@ -27,7 +26,8 @@ const UsersManagementPage = () => {
                     userGroup: "",
                     isActive: 1,
                     isNew: true
-                }
+                },
+                ...data.data
             ]);
             setEditedRows(new Set());
         } catch (err) {
