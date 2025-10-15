@@ -106,7 +106,7 @@ const ProfilePage = () => {
                             </label>
                             <input
                                 type="text"
-                                value={user?.username || ""}
+                                value={formData?.username || ""}
                                 disabled
                                 className="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-500 cursor-not-allowed"
                             />
