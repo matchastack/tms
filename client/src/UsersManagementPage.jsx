@@ -18,6 +18,10 @@ const UsersManagementPage = () => {
         try {
             setIsLoading(true);
             const { data } = await axios.get("/accounts");
+            const existingUsers = data.data.map(user => ({
+                ...user,
+                originalUsername: user.username
+            }));
             setUsers([
                 {
                     username: "",
@@ -27,7 +31,7 @@ const UsersManagementPage = () => {
                     isActive: 1,
                     isNew: true
                 },
-                ...data.data
+                ...existingUsers
             ]);
             setEditedRows(new Set());
         } catch (err) {
@@ -180,17 +184,12 @@ const UsersManagementPage = () => {
                         </thead>
                         <tbody className="bg-white">
                             {users.map((user, index) => {
-                                // Store original username for existing users
-                                if (!user.isNew && !user.originalUsername) {
-                                    user.originalUsername = user.username;
-                                }
-
                                 return (
                                     <tr
                                         key={
-                                            user.originalUsername ||
-                                            user.username ||
-                                            `new-${index}`
+                                            user.isNew
+                                                ? "new-user"
+                                                : user.originalUsername
                                         }
                                         className="border-b border-gray-100"
                                     >
