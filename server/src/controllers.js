@@ -47,7 +47,6 @@ export const getCurrentUser = async (req, res) => {
     res.json({
         success: true,
         data: {
-            id: req.user.id,
             username: req.user.username,
             email: req.user.email,
             group: req.user.group
@@ -98,15 +97,15 @@ export const createAccount = async (req, res, next) => {
 
 export const updateAccount = async (req, res, next) => {
     try {
-        const { id } = req.params;
-        const { username, email, password, userGroup, isActive } = req.body;
+        const { username } = req.params;
+        const { email, password, userGroup, isActive, newUsername } = req.body;
 
-        const result = await services.updateAccount(id, {
-            username,
+        const result = await services.updateAccount(username, {
             email,
             password,
             userGroup,
-            isActive
+            isActive,
+            newUsername
         });
 
         res.json({

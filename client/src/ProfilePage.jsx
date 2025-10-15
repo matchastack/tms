@@ -20,7 +20,7 @@ const ProfilePage = () => {
         if (user) {
             setFormData(prev => ({
                 ...prev,
-                username: user.name || "",
+                username: user.username || "",
                 email: user.email || ""
             }));
         }
@@ -63,17 +63,16 @@ const ProfilePage = () => {
 
         try {
             const updateData = {
-                username: formData.username,
                 email: formData.email,
                 userGroup: user.group,
-                isActive: user.isActive
+                isActive: user.isActive || 1
             };
 
             if (formData.password) {
                 updateData.password = formData.password;
             }
 
-            await axios.put(`/accounts/${user.id}`, updateData);
+            await axios.put(`/accounts/${user.username}`, updateData);
 
             setSuccess("Profile updated successfully");
             setFormData(prev => ({
@@ -102,7 +101,7 @@ const ProfilePage = () => {
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Name
+                                Username
                             </label>
                             <input
                                 type="text"

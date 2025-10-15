@@ -105,7 +105,8 @@ export const requireSelfOrAdmin = (req, res, next) => {
     }
 
     const isAdmin = req.user.group?.toLowerCase() === "admin";
-    const isSelf = parseInt(req.params.id, 10) === req.user.id;
+    const isSelf = req.params.username === req.user.username;
+
     if (!isAdmin && !isSelf) {
         return res.status(403).json({
             success: false,

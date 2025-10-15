@@ -17,7 +17,6 @@ export const loginUser = async (username, password) => {
     }
 
     const accessToken = generateAccessToken({
-        id: user.id,
         username: user.username,
         email: user.email,
         group: user.userGroup
@@ -26,8 +25,7 @@ export const loginUser = async (username, password) => {
     return {
         accessToken,
         user: {
-            id: user.id,
-            name: user.username,
+            username: user.username,
             email: user.email,
             group: user.userGroup,
             isActive: user.isActive
@@ -69,19 +67,27 @@ export const createAccount = async accountData => {
     });
 };
 
-export const updateAccount = async (id, accountData) => {
-    const { username, email, password, userGroup, isActive } = accountData;
+export const updateAccount = async (username, accountData) => {
+    const { email, password, userGroup, isActive, newUsername } = accountData;
+
+    // Check if new username already exists (if username is being changed)
+    if (newUsername && newUsername !== username) {
+        const existingUser = await userModel.findUserByName(newUsername);
+        if (existingUser) {
+            throw new Error("Username already exists");
+        }
+    }
 
     const updateData = {
-        username,
         email,
         userGroup,
-        isActive
+        isActive,
+        newUsername
     };
 
     if (password) {
         updateData.password = await bcrypt.hash(password, config.bcryptRounds);
     }
 
-    return await userModel.updateAccount(id, updateData);
+    return await userModel.updateAccount(username, updateData);
 };

@@ -27,7 +27,7 @@ router.post(
 );
 
 router.put(
-    "/accounts/:id",
+    "/accounts/:username",
     validations.authenticateToken,
     validations.requireSelfOrAdmin,
     controllers.updateAccount
