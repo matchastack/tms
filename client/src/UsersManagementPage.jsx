@@ -317,20 +317,24 @@ const UsersManagementPage = () => {
                                             />
                                         </td>
                                         <td className="px-4 py-3 text-center">
-                                            <button
-                                                onClick={() =>
-                                                    handleActiveToggle(index)
-                                                }
-                                                className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
-                                                    user.isActive === 1
-                                                        ? "bg-green-100 text-green-800"
-                                                        : "bg-red-100 text-red-800"
-                                                }`}
-                                            >
-                                                {user.isActive === 1
-                                                    ? "Active"
-                                                    : "Inactive"}
-                                            </button>
+                                            <label className="inline-flex items-center cursor-pointer">
+                                                <div className="relative">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={
+                                                            user.isActive === 1
+                                                        }
+                                                        onChange={() =>
+                                                            handleActiveToggle(
+                                                                index
+                                                            )
+                                                        }
+                                                        className="sr-only peer"
+                                                    />
+                                                    <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-colors"></div>
+                                                    <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform peer-checked:translate-x-5"></div>
+                                                </div>
+                                            </label>
                                         </td>
                                         <td className="px-4 py-3 text-center">
                                             {user.isNew ? (
