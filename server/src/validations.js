@@ -1,9 +1,36 @@
 import jwt from "jsonwebtoken";
 import { config } from "./config/config.js";
 
+export const validatePassword = password => {
+    const minLength = 8;
+    const maxLength = 10;
+    const hasLetter = /[a-zA-Z]/.test(password);
+    const hasNumber = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(
+        password
+    );
+
+    if (password.length < minLength || password.length > maxLength) {
+        return `Password must be between ${minLength} and ${maxLength} characters`;
+    }
+
+    if (!hasLetter) {
+        return "Password must contain at least one letter";
+    }
+
+    if (!hasNumber) {
+        return "Password must contain at least one number";
+    }
+
+    if (!hasSpecialChar) {
+        return "Password must contain at least one special character";
+    }
+
+    return null;
+};
+
 export const validateLogin = (req, res, next) => {
     const { username, password } = req.body;
-
     const errors = [];
 
     if (!username) {
@@ -12,6 +39,64 @@ export const validateLogin = (req, res, next) => {
 
     if (!password) {
         errors.push("Password is required");
+    }
+
+    if (errors.length > 0) {
+        return res.status(400).json({
+            success: false,
+            message: "Validation failed",
+            errors
+        });
+    }
+
+    next();
+};
+
+export const validateAccountCreation = (req, res, next) => {
+    const { username, email, password, userGroup } = req.body;
+    const errors = [];
+
+    if (!username) {
+        errors.push("Username is required");
+    }
+
+    if (!email) {
+        errors.push("Email is required");
+    }
+
+    if (!password) {
+        errors.push("Password is required");
+    } else {
+        const passwordError = validatePassword(password);
+        if (passwordError) {
+            errors.push(passwordError);
+        }
+    }
+
+    if (!userGroup) {
+        errors.push("User group is required");
+    }
+
+    if (errors.length > 0) {
+        return res.status(400).json({
+            success: false,
+            message: "Validation failed",
+            errors
+        });
+    }
+
+    next();
+};
+
+export const validateAccountUpdate = (req, res, next) => {
+    const { password } = req.body;
+    const errors = [];
+
+    if (password) {
+        const passwordError = validatePassword(password);
+        if (passwordError) {
+            errors.push(passwordError);
+        }
     }
 
     if (errors.length > 0) {

@@ -3,6 +3,38 @@ import { useAuth } from "./AuthContext";
 import axios from "axios";
 import Header from "./Header";
 
+const validatePassword = password => {
+    const minLength = 8;
+    const maxLength = 10;
+    const hasLetter = /[a-zA-Z]/.test(password);
+    const hasNumber = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(
+        password
+    );
+
+    if (!password) {
+        return "Password is required";
+    }
+
+    if (password.length < minLength || password.length > maxLength) {
+        return `Password must be between ${minLength} and ${maxLength} characters`;
+    }
+
+    if (!hasLetter) {
+        return "Password must contain at least one letter";
+    }
+
+    if (!hasNumber) {
+        return "Password must contain at least one number";
+    }
+
+    if (!hasSpecialChar) {
+        return "Password must contain at least one special character";
+    }
+
+    return null;
+};
+
 const ProfilePage = () => {
     const { logout, user } = useAuth();
     const [formData, setFormData] = useState({
@@ -49,14 +81,17 @@ const ProfilePage = () => {
             return;
         }
 
-        if (formData.password && formData.password.length < 8) {
-            setError("Password must be at least 8 characters");
-            return;
-        }
+        if (formData.password) {
+            const passwordError = validatePassword(formData.password);
+            if (passwordError) {
+                setError(passwordError);
+                return;
+            }
 
-        if (formData.password && !formData.currentPassword) {
-            setError("Current password is required to change password");
-            return;
+            if (!formData.currentPassword) {
+                setError("Current password is required to change password");
+                return;
+            }
         }
 
         setIsLoading(true);
@@ -82,7 +117,10 @@ const ProfilePage = () => {
                 confirmPassword: ""
             }));
         } catch (err) {
-            setError(err.response?.data?.message || "Failed to update profile");
+            const errorMessage = err.response?.data?.errors
+                ? err.response.data.errors.join(", ")
+                : err.response?.data?.message || "Failed to update profile";
+            setError(errorMessage);
         } finally {
             setIsLoading(false);
         }
@@ -163,6 +201,10 @@ const ProfilePage = () => {
                                 placeholder="Leave blank to keep current"
                                 className="w-full px-4 py-2 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             />
+                            <p className="mt-1 text-xs text-gray-500">
+                                8-10 characters with letters, numbers, and
+                                special characters
+                            </p>
                         </div>
 
                         <div>
