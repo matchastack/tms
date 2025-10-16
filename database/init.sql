@@ -12,3 +12,13 @@ CREATE TABLE IF NOT EXISTS accounts (
 
 INSERT INTO accounts (username, password, email, userGroups, isActive) VALUES
 ("admin", "$2a$10$xjP1qgUcVGXwCyu5OYEZFuGt5CsbjcK6oHFV.IJu4qyuXo62Dip46", "admin@m.com", '["admin"]', 1);
+
+CREATE TABLE IF NOT EXISTS user_groups (
+    group_name VARCHAR(50)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+INSERT INTO user_groups (group_name) VALUES
+("admin"),
+("project lead"),
+("project manager"),
+("dev team");
