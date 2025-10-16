@@ -16,7 +16,10 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
         return <Navigate to="/" replace />;
     }
 
-    if (allowedRoles.length > 0 && !allowedRoles.includes(user?.group)) {
+    if (
+        allowedRoles.length > 0 &&
+        !user?.groups?.some(group => allowedRoles.includes(group))
+    ) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center">
