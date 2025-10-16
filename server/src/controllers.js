@@ -69,26 +69,26 @@ export const getAccounts = async (req, res, next) => {
 
 export const createAccount = async (req, res, next) => {
     try {
-        const { username, email, password, userGroup } = req.body;
+        const { username, email, password, userGroups, isActive } = req.body;
 
-        if (!username || !email || !password || !userGroup) {
+        if (!username || !email || !password) {
             return res.status(400).json({
                 success: false,
-                message: "All fields are required"
+                message: "Username, email and password are required"
             });
         }
 
-        const result = await services.createAccount({
+        const newAccount = await services.createAccount({
             username,
             email,
             password,
-            userGroup
+            userGroups: Array.isArray(userGroups) ? userGroups : []
         });
 
         res.status(201).json({
             success: true,
             message: "Account created successfully",
-            data: result
+            data: newAccount
         });
     } catch (error) {
         next(error);
@@ -98,12 +98,12 @@ export const createAccount = async (req, res, next) => {
 export const updateAccount = async (req, res, next) => {
     try {
         const { username } = req.params;
-        const { email, password, userGroup, isActive, newUsername } = req.body;
+        const { email, password, userGroups, isActive, newUsername } = req.body;
 
-        const result = await services.updateAccount(username, {
+        const updatedAccount = await services.updateAccount(username, {
             email,
             password,
-            userGroup,
+            userGroups: Array.isArray(userGroups) ? userGroups : [],
             isActive,
             newUsername
         });
@@ -111,7 +111,7 @@ export const updateAccount = async (req, res, next) => {
         res.json({
             success: true,
             message: "Account updated successfully",
-            data: result
+            data: updatedAccount
         });
     } catch (error) {
         next(error);

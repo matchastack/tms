@@ -19,7 +19,7 @@ export const loginUser = async (username, password) => {
     const accessToken = generateAccessToken({
         username: user.username,
         email: user.email,
-        group: user.userGroup
+        groups: user.userGroups
     });
 
     return {
@@ -27,7 +27,7 @@ export const loginUser = async (username, password) => {
         user: {
             username: user.username,
             email: user.email,
-            group: user.userGroup,
+            groups: user.userGroups,
             isActive: user.isActive
         }
     };
@@ -44,7 +44,7 @@ export const getAllAccounts = async () => {
 };
 
 export const createAccount = async accountData => {
-    const { username, email, password, userGroup } = accountData;
+    const { username, email, password, userGroups } = accountData;
 
     const existingUser = await userModel.findUserByName(username);
     if (existingUser) {
@@ -62,15 +62,15 @@ export const createAccount = async accountData => {
         username,
         email,
         password: hashedPassword,
-        userGroup,
+        userGroups: userGroups || [],
         isActive: 1
     });
 };
 
 export const updateAccount = async (username, accountData) => {
-    const { email, password, userGroup, isActive, newUsername } = accountData;
+    const { email, password, userGroups, isActive, newUsername } = accountData;
 
-    // Check if new username already exists (if username is being changed)
+    // TODO: username cannot be changed. Remove this in future.
     if (newUsername && newUsername !== username) {
         const existingUser = await userModel.findUserByName(newUsername);
         if (existingUser) {
@@ -80,7 +80,7 @@ export const updateAccount = async (username, accountData) => {
 
     const updateData = {
         email,
-        userGroup,
+        userGroups: userGroups || [],
         isActive,
         newUsername
     };

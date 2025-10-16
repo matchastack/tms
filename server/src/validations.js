@@ -146,7 +146,8 @@ export const requireAdmin = (req, res, next) => {
         });
     }
 
-    if (req.user.group?.toLowerCase() !== "admin") {
+    const userGroups = req.user.groups || [];
+    if (!userGroups.some(group => group.toLowerCase() === "admin")) {
         return res.status(403).json({
             success: false,
             message: "Admin access required"
@@ -165,9 +166,9 @@ export const requireRole = (...allowedRoles) => {
             });
         }
 
-        const userRole = req.user.group?.toLowerCase();
-        const hasPermission = allowedRoles.some(
-            role => role.toLowerCase() === userRole
+        const userGroups = req.user.groups || [];
+        const hasPermission = allowedRoles.some(role =>
+            userGroups.some(group => group.toLowerCase() === role.toLowerCase())
         );
 
         if (!hasPermission) {
@@ -189,7 +190,8 @@ export const requireSelfOrAdmin = (req, res, next) => {
         });
     }
 
-    const isAdmin = req.user.group?.toLowerCase() === "admin";
+    const userGroups = req.user.groups || [];
+    const isAdmin = userGroups.some(group => group.toLowerCase() === "admin");
     const isSelf = req.params.username === req.user.username;
 
     if (!isAdmin && !isSelf) {

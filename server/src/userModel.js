@@ -6,80 +6,79 @@ export const findUserByName = async name => {
     return results[0];
 };
 
-// Remove findUserById function - no longer needed
-
 export const findUserByEmail = async email => {
     const sql = "SELECT * FROM accounts WHERE email = ?";
     const results = await query(sql, [email]);
+    if (results[0] && results[0].userGroups) {
+        results[0].userGroups = JSON.parse(results[0].userGroups);
+    }
     return results[0];
 };
 
 export const getAllAccounts = async () => {
-    const sql = "SELECT username, email, userGroup, isActive FROM accounts";
+    const sql = "SELECT username, email, userGroups, isActive FROM accounts";
     return await query(sql);
 };
 
 export const createAccount = async accountData => {
-    const { username, email, password, userGroup, isActive } = accountData;
+    const { username, email, password, userGroups, isActive } = accountData;
     const sql = `
-        INSERT INTO accounts (username, email, password, userGroup, isActive)
+        INSERT INTO accounts (username, email, password, userGroups, isActive)
         VALUES (?, ?, ?, ?, ?)
     `;
-    await query(sql, [username, email, password, userGroup, isActive]);
+    await query(sql, [username, email, password, userGroups, isActive]);
     return {
         username,
         email,
-        userGroup,
+        userGroups,
         isActive
     };
 };
 
 export const updateAccount = async (username, accountData) => {
-    const { email, password, userGroup, isActive, newUsername } = accountData;
+    const { email, password, userGroups, isActive, newUsername } = accountData;
 
     let sql;
     let params;
 
     if (newUsername && newUsername !== username) {
-        // Handle username change
         if (password) {
             sql = `
                 UPDATE accounts 
-                SET username = ?, email = ?, password = ?, userGroup = ?, isActive = ?
+                SET username = ?, email = ?, password = ?, userGroups = ?, isActive = ?
                 WHERE username = ?
             `;
             params = [
                 newUsername,
                 email,
                 password,
-                userGroup,
+                userGroups,
                 isActive,
                 username
             ];
         } else {
             sql = `
                 UPDATE accounts 
-                SET username = ?, email = ?, userGroup = ?, isActive = ?
+                SET username = ?, email = ?, userGroups = ?, isActive = ?
                 WHERE username = ?
             `;
-            params = [newUsername, email, userGroup, isActive, username];
+            params = [newUsername, email, userGroups, isActive, username];
         }
     } else {
-        // No username change
         if (password) {
             sql = `
                 UPDATE accounts 
-                SET email = ?, password = ?, userGroup = ?, isActive = ?
+                SET email = ?, password = ?, userGroups = ?, isActive = ?
                 WHERE username = ?
             `;
-            params = [email, password, userGroup, isActive, username];
+            params = [email, password, userGroups, isActive, username];
         } else {
             sql = `
                 UPDATE accounts 
-                SET email = ?, userGroup = ?, isActive = ?
+                SET email = ?, userGroups = ?, isActive = ?
                 WHERE username = ?
             `;
-            params = [email, userGroup, isActive, username];
+            params = [email, userGroups, isActive, username];
         }
     }
 
@@ -88,7 +87,7 @@ export const updateAccount = async (username, accountData) => {
     return {
         username: newUsername || username,
         email,
-        userGroup,
+        userGroups,
         isActive
     };
 };
