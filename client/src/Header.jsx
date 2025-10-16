@@ -2,6 +2,73 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 
+const getMenuOptions = userGroups => {
+    const allOptions = {
+        home: {
+            label: "Home",
+            path: "/home",
+            icon: (
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                >
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    <polyline points="9 22 9 12 15 12 15 22" />
+                </svg>
+            )
+        },
+        users: {
+            label: "Users Management",
+            path: "/user/accounts",
+            icon: (
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                >
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+            )
+        },
+        profile: {
+            label: "Profile",
+            path: "/user/profile",
+            icon: (
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                >
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                </svg>
+            )
+        }
+    };
+
+    let options = [allOptions.home, allOptions.profile];
+    for (const userGroup of userGroups) {
+        switch (userGroup?.toLowerCase()) {
+            case "admin":
+                options.push(allOptions.users);
+        }
+    }
+    return options;
+};
+
 const Header = ({
     title = "Task Management System",
     onLogout,
@@ -11,7 +78,7 @@ const Header = ({
     const navigate = useNavigate();
     const { user } = useAuth();
 
-    const menuOptions = getMenuOptions(user?.group);
+    const menuOptions = getMenuOptions(user?.groups);
 
     const handleLogout = async () => {
         await onLogout();
@@ -76,81 +143,6 @@ const Header = ({
             )}
         </header>
     );
-};
-
-const getMenuOptions = userGroup => {
-    const allOptions = {
-        home: {
-            label: "Home",
-            path: "/home",
-            icon: (
-                <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                >
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                    <polyline points="9 22 9 12 15 12 15 22" />
-                </svg>
-            )
-        },
-        users: {
-            label: "Users Management",
-            path: "/user/accounts",
-            icon: (
-                <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                >
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                    <circle cx="9" cy="7" r="4" />
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                </svg>
-            )
-        },
-        profile: {
-            label: "Profile",
-            path: "/user/profile",
-            icon: (
-                <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                >
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                    <circle cx="12" cy="7" r="4" />
-                </svg>
-            )
-        }
-    };
-
-    switch (userGroup?.toLowerCase()) {
-        case "admin":
-            return [allOptions.home, allOptions.users, allOptions.profile];
-
-        case "project lead":
-            return [allOptions.home, allOptions.profile];
-
-        case "project manager":
-            return [allOptions.home, allOptions.profile];
-
-        case "dev team":
-            return [allOptions.home, allOptions.profile];
-
-        default:
-            return [allOptions.home, allOptions.profile];
-    }
 };
 
 export default Header;
