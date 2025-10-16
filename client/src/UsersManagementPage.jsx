@@ -35,6 +35,74 @@ const validatePassword = password => {
     return null;
 };
 
+const AVAILABLE_GROUPS = [
+    "admin",
+    "project lead",
+    "project manager",
+    "dev team"
+];
+
+const MultiSelect = ({ value = [], onChange, placeholder }) => {
+    const [isOpen, setIsOpen] = useState(false);
+
+    const handleToggle = group => {
+        const newValue = value.includes(group)
+            ? value.filter(g => g !== group)
+            : [...value, group];
+        onChange(newValue);
+    };
+
+    return (
+        <div className="relative">
+            <button
+                type="button"
+                onClick={() => setIsOpen(!isOpen)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-left bg-white outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            >
+                {value.length > 0 ? (
+                    <span>{value.join(", ")}</span>
+                ) : (
+                    <span className="text-gray-400">
+                        {placeholder || "Select groups..."}
+                    </span>
+                )}
+                <svg
+                    className="absolute right-2 top-3 w-4 h-4 pointer-events-none"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                    />
+                </svg>
+            </button>
+
+            {isOpen && (
+                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
+                    {AVAILABLE_GROUPS.map(group => (
+                        <label
+                            key={group}
+                            className="flex items-center px-3 py-2 hover:bg-gray-50 cursor-pointer"
+                        >
+                            <input
+                                type="checkbox"
+                                checked={value.includes(group)}
+                                onChange={() => handleToggle(group)}
+                                className="mr-2"
+                            />
+                            <span className="text-sm">{group}</span>
+                        </label>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+};
+
 const UsersManagementPage = () => {
     const { logout } = useAuth();
     const [users, setUsers] = useState([]);
@@ -52,14 +120,16 @@ const UsersManagementPage = () => {
             const { data } = await axios.get("/accounts");
             const existingUsers = data.data.map(user => ({
                 ...user,
-                originalUsername: user.username
+                userGroups: Array.isArray(user.userGroups)
+                    ? user.userGroups
+                    : []
             }));
             setUsers([
                 {
                     username: "",
                     email: "",
                     password: "",
-                    userGroup: "",
+                    userGroups: [],
                     isActive: 1,
                     isNew: true
                 },
@@ -124,14 +194,14 @@ const UsersManagementPage = () => {
                     username: user.username,
                     email: user.email,
                     password: user.password,
-                    userGroup: user.userGroup
+                    userGroups: user.userGroups
                 });
 
                 await fetchUsers();
             } else {
                 const updateData = {
                     email: user.email,
-                    userGroup: user.userGroup,
+                    userGroups: user.userGroups,
                     isActive: user.isActive
                 };
 
@@ -144,28 +214,15 @@ const UsersManagementPage = () => {
                     updateData.password = user.password;
                 }
 
-                // Check if username was changed
-                if (
-                    user.originalUsername &&
-                    user.originalUsername !== user.username
-                ) {
-                    updateData.newUsername = user.username;
-                }
-
-                await axios.put(
-                    `/accounts/${user.originalUsername || user.username}`,
-                    updateData
-                );
+                await axios.put(`/accounts/${user.username}`, updateData);
 
                 const newEditedRows = new Set(editedRows);
                 newEditedRows.delete(index);
                 setEditedRows(newEditedRows);
 
-                // Update originalUsername after successful save
                 const updatedUsers = [...users];
                 updatedUsers[index] = {
                     ...updatedUsers[index],
-                    originalUsername: user.username,
                     password: "" // Clear password after save
                 };
                 setUsers(updatedUsers);
@@ -260,22 +317,20 @@ const UsersManagementPage = () => {
                                             />
                                         </td>
                                         <td className="px-4 py-3">
-                                            <input
-                                                type="text"
-                                                value={user.userGroup}
-                                                onChange={e =>
+                                            <MultiSelect
+                                                value={user.userGroups}
+                                                onChange={value =>
                                                     handleFieldChange(
                                                         index,
-                                                        "userGroup",
-                                                        e.target.value
+                                                        "userGroups",
+                                                        value
                                                     )
                                                 }
                                                 placeholder={
                                                     user.isNew
-                                                        ? "User Group"
+                                                        ? "Select Groups"
                                                         : ""
                                                 }
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                                             />
                                         </td>
                                         <td className="px-4 py-3">
