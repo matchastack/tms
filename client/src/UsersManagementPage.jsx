@@ -3,6 +3,38 @@ import { useAuth } from "./AuthContext";
 import axios from "axios";
 import Header from "./Header";
 
+const validatePassword = password => {
+    const minLength = 8;
+    const maxLength = 10;
+    const hasLetter = /[a-zA-Z]/.test(password);
+    const hasNumber = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(
+        password
+    );
+
+    if (!password) {
+        return "Password is required";
+    }
+
+    if (password.length < minLength || password.length > maxLength) {
+        return `Password must be between ${minLength} and ${maxLength} characters`;
+    }
+
+    if (!hasLetter) {
+        return "Password must contain at least one letter";
+    }
+
+    if (!hasNumber) {
+        return "Password must contain at least one number";
+    }
+
+    if (!hasSpecialChar) {
+        return "Password must contain at least one special character";
+    }
+
+    return null;
+};
+
 const UsersManagementPage = () => {
     const { logout } = useAuth();
     const [users, setUsers] = useState([]);
@@ -82,6 +114,12 @@ const UsersManagementPage = () => {
                     return;
                 }
 
+                const passwordError = validatePassword(user.password);
+                if (passwordError) {
+                    setError(passwordError);
+                    return;
+                }
+
                 await axios.post("/accounts", {
                     username: user.username,
                     email: user.email,
@@ -89,7 +127,6 @@ const UsersManagementPage = () => {
                     userGroup: user.userGroup
                 });
 
-                setError("");
                 await fetchUsers();
             } else {
                 const updateData = {
@@ -99,6 +136,11 @@ const UsersManagementPage = () => {
                 };
 
                 if (user.password) {
+                    const passwordError = validatePassword(user.password);
+                    if (passwordError) {
+                        setError(passwordError);
+                        return;
+                    }
                     updateData.password = user.password;
                 }
 
@@ -115,7 +157,6 @@ const UsersManagementPage = () => {
                     updateData
                 );
 
-                setError("");
                 const newEditedRows = new Set(editedRows);
                 newEditedRows.delete(index);
                 setEditedRows(newEditedRows);
@@ -130,6 +171,9 @@ const UsersManagementPage = () => {
                 setUsers(updatedUsers);
             }
         } catch (err) {
+            const errorMessage = err.response?.data?.errors
+                ? err.response.data.errors.join(", ")
+                : err.response?.data?.message || err.message;
             setError(err.response?.data?.message || err.message);
         }
     };
