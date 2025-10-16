@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { config } from "./config/config.js";
 import * as userModel from "./userModel.js";
+import e from "express";
 
 export const loginUser = async (username, password) => {
     const user = await userModel.findUserByName(username);
@@ -41,6 +42,11 @@ const generateAccessToken = payload => {
 
 export const getAllAccounts = async () => {
     return await userModel.getAllAccounts();
+};
+
+export const getUserByUsername = async username => {
+    const user = await userModel.findUserByName(username);
+    return user;
 };
 
 export const createAccount = async accountData => {

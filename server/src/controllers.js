@@ -44,14 +44,23 @@ export const logout = (req, res) => {
 };
 
 export const getCurrentUser = async (req, res) => {
-    res.json({
-        success: true,
-        data: {
-            username: req.user.username,
-            email: req.user.email,
-            group: req.user.group
-        }
-    });
+    try {
+        const username = req.user.username;
+        const user = await services.getUserByUsername(username);
+        res.json({
+            success: true,
+            data: {
+                username: user.username,
+                email: user.email,
+                groups: user.userGroups
+            }
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Failed to retrieve user profile"
+        });
+    }
 };
 
 export const getAccounts = async (req, res, next) => {
