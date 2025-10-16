@@ -38,7 +38,6 @@ const validatePassword = password => {
 const ProfilePage = () => {
     const { logout, user } = useAuth();
     const [formData, setFormData] = useState({
-        username: "",
         email: "",
         currentPassword: "",
         password: "",
@@ -52,7 +51,6 @@ const ProfilePage = () => {
         if (user) {
             setFormData(prev => ({
                 ...prev,
-                username: user.username || "",
                 email: user.email || ""
             }));
         }
@@ -98,9 +96,7 @@ const ProfilePage = () => {
 
         try {
             const updateData = {
-                email: formData.email,
-                userGroup: user.group,
-                isActive: user.isActive || 1
+                email: formData.email
             };
 
             if (formData.password) {
@@ -143,7 +139,7 @@ const ProfilePage = () => {
                             </label>
                             <input
                                 type="text"
-                                value={formData?.username || ""}
+                                value={user?.username || ""}
                                 disabled
                                 className="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-500 cursor-not-allowed"
                             />
@@ -151,11 +147,11 @@ const ProfilePage = () => {
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                User Group
+                                User Groups
                             </label>
                             <input
                                 type="text"
-                                value={user?.group || ""}
+                                value={user?.groups || ""}
                                 disabled
                                 className="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-500 cursor-not-allowed"
                             />
