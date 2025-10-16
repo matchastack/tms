@@ -9,9 +9,6 @@ export const findUserByName = async name => {
 export const findUserByEmail = async email => {
     const sql = "SELECT * FROM accounts WHERE email = ?";
     const results = await query(sql, [email]);
-    if (results[0] && results[0].userGroups) {
-        results[0].userGroups = JSON.parse(results[0].userGroups);
-    }
     return results[0];
 };
 
@@ -36,56 +33,31 @@ export const createAccount = async accountData => {
 };
 
 export const updateAccount = async (username, accountData) => {
-    const { email, password, userGroups, isActive, newUsername } = accountData;
+    const { email, password, userGroups, isActive } = accountData;
 
     let sql;
     let params;
 
-    if (newUsername && newUsername !== username) {
-        if (password) {
-            sql = `
-                UPDATE accounts 
-                SET username = ?, email = ?, password = ?, userGroups = ?, isActive = ?
-                WHERE username = ?
+    if (password) {
+        sql = `
+            UPDATE accounts 
+            SET email = ?, password = ?, userGroups = ?, isActive = ?
+            WHERE username = ?
             `;
-            params = [
-                newUsername,
-                email,
-                password,
-                userGroups,
-                isActive,
-                username
-            ];
-        } else {
-            sql = `
-                UPDATE accounts 
-                SET username = ?, email = ?, userGroups = ?, isActive = ?
-                WHERE username = ?
-            `;
-            params = [newUsername, email, userGroups, isActive, username];
-        }
+        params = [email, password, userGroups, isActive, username];
     } else {
-        if (password) {
-            sql = `
-                UPDATE accounts 
-                SET email = ?, password = ?, userGroups = ?, isActive = ?
-                WHERE username = ?
+        sql = `
+            UPDATE accounts 
+            SET email = ?, userGroups = ?, isActive = ?
+            WHERE username = ?
             `;
-            params = [email, password, userGroups, isActive, username];
-        } else {
-            sql = `
-                UPDATE accounts 
-                SET email = ?, userGroups = ?, isActive = ?
-                WHERE username = ?
-            `;
-            params = [email, userGroups, isActive, username];
-        }
+        params = [email, userGroups, isActive, username];
     }
 
     await query(sql, params);
 
     return {
-        username: newUsername || username,
+        username,
         email,
         userGroups,
         isActive
