@@ -11,72 +11,24 @@ const HomePage = () => {
     ];
 
     return (
-        <div style={{ minHeight: "100vh", backgroundColor: "#f9fafb" }}>
+        <div className="min-h-screen bg-gray-50">
             <Header onLogout={logout} showLogout={true} />
 
-            <main style={{ padding: "3rem 2rem" }}>
-                <h2
-                    style={{
-                        fontSize: "1.875rem",
-                        fontWeight: "600",
-                        color: "#111827",
-                        marginBottom: "2rem"
-                    }}
-                >
+            <main className="p-12">
+                <h2 className="text-3xl font-semibold text-gray-900 mb-8">
                     Applications
                 </h2>
 
-                <div
-                    style={{
-                        display: "grid",
-                        gridTemplateColumns:
-                            "repeat(auto-fill, minmax(250px, 1fr))",
-                        gap: "2rem",
-                        maxWidth: "1200px"
-                    }}
-                >
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl">
                     {applications.map(app => (
                         <div
                             key={app.id}
-                            style={{
-                                backgroundColor: "#f3f4f6",
-                                padding: "2rem",
-                                borderRadius: "0.5rem",
-                                cursor: "pointer",
-                                transition: "all 0.2s",
-                                border: "1px solid transparent"
-                            }}
-                            onMouseEnter={e => {
-                                e.currentTarget.style.backgroundColor =
-                                    "#e5e7eb";
-                                e.currentTarget.style.borderColor = "#d1d5db";
-                            }}
-                            onMouseLeave={e => {
-                                e.currentTarget.style.backgroundColor =
-                                    "#f3f4f6";
-                                e.currentTarget.style.borderColor =
-                                    "transparent";
-                            }}
+                            className="bg-gray-100 p-8 rounded-lg cursor-pointer transition-all border border-transparent hover:bg-gray-200 hover:border-gray-300"
                         >
-                            <h3
-                                style={{
-                                    fontSize: "1.125rem",
-                                    fontWeight: "600",
-                                    color: "#111827",
-                                    marginBottom: "1rem"
-                                }}
-                            >
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">
                                 {app.name}
                             </h3>
-                            <p
-                                style={{
-                                    fontSize: "0.875rem",
-                                    color: "#6b7280",
-                                    margin: 0
-                                }}
-                            >
-                                Name:
-                            </p>
+                            <p className="text-sm text-gray-600">Name:</p>
                         </div>
                     ))}
                 </div>
