@@ -4,7 +4,7 @@ import { useAuth } from "./AuthContext";
 
 const LoginPage = () => {
     const navigate = useNavigate();
-    const { login, isAuthenticated } = useAuth();
+    const { login, isAuthenticated, user } = useAuth();
     const [formData, setFormData] = useState({
         username: "",
         password: ""
@@ -12,9 +12,14 @@ const LoginPage = () => {
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
+    const isOnlyAdmin =
+        user && user.groups.length === 1 && user.groups[0] === "admin";
+
     useEffect(() => {
         if (isAuthenticated) {
-            navigate("/home", { replace: true });
+            isOnlyAdmin
+                ? navigate("/user/accounts", { replace: true })
+                : navigate("/home", { replace: true });
         }
     }, [isAuthenticated, navigate]);
 
