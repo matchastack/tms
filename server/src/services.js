@@ -48,7 +48,7 @@ export const getAllAccounts = async () => {
 };
 
 export const createAccount = async accountData => {
-    const { username, email, password, userGroups } = accountData;
+    const { username, email, password, userGroups, isActive } = accountData;
 
     const existingUser = await query(
         "SELECT * FROM accounts WHERE username = ?",
@@ -88,7 +88,10 @@ export const updateAccount = async (username, accountData) => {
     let params;
 
     if (password) {
-        updatedPassword = await bcrypt.hash(password, config.bcryptRounds);
+        const updatedPassword = await bcrypt.hash(
+            password,
+            config.bcryptRounds
+        );
         sql = `
             UPDATE accounts 
             SET email = ?, password = ?, userGroups = ?, isActive = ?

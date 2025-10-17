@@ -96,7 +96,9 @@ const ProfilePage = () => {
 
         try {
             const updateData = {
-                email: formData.email
+                email: formData.email,
+                userGroups: user.groups,
+                isActive: 1
             };
 
             if (formData.password) {
