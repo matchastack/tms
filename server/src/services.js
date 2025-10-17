@@ -96,6 +96,15 @@ export const createAccount = async accountData => {
 export const updateAccount = async (username, accountData) => {
     const { email, password, userGroups, isActive } = accountData;
 
+    if (username === "admin") {
+        if (isActive === 0) {
+            throw new Error("Root admin account cannot be disabled");
+        }
+        if (userGroups && !userGroups.includes("admin")) {
+            throw new Error("Cannot remove admin role from root admin");
+        }
+    }
+
     let sql;
     let params;
 

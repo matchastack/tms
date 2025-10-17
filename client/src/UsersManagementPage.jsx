@@ -3,6 +3,8 @@ import { useAuth } from "./AuthContext";
 import axios from "axios";
 import Header from "./Header";
 
+const ROOT_ADMIN_USERNAME = "admin";
+
 const validatePassword = password => {
     const minLength = 8;
     const maxLength = 10;
@@ -187,6 +189,16 @@ const UsersManagementPage = () => {
 
     const handleSaveRow = async index => {
         const user = users[index];
+        if (user.username === ROOT_ADMIN_USERNAME && !user.isNew) {
+            if (user.isActive === 0) {
+                setError("Root admin account cannot be disabled");
+                return;
+            }
+            if (!user.userGroups.includes("admin")) {
+                setError("Cannot remove admin role from root admin");
+                return;
+            }
+        }
 
         try {
             if (user.isNew) {

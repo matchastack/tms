@@ -109,6 +109,16 @@ export const updateAccount = async (req, res, next) => {
         const { username, email, password, userGroups, isActive, newUsername } =
             req.body;
 
+        const isTargetRootAdmin = username === "admin";
+        const isRequesterRootAdmin = req.user.username === "admin";
+
+        if (isTargetRootAdmin && !isRequesterRootAdmin && (email || password)) {
+            return res.status(403).json({
+                success: false,
+                message: "Cannot modify root admin account email or password"
+            });
+        }
+
         const updatedAccount = await services.updateAccount(username, {
             email,
             password,
@@ -126,7 +136,6 @@ export const updateAccount = async (req, res, next) => {
         next(error);
     }
 };
-
 export const getUserGroups = async (req, res, next) => {
     try {
         const groups = await services.getAllUserGroups();
