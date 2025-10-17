@@ -36,4 +36,11 @@ router.put(
     controllers.updateAccount
 );
 
+router.get(
+    "/user_groups",
+    validations.authenticateToken,
+    validations.requireAdmin,
+    controllers.getUserGroups
+);
+
 export default router;

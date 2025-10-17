@@ -2,7 +2,6 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { config } from "./config/config.js";
 import * as userModel from "./userModel.js";
-import e from "express";
 
 export const loginUser = async (username, password) => {
     const user = await userModel.findUserByName(username);
@@ -96,4 +95,8 @@ export const updateAccount = async (username, accountData) => {
     }
 
     return await userModel.updateAccount(username, updateData);
+};
+
+export const getAllUserGroups = async () => {
+    return await userModel.getAllUserGroups();
 };

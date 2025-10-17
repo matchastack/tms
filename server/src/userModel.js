@@ -63,3 +63,9 @@ export const updateAccount = async (username, accountData) => {
         isActive
     };
 };
+
+export const getAllUserGroups = async () => {
+    const sql = "SELECT group_name FROM user_groups";
+    const results = await query(sql);
+    return results.map(row => row.group_name);
+};

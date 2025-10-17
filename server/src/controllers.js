@@ -126,3 +126,16 @@ export const updateAccount = async (req, res, next) => {
         next(error);
     }
 };
+
+export const getUserGroups = async (req, res, next) => {
+    try {
+        const groups = await services.getAllUserGroups();
+        res.json({
+            success: true,
+            data: groups,
+            message: "User groups retrieved successfully"
+        });
+    } catch (error) {
+        next(error);
+    }
+};
