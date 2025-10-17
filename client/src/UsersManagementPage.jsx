@@ -334,9 +334,11 @@ const UsersManagementPage = () => {
                                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider border-b border-gray-200">
                                     Username
                                 </th>
-                                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b  border-gray-200">
                                     <div className="flex items-center gap-2">
-                                        <span>GROUPS</span>
+                                        <span className="text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                                            Groups
+                                        </span>
                                         <div className="flex items-center gap-1">
                                             <input
                                                 type="text"
