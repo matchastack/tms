@@ -20,7 +20,6 @@ export const loginUser = async (username, password) => {
 
     const accessToken = generateAccessToken({
         username: user.username,
-        email: user.email,
         groups: user.userGroups
     });
 
@@ -39,6 +38,19 @@ const generateAccessToken = payload => {
     return jwt.sign(payload, config.jwtSecret, {
         expiresIn: config.jwtExpiration
     });
+};
+
+export const getUserByUsername = async username => {
+    const user = await query(
+        "SELECT username, email, userGroups, isActive FROM accounts WHERE username = ?",
+        [username]
+    ).then(results => results[0]);
+
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    return user;
 };
 
 export const getAllAccounts = async () => {
