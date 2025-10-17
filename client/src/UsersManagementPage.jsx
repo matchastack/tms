@@ -170,7 +170,6 @@ const UsersManagementPage = () => {
         try {
             const { data } = await axios.get("/user_groups");
             setAvailableGroups(data.data);
-            console.log("Fetched groups:", data.data);
         } catch (err) {
             console.error("Failed to fetch groups:", err);
         }
