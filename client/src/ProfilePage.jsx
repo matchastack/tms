@@ -105,7 +105,10 @@ const ProfilePage = () => {
                 updateData.password = formData.password;
             }
 
-            await axios.put(`/accounts/${user.username}`, updateData);
+            await axios.put("/accounts", {
+                username: user.username,
+                ...updateData
+            });
 
             setSuccess("Profile updated successfully");
             setFormData(prev => ({

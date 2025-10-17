@@ -230,7 +230,10 @@ const UsersManagementPage = () => {
                     updateData.password = user.password;
                 }
 
-                await axios.put(`/accounts/${user.username}`, updateData);
+                await axios.put("/accounts", {
+                    username: user.username,
+                    ...updateData
+                });
 
                 const newEditedRows = new Set(editedRows);
                 newEditedRows.delete(index);

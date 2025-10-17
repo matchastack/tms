@@ -29,7 +29,7 @@ router.post(
 );
 
 router.put(
-    "/accounts/:username",
+    "/accounts",
     validations.authenticateToken,
     validations.requireSelfOrAdmin,
     validations.validateAccountUpdate,

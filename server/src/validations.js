@@ -195,7 +195,7 @@ export const requireSelfOrAdmin = (req, res, next) => {
     }
 
     const isAdmin = userHasGroup(req.user, "admin");
-    const isSelf = req.params.username === req.user.username;
+    const isSelf = req.body.username === req.user.username;
 
     if (!isAdmin && !isSelf) {
         return res.status(403).json({

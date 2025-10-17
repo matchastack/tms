@@ -106,8 +106,8 @@ export const createAccount = async (req, res, next) => {
 
 export const updateAccount = async (req, res, next) => {
     try {
-        const { username } = req.params;
-        const { email, password, userGroups, isActive, newUsername } = req.body;
+        const { username, email, password, userGroups, isActive, newUsername } =
+            req.body;
 
         const updatedAccount = await services.updateAccount(username, {
             email,
