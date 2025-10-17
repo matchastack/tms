@@ -148,3 +148,19 @@ export const createGroup = async groupName => {
     await query(insertQuery, [groupName]);
     return { groupName };
 };
+
+export const checkGroup = async (userId, groupName) => {
+    const user = await query(
+        "SELECT userGroups FROM accounts WHERE username = ?",
+        [userId]
+    ).then(results => results[0]);
+
+    if (!user) {
+        return false;
+    }
+
+    const userGroups = user.userGroups || [];
+    return userGroups.some(
+        group => group.toLowerCase() === groupName.toLowerCase()
+    );
+};

@@ -1,6 +1,13 @@
 import jwt from "jsonwebtoken";
 import { config } from "./config/config.js";
 
+const userHasGroup = (user, groupName) => {
+    const userGroups = user.groups || [];
+    return userGroups.some(
+        group => group.toLowerCase() === groupName.toLowerCase()
+    );
+};
+
 export const validatePassword = password => {
     const minLength = 8;
     const maxLength = 10;
@@ -146,8 +153,7 @@ export const requireAdmin = (req, res, next) => {
         });
     }
 
-    const userGroups = req.user.groups || [];
-    if (!userGroups.some(group => group.toLowerCase() === "admin")) {
+    if (!userHasGroup(req.user, "admin")) {
         return res.status(403).json({
             success: false,
             message: "Admin access required"
@@ -166,11 +172,9 @@ export const requireRole = (...allowedRoles) => {
             });
         }
 
-        const userGroups = req.user.groups || [];
         const hasPermission = allowedRoles.some(role =>
-            userGroups.some(group => group.toLowerCase() === role.toLowerCase())
+            userHasGroup(req.user, role)
         );
-
         if (!hasPermission) {
             return res.status(403).json({
                 success: false,
@@ -190,8 +194,7 @@ export const requireSelfOrAdmin = (req, res, next) => {
         });
     }
 
-    const userGroups = req.user.groups || [];
-    const isAdmin = userGroups.some(group => group.toLowerCase() === "admin");
+    const isAdmin = userHasGroup(req.user, "admin");
     const isSelf = req.params.username === req.user.username;
 
     if (!isAdmin && !isSelf) {
