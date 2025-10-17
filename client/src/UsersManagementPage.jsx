@@ -35,14 +35,14 @@ const validatePassword = password => {
     return null;
 };
 
-const AVAILABLE_GROUPS = [
-    "admin",
-    "project lead",
-    "project manager",
-    "dev team"
-];
+const AVAILABLE_GROUPS_INITIAL = [];
 
-const MultiSelect = ({ value = [], onChange, placeholder }) => {
+const MultiSelect = ({
+    value = [],
+    onChange,
+    placeholder,
+    availableGroups = []
+}) => {
     const [isOpen, setIsOpen] = useState(false);
 
     const handleToggle = group => {
@@ -83,7 +83,7 @@ const MultiSelect = ({ value = [], onChange, placeholder }) => {
 
             {isOpen && (
                 <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
-                    {AVAILABLE_GROUPS.map(group => (
+                    {availableGroups.map(group => (
                         <label
                             key={group}
                             className="flex items-center px-3 py-2 hover:bg-gray-50 cursor-pointer"
@@ -109,9 +109,15 @@ const UsersManagementPage = () => {
     const [editedRows, setEditedRows] = useState(new Set());
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
+    const [availableGroups, setAvailableGroups] = useState(
+        AVAILABLE_GROUPS_INITIAL
+    );
+    const [newGroupName, setNewGroupName] = useState("");
+    const [isCreatingGroup, setIsCreatingGroup] = useState(false);
 
     useEffect(() => {
         fetchUsers();
+        fetchGroups();
     }, []);
 
     const fetchUsers = async () => {
@@ -140,6 +146,16 @@ const UsersManagementPage = () => {
             setError(err.response?.data?.message || "Failed to fetch users");
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const fetchGroups = async () => {
+        try {
+            const { data } = await axios.get("/user_groups");
+            setAvailableGroups(data.data);
+            console.log("Fetched groups:", data.data);
+        } catch (err) {
+            console.error("Failed to fetch groups:", err);
         }
     };
 
@@ -235,6 +251,26 @@ const UsersManagementPage = () => {
         }
     };
 
+    const handleCreateGroup = async () => {
+        if (!newGroupName.trim()) {
+            return;
+        }
+
+        setIsCreatingGroup(true);
+        try {
+            await axios.post("/user_groups", {
+                groupName: newGroupName.trim()
+            });
+            await fetchGroups();
+            setNewGroupName("");
+            setError("");
+        } catch (err) {
+            setError(err.response?.data?.message || "Failed to create group");
+        } finally {
+            setIsCreatingGroup(false);
+        }
+    };
+
     if (isLoading) {
         return (
             <div className="min-h-screen bg-gray-50">
@@ -268,8 +304,41 @@ const UsersManagementPage = () => {
                                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider border-b border-gray-200">
                                     Username
                                 </th>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider border-b border-gray-200">
-                                    User Group
+                                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                                    <div className="flex items-center gap-2">
+                                        <span>User Groups</span>
+                                        <div className="flex items-center gap-1">
+                                            <input
+                                                type="text"
+                                                value={newGroupName}
+                                                onChange={e =>
+                                                    setNewGroupName(
+                                                        e.target.value
+                                                    )
+                                                }
+                                                onKeyDown={e => {
+                                                    if (e.key === "Enter") {
+                                                        handleCreateGroup();
+                                                    }
+                                                }}
+                                                placeholder="New group"
+                                                className="px-2 py-1 text-xs border border-gray-300 rounded outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                                disabled={isCreatingGroup}
+                                            />
+                                            <button
+                                                onClick={handleCreateGroup}
+                                                disabled={
+                                                    isCreatingGroup ||
+                                                    !newGroupName.trim()
+                                                }
+                                                className="px-2 py-1 text-xs !bg-green-400 text-black rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                                            >
+                                                {isCreatingGroup
+                                                    ? "..."
+                                                    : "Add"}
+                                            </button>
+                                        </div>
+                                    </div>
                                 </th>
                                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider border-b border-gray-200">
                                     Email
@@ -328,8 +397,11 @@ const UsersManagementPage = () => {
                                                 }
                                                 placeholder={
                                                     user.isNew
-                                                        ? "Select Groups"
+                                                        ? "Select groups..."
                                                         : ""
+                                                }
+                                                availableGroups={
+                                                    availableGroups
                                                 }
                                             />
                                         </td>
