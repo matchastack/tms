@@ -100,3 +100,7 @@ export const updateAccount = async (username, accountData) => {
 export const getAllUserGroups = async () => {
     return await userModel.getAllUserGroups();
 };
+
+export const createGroup = async groupName => {
+    return await userModel.createGroup(groupName);
+};

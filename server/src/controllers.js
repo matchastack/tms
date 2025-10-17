@@ -139,3 +139,25 @@ export const getUserGroups = async (req, res, next) => {
         next(error);
     }
 };
+
+export const createGroup = async (req, res, next) => {
+    try {
+        const { groupName } = req.body;
+
+        if (!groupName || !groupName.trim()) {
+            return res.status(400).json({
+                success: false,
+                message: "Group name is required"
+            });
+        }
+
+        const newGroup = await services.createGroup(groupName.trim());
+        res.status(201).json({
+            success: true,
+            message: "Group created successfully",
+            data: newGroup
+        });
+    } catch (error) {
+        next(error);
+    }
+};

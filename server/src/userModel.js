@@ -69,3 +69,15 @@ export const getAllUserGroups = async () => {
     const results = await query(sql);
     return results.map(row => row.group_name);
 };
+
+export const createGroup = async groupName => {
+    const existingGroups = await getAllUserGroups();
+
+    if (existingGroups.includes(groupName)) {
+        throw new Error("Group already exists");
+    }
+
+    const insertQuery = "INSERT INTO user_groups (group_name) VALUES (?)";
+    await query(insertQuery, [groupName]);
+    return { groupName };
+};

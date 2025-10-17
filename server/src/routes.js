@@ -43,4 +43,11 @@ router.get(
     controllers.getUserGroups
 );
 
+router.post(
+    "/user_groups",
+    validations.authenticateToken,
+    validations.requireAdmin,
+    controllers.createGroup
+);
+
 export default router;
