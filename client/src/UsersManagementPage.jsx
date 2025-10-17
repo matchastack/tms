@@ -336,7 +336,7 @@ const UsersManagementPage = () => {
                                 </th>
                                 <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
                                     <div className="flex items-center gap-2">
-                                        <span>User Groups</span>
+                                        <span>GROUPS</span>
                                         <div className="flex items-center gap-1">
                                             <input
                                                 type="text"
@@ -351,7 +351,7 @@ const UsersManagementPage = () => {
                                                         handleCreateGroup();
                                                     }
                                                 }}
-                                                placeholder="New group"
+                                                placeholder="new group"
                                                 className="px-2 py-1 text-xs border border-gray-300 rounded outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                                                 disabled={isCreatingGroup}
                                             />
