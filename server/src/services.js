@@ -1,10 +1,12 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { query } from "./config/database.js";
 import { config } from "./config/config.js";
-import * as userModel from "./userModel.js";
 
 export const loginUser = async (username, password) => {
-    const user = await userModel.findUserByName(username);
+    const user = await query("SELECT * FROM accounts WHERE username = ?", [
+        username
+    ]).then(results => results[0]);
 
     if (!user) {
         throw new Error("User does not exist");
@@ -40,67 +42,94 @@ const generateAccessToken = payload => {
 };
 
 export const getAllAccounts = async () => {
-    return await userModel.getAllAccounts();
-};
-
-export const getUserByUsername = async username => {
-    const user = await userModel.findUserByName(username);
-    return user;
+    return await query(
+        "SELECT username, email, userGroups, isActive FROM accounts"
+    );
 };
 
 export const createAccount = async accountData => {
     const { username, email, password, userGroups } = accountData;
 
-    const existingUser = await userModel.findUserByName(username);
+    const existingUser = await query(
+        "SELECT * FROM accounts WHERE username = ?",
+        [username]
+    ).then(results => results[0]);
     if (existingUser) {
         throw new Error("Username already exists");
     }
 
-    const existingEmail = await userModel.findUserByEmail(email);
+    const existingEmail = await query(
+        "SELECT * FROM accounts WHERE email = ?",
+        [email]
+    ).then(results => results[0]);
     if (existingEmail) {
         throw new Error("Email already exists");
     }
 
     const hashedPassword = await bcrypt.hash(password, config.bcryptRounds);
 
-    return await userModel.createAccount({
+    const sql = `
+        INSERT INTO accounts (username, email, password, userGroups, isActive)
+        VALUES (?, ?, ?, ?, ?)
+    `;
+    await query(sql, [username, email, hashedPassword, userGroups, isActive]);
+    return {
         username,
         email,
-        password: hashedPassword,
-        userGroups: userGroups || [],
-        isActive: 1
-    });
+        userGroups,
+        isActive
+    };
 };
 
 export const updateAccount = async (username, accountData) => {
-    const { email, password, userGroups, isActive, newUsername } = accountData;
+    const { email, password, userGroups, isActive } = accountData;
 
-    // TODO: username cannot be changed. Remove this in future.
-    if (newUsername && newUsername !== username) {
-        const existingUser = await userModel.findUserByName(newUsername);
-        if (existingUser) {
-            throw new Error("Username already exists");
-        }
-    }
-
-    const updateData = {
-        email,
-        userGroups: userGroups || [],
-        isActive,
-        newUsername
-    };
+    let sql;
+    let params;
 
     if (password) {
-        updateData.password = await bcrypt.hash(password, config.bcryptRounds);
+        updatedPassword = await bcrypt.hash(password, config.bcryptRounds);
+        sql = `
+            UPDATE accounts 
+            SET email = ?, password = ?, userGroups = ?, isActive = ?
+            WHERE username = ?
+            `;
+        params = [email, updatedPassword, userGroups, isActive, username];
+    } else {
+        sql = `
+            UPDATE accounts 
+            SET email = ?, userGroups = ?, isActive = ?
+            WHERE username = ?
+            `;
+        params = [email, userGroups, isActive, username];
     }
 
-    return await userModel.updateAccount(username, updateData);
+    await query(sql, params);
+
+    return {
+        username,
+        email,
+        userGroups,
+        isActive
+    };
 };
 
 export const getAllUserGroups = async () => {
-    return await userModel.getAllUserGroups();
+    return await query("SELECT group_name FROM user_groups").then(results =>
+        results.map(row => row.group_name)
+    );
 };
 
 export const createGroup = async groupName => {
-    return await userModel.createGroup(groupName);
+    const existingGroups = await query(
+        "SELECT group_name FROM user_groups"
+    ).then(results => results.map(row => row.group_name));
+
+    if (existingGroups.includes(groupName)) {
+        throw new Error("Group already exists");
+    }
+
+    const insertQuery = "INSERT INTO user_groups (group_name) VALUES (?)";
+    await query(insertQuery, [groupName]);
+    return { groupName };
 };
