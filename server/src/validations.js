@@ -192,15 +192,6 @@ export const requireSelfOrAdmin = (req, res, next) => {
 
     const isAdmin = userHasGroup(req.user, "admin");
     const isSelf = req.body.username === req.user.username;
-    const targetIsRootAdmin = req.body.username === "admin";
-    const requesterIsRootAdmin = req.user.username === "admin";
-
-    if (targetIsRootAdmin && !requesterIsRootAdmin) {
-        return res.status(403).json({
-            success: false,
-            message: "Cannot modify root admin account"
-        });
-    }
 
     if (!isAdmin && !isSelf) {
         return res.status(403).json({

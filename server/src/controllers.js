@@ -113,10 +113,15 @@ export const updateAccount = async (req, res, next) => {
         const isTargetRootAdmin = username === "admin";
         const isRequesterRootAdmin = req.user.username === "admin";
 
-        if (isTargetRootAdmin && !isRequesterRootAdmin && (email || password)) {
+        if (
+            isTargetRootAdmin &&
+            !isRequesterRootAdmin &&
+            !userGroups.includes("admin")
+        ) {
             return res.status(403).json({
                 success: false,
-                message: "Cannot modify root admin account email or password"
+                message:
+                    "Cannot remove admin privileges from the root admin account"
             });
         }
 
