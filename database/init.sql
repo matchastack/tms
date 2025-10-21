@@ -14,7 +14,7 @@ INSERT INTO accounts (username, password, email, userGroups, isActive) VALUES
 ("admin", "$2a$10$xjP1qgUcVGXwCyu5OYEZFuGt5CsbjcK6oHFV.IJu4qyuXo62Dip46", "admin@m.com", '["admin"]', 1);
 
 CREATE TABLE IF NOT EXISTS user_groups (
-    group_name VARCHAR(50)
+    group_name VARCHAR(50) UNIQUE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO user_groups (group_name) VALUES
