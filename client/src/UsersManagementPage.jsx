@@ -141,19 +141,20 @@ const UsersManagementPage = () => {
         try {
             setIsLoading(true);
             const { data } = await axios.get("/accounts");
-            const existingUsers = data.data.map(user => ({
-                ...user,
-                userGroups: Array.isArray(user.userGroups)
-                    ? user.userGroups
-                    : []
-            }));
-            // .sort((a, b) =>
-            //     a.username === ROOT_ADMIN_USERNAME
-            //         ? -1
-            //         : b.username === ROOT_ADMIN_USERNAME
-            //         ? 1
-            //         : a.username.localeCompare(b.username)
-            // );
+            const existingUsers = data.data
+                .map(user => ({
+                    ...user,
+                    userGroups: Array.isArray(user.userGroups)
+                        ? user.userGroups
+                        : []
+                }))
+                .sort((a, b) =>
+                    a.username === ROOT_ADMIN_USERNAME
+                        ? -1
+                        : b.username === ROOT_ADMIN_USERNAME
+                        ? 1
+                        : a.username.localeCompare(b.username)
+                );
             setUsers([
                 {
                     username: "",
