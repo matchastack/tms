@@ -147,6 +147,13 @@ const UsersManagementPage = () => {
                     ? user.userGroups
                     : []
             }));
+            // .sort((a, b) =>
+            //     a.username === ROOT_ADMIN_USERNAME
+            //         ? -1
+            //         : b.username === ROOT_ADMIN_USERNAME
+            //         ? 1
+            //         : a.username.localeCompare(b.username)
+            // );
             setUsers([
                 {
                     username: "",
@@ -220,7 +227,7 @@ const UsersManagementPage = () => {
                     !user.username ||
                     !user.email ||
                     !user.password ||
-                    !user.userGroup
+                    !user.userGroups
                 ) {
                     setError("All fields are required for new user");
                     return;
@@ -236,7 +243,8 @@ const UsersManagementPage = () => {
                     username: user.username,
                     email: user.email,
                     password: user.password,
-                    userGroups: user.userGroups
+                    userGroups: user.userGroups,
+                    isActive: user.isActive
                 });
 
                 await fetchUsers();

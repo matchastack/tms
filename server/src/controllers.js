@@ -91,7 +91,8 @@ export const createAccount = async (req, res, next) => {
             username,
             email,
             password,
-            userGroups: Array.isArray(userGroups) ? userGroups : []
+            userGroups: Array.isArray(userGroups) ? userGroups : [],
+            isActive
         });
 
         res.status(201).json({

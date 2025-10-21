@@ -60,7 +60,7 @@ export const validateLogin = (req, res, next) => {
 };
 
 export const validateAccountCreation = (req, res, next) => {
-    const { username, email, password, userGroup } = req.body;
+    const { username, email, password, userGroups } = req.body;
     const errors = [];
 
     if (!username) {
@@ -80,14 +80,14 @@ export const validateAccountCreation = (req, res, next) => {
         }
     }
 
-    if (!userGroup) {
-        errors.push("User group is required");
+    if (!userGroups || userGroups.length === 0) {
+        errors.push("At least one user group is required");
     }
 
     if (errors.length > 0) {
         return res.status(400).json({
             success: false,
-            message: "Validation failed",
+            message: "Validation failed: " + errors.join(", "),
             errors
         });
     }
