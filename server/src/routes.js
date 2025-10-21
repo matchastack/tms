@@ -47,6 +47,7 @@ router.post(
     "/user_groups",
     validations.authenticateToken,
     validations.requireAdmin,
+    validations.validateGroupCreation,
     controllers.createGroup
 );
 

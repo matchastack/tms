@@ -51,7 +51,7 @@ export const validateLogin = (req, res, next) => {
     if (errors.length > 0) {
         return res.status(400).json({
             success: false,
-            message: "Validation failed",
+            message: "Validation failed: " + errors.join(", "),
             errors
         });
     }
@@ -92,22 +92,32 @@ export const validateAccountCreation = (req, res, next) => {
 };
 
 export const validateAccountUpdate = (req, res, next) => {
-    const { password } = req.body;
-    const errors = [];
+    const { username, email, password, userGroups, isActive, newUsername } =
+        req.body;
+
+    const isTargetRootAdmin = username === "admin";
+    const isRequesterRootAdmin = req.user.username === "admin";
+
+    if (
+        isTargetRootAdmin &&
+        !isRequesterRootAdmin &&
+        !userGroups.includes("admin")
+    ) {
+        return res.status(403).json({
+            success: false,
+            message:
+                "Cannot remove admin privileges from the root admin account"
+        });
+    }
 
     if (password) {
         const passwordError = validatePassword(password);
         if (passwordError) {
-            errors.push(passwordError);
+            return res.status(400).json({
+                success: false,
+                message: passwordError
+            });
         }
-    }
-
-    if (errors.length > 0) {
-        return res.status(400).json({
-            success: false,
-            message: "Validation failed",
-            errors
-        });
     }
 
     next();
@@ -197,6 +207,17 @@ export const requireSelfOrAdmin = (req, res, next) => {
         return res.status(403).json({
             success: false,
             message: "Access denied"
+        });
+    }
+    next();
+};
+
+export const validateGroupCreation = (req, res, next) => {
+    const { groupName } = req.body;
+    if (!groupName || !groupName.trim()) {
+        return res.status(400).json({
+            success: false,
+            message: "Group name is required"
         });
     }
     next();
