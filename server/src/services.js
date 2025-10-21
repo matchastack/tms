@@ -12,6 +12,10 @@ export const loginUser = async (username, password) => {
         throw new Error("User does not exist");
     }
 
+    if (!user.isActive) {
+        throw new Error("User account is inactive");
+    }
+
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
