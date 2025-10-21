@@ -80,10 +80,6 @@ export const validateAccountCreation = (req, res, next) => {
         }
     }
 
-    if (!userGroups || userGroups.length === 0) {
-        errors.push("At least one user group is required");
-    }
-
     if (errors.length > 0) {
         return res.status(400).json({
             success: false,
