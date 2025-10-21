@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { query } from "./config/database.js";
+import { query, withTransaction } from "./config/database.js";
 import { config } from "./config/config.js";
 
 export const loginUser = async (username, password) => {
@@ -66,80 +66,84 @@ export const getAllAccounts = async () => {
 export const createAccount = async accountData => {
     const { username, email, password, userGroups, isActive } = accountData;
 
-    const existingUser = await query(
-        "SELECT * FROM accounts WHERE username = ?",
-        [username]
-    ).then(results => results[0]);
-    if (existingUser) {
-        throw new Error("Username already exists");
-    }
+    return await withTransaction(async connection => {
+        const existingUser = await query(
+            "SELECT * FROM accounts WHERE username = ?",
+            [username]
+        ).then(results => results[0]);
+        if (existingUser) {
+            throw new Error("Username already exists");
+        }
 
-    const existingEmail = await query(
-        "SELECT * FROM accounts WHERE email = ?",
-        [email]
-    ).then(results => results[0]);
-    if (existingEmail) {
-        throw new Error("Email already exists");
-    }
+        const existingEmail = await query(
+            "SELECT * FROM accounts WHERE email = ?",
+            [email]
+        ).then(results => results[0]);
+        if (existingEmail) {
+            throw new Error("Email already exists");
+        }
 
-    const hashedPassword = await bcrypt.hash(password, config.bcryptRounds);
+        const hashedPassword = await bcrypt.hash(password, config.bcryptRounds);
 
-    const sql = `
-        INSERT INTO accounts (username, email, password, userGroups, isActive)
-        VALUES (?, ?, ?, ?, ?)
-    `;
-    await query(sql, [username, email, hashedPassword, userGroups, isActive]);
-    return {
-        username,
-        email,
-        userGroups,
-        isActive
-    };
+        await connection.execute(
+            "INSERT INTO accounts (username, email, password, userGroups, isActive) VALUES (?, ?, ?, ?, ?)",
+            [username, email, hashedPassword, userGroups, isActive]
+        );
+
+        return {
+            username,
+            email,
+            userGroups,
+            isActive
+        };
+    });
 };
 
 export const updateAccount = async (username, accountData) => {
     const { email, password, userGroups, isActive } = accountData;
 
-    if (username === "admin") {
-        if (isActive === 0) {
-            throw new Error("Root admin account cannot be disabled");
+    return await withTransaction(async connection => {
+        if (username === "admin") {
+            if (isActive === 0) {
+                throw new Error("Root admin account cannot be disabled");
+            }
+            if (userGroups && !userGroups.includes("admin")) {
+                throw new Error("Cannot remove admin role from root admin");
+            }
         }
-        if (userGroups && !userGroups.includes("admin")) {
-            throw new Error("Cannot remove admin role from root admin");
-        }
-    }
 
-    let sql;
-    let params;
+        let sql;
+        let params;
 
-    if (password) {
-        const updatedPassword = await bcrypt.hash(
-            password,
-            config.bcryptRounds
-        );
-        sql = `
+        if (password) {
+            const updatedPassword = await bcrypt.hash(
+                password,
+                config.bcryptRounds
+            );
+            sql = `
             UPDATE accounts 
             SET email = ?, password = ?, userGroups = ?, isActive = ?
             WHERE username = ?
             `;
-        params = [email, updatedPassword, userGroups, isActive, username];
-    } else {
-        sql = `
+            params = [email, updatedPassword, userGroups, isActive, username];
+        } else {
+            sql = `
             UPDATE accounts 
             SET email = ?, userGroups = ?, isActive = ?
             WHERE username = ?
             `;
-        params = [email, userGroups, isActive, username];
-    }
+            params = [email, userGroups, isActive, username];
+        }
 
-    await query(sql, params);
+        await connection.execute(sql, params);
 
-    return {
-        username,
-        email,
-        userGroups,
-        isActive
-    };
+        return {
+            username,
+            email,
+            userGroups,
+            isActive
+        };
+    });
 };
 
 export const getAllUserGroups = async () => {
@@ -149,17 +153,21 @@ export const getAllUserGroups = async () => {
 };
 
 export const createGroup = async groupName => {
-    const existingGroups = await query(
-        "SELECT group_name FROM user_groups"
-    ).then(results => results.map(row => row.group_name));
+    return await withTransaction(async connection => {
+        const existingGroups = await query(
+            "SELECT group_name FROM user_groups"
+        ).then(results => results.map(row => row.group_name));
 
-    if (existingGroups.includes(groupName)) {
-        throw new Error("Group already exists");
-    }
+        if (existingGroups.includes(groupName)) {
+            throw new Error("Group already exists");
+        }
 
-    const insertQuery = "INSERT INTO user_groups (group_name) VALUES (?)";
-    await query(insertQuery, [groupName]);
-    return { groupName };
+        await connection.execute(
+            "INSERT INTO user_groups (group_name) VALUES (?)",
+            [groupName]
+        );
+        return { groupName };
+    });
 };
 
 export const checkGroup = async (userId, groupName) => {
