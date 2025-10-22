@@ -71,23 +71,20 @@ const ProfilePage = () => {
         setError("");
         setSuccess("");
 
-        if (
-            formData.password &&
-            formData.password !== formData.confirmPassword
-        ) {
-            setError("Passwords do not match");
-            return;
-        }
-
         if (formData.password) {
-            const passwordError = validatePassword(formData.password);
-            if (passwordError) {
-                setError(passwordError);
+            if (!formData.currentPassword) {
+                setError("Current password is required to change password");
                 return;
             }
 
-            if (!formData.currentPassword) {
-                setError("Current password is required to change password");
+            if (formData.password !== formData.confirmPassword) {
+                setError("Passwords do not match");
+                return;
+            }
+
+            const passwordError = validatePassword(formData.password);
+            if (passwordError) {
+                setError(passwordError);
                 return;
             }
         }
@@ -103,9 +100,10 @@ const ProfilePage = () => {
 
             if (formData.password) {
                 updateData.password = formData.password;
+                updateData.currentPassword = formData.currentPassword;
             }
 
-            await axios.put("/accounts", {
+            await axios.put("/profile", {
                 username: user.username,
                 ...updateData
             });

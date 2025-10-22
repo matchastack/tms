@@ -55,6 +55,27 @@ export const getCurrentUser = async (req, res) => {
     }
 };
 
+export const updateCurrentUser = async (req, res, next) => {
+    try {
+        const username = req.user.username;
+        const { email, currentPassword, password } = req.body;
+
+        const updatedUser = await services.updateUserProfile(username, {
+            email,
+            currentPassword,
+            password
+        });
+
+        res.status(200).json({
+            success: true,
+            message: "Profile updated successfully",
+            data: updatedUser
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const getAccounts = async (req, res, next) => {
     try {
         const accounts = await services.getAllAccounts();

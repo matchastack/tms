@@ -57,6 +57,49 @@ export const getUserByUsername = async username => {
     return user;
 };
 
+export const updateUserProfile = async (username, profileData) => {
+    const { email, currentPassword, password } = profileData;
+    return await withTransaction(async connection => {
+        const user = await query("SELECT * FROM accounts WHERE username = ?", [
+            username
+        ]).then(results => results[0]);
+
+        if (!user) {
+            throw new Error("User not found");
+        }
+
+        if (password) {
+            const isCurrentPasswordValid = await bcrypt.compare(
+                currentPassword,
+                user.password
+            );
+
+            if (!isCurrentPasswordValid) {
+                throw new Error("Current password is incorrect");
+            }
+
+            const hashedNewPassword = await bcrypt.hash(
+                password,
+                config.bcryptRounds
+            );
+
+            await connection.execute(
+                "UPDATE accounts SET email = ?, password = ? WHERE username = ?",
+                [email, hashedNewPassword, username]
+            );
+        } else {
+            await connection.execute(
+                "UPDATE accounts SET email = ? WHERE username = ?",
+                [email, username]
+            );
+        }
+        return {
+            username,
+            email
+        };
+    });
+};
+
 export const getAllAccounts = async () => {
     return await query(
         "SELECT username, email, userGroups, isActive FROM accounts"

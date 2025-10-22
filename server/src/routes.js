@@ -13,6 +13,13 @@ router.get(
     controllers.getCurrentUser
 );
 
+router.put(
+    "/profile",
+    validations.authenticateToken,
+    validations.validateProfileUpdate,
+    controllers.updateCurrentUser
+);
+
 router.get(
     "/accounts",
     validations.authenticateToken,

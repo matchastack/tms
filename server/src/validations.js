@@ -222,3 +222,33 @@ export const validateGroupCreation = (req, res, next) => {
     }
     next();
 };
+
+export const validateProfileUpdate = (req, res, next) => {
+    const { email, currentPassword, password } = req.body;
+    const errors = [];
+
+    if (!email || !email.trim()) {
+        errors.push("Email is required");
+    }
+
+    if (!currentPassword) {
+        errors.push("Current password is required");
+    }
+
+    if (password) {
+        const passwordError = validatePassword(password);
+        if (passwordError) {
+            errors.push(passwordError);
+        }
+    }
+
+    if (errors.length > 0) {
+        return res.status(400).json({
+            success: false,
+            message: "Validation failed: " + errors.join(", "),
+            errors
+        });
+    }
+
+    next();
+};
