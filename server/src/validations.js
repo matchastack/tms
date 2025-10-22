@@ -17,13 +17,28 @@ export const validatePassword = password => {
         password
     );
 
-    return (
-        password.length < minLength &&
-        password.length > maxLength &&
-        !hasLetter &&
-        !hasNumber &&
-        !hasSpecialChar
-    );
+    if (password.length < minLength || password.length > maxLength) {
+        return `Password must be between ${minLength} and ${maxLength} characters`;
+    }
+
+    if (!hasLetter) {
+        return "Password must contain at least one letter";
+    }
+
+    if (!hasNumber) {
+        return "Password must contain at least one number";
+    }
+
+    if (!hasSpecialChar) {
+        return "Password must contain at least one special character";
+    }
+
+    return null;
+};
+
+export const validateEmail = email => {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(email);
 };
 
 export const validateLogin = (req, res, next) => {
@@ -56,11 +71,18 @@ export const validateAccountCreation = (req, res, next) => {
         });
     }
 
-    if (!validatePassword(password)) {
+    const passwordError = validatePassword(password);
+    if (passwordError) {
         return res.status(401).json({
             success: false,
-            message:
-                "Password must be 8-10 characters long and include at least one letter, one number, and one special character"
+            message: passwordError
+        });
+    }
+
+    if (!validateEmail(email)) {
+        return res.status(400).json({
+            success: false,
+            message: "Email must be valid"
         });
     }
 
@@ -87,13 +109,20 @@ export const validateAccountUpdate = (req, res, next) => {
     }
 
     if (password) {
-        if (!validatePassword(password)) {
-            return res.status(401).json({
+        const passwordError = validatePassword(password);
+        if (passwordError) {
+            return res.status(400).json({
                 success: false,
-                message:
-                    "Password must be 8-10 characters long and include at least one letter, one number, and one special character"
+                message: passwordError
             });
         }
+    }
+
+    if (email && !validateEmail(email)) {
+        return res.status(400).json({
+            success: false,
+            message: "Email must be valid"
+        });
     }
 
     next();
@@ -207,14 +236,18 @@ export const validateProfileUpdate = (req, res, next) => {
         errors.push("Email is required");
     }
 
+    if (!validateEmail(email)) {
+        errors.push("Email must be valid");
+    }
+
     if (password) {
         if (!currentPassword) {
             errors.push("Current password is required");
         }
-        if (!validatePassword(password)) {
-            errors.push(
-                "Password must be 8-10 characters long and include at least one letter, one number, and one special character"
-            );
+
+        const passwordError = validatePassword(password);
+        if (passwordError) {
+            errors.push(passwordError);
         }
     }
 
