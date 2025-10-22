@@ -68,7 +68,7 @@ export const updateUserProfile = async (username, profileData) => {
             "SELECT * FROM accounts WHERE email = ?",
             [email]
         ).then(results => results[0]);
-        if (existingEmail) {
+        if (existingEmail && existingEmail.email !== user.email) {
             throw new Error("Email already exists");
         }
 
