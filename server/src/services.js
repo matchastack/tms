@@ -118,16 +118,12 @@ export const createAccount = async accountData => {
             "SELECT * FROM accounts WHERE username = ?",
             [username]
         ).then(results => results[0]);
-        if (existingUser) {
-            throw new Error("Username already exists");
-        }
-
         const existingEmail = await query(
             "SELECT * FROM accounts WHERE email = ?",
             [email]
         ).then(results => results[0]);
-        if (existingEmail) {
-            throw new Error("Email already exists");
+        if (existingUser || existingEmail) {
+            throw new Error("Username or email already exists");
         }
 
         const hashedPassword = await bcrypt.hash(password, config.bcryptRounds);

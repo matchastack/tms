@@ -113,7 +113,10 @@ export const createAccount = async (req, res, next) => {
             data: newAccount
         });
     } catch (error) {
-        next(error);
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
     }
 };
 
