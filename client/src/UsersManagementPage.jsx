@@ -60,7 +60,8 @@ const UsersManagementPage = () => {
                     ...user,
                     userGroups: Array.isArray(user.userGroups)
                         ? user.userGroups
-                        : []
+                        : [],
+                    error: ""
                 }))
                 .sort((a, b) =>
                     a.username === ROOT_ADMIN_USERNAME
@@ -76,7 +77,8 @@ const UsersManagementPage = () => {
                     password: "",
                     userGroups: [],
                     isActive: 1,
-                    isNew: true
+                    isNew: true,
+                    error: ""
                 },
                 ...existingUsers
             ]);
@@ -128,11 +130,21 @@ const UsersManagementPage = () => {
         const user = users[index];
         if (user.username === ROOT_ADMIN_USERNAME && !user.isNew) {
             if (user.isActive === 0) {
-                setError("Cannot deactivate the original admin");
+                const updatedUsers = [...users];
+                updatedUsers[index] = {
+                    ...user,
+                    error: "Cannot deactivate the original admin"
+                };
+                setUsers(updatedUsers);
                 return;
             }
             if (!user.userGroups.includes("admin")) {
-                setError("Cannot remove admin group from original admin");
+                const updatedUsers = [...users];
+                updatedUsers[index] = {
+                    ...user,
+                    error: "Cannot remove admin group from original admin"
+                };
+                setUsers(updatedUsers);
                 return;
             }
         }
@@ -140,13 +152,20 @@ const UsersManagementPage = () => {
         try {
             if (user.isNew) {
                 if (!user.username || !user.email || !user.password) {
-                    setError("Field(s) cannot be empty");
+                    const updatedUsers = [...users];
+                    updatedUsers[index] = {
+                        ...user,
+                        error: "Field(s) cannot be empty"
+                    };
+                    setUsers(updatedUsers);
                     return;
                 }
 
                 const passwordError = validatePassword(user.password);
                 if (passwordError) {
-                    setError(passwordError);
+                    const updatedUsers = [...users];
+                    updatedUsers[index] = { ...user, error: passwordError };
+                    setUsers(updatedUsers);
                     return;
                 }
 
@@ -169,7 +188,9 @@ const UsersManagementPage = () => {
                 if (user.password) {
                     const passwordError = validatePassword(user.password);
                     if (passwordError) {
-                        setError(passwordError);
+                        const updatedUsers = [...users];
+                        updatedUsers[index] = { ...user, error: passwordError };
+                        setUsers(updatedUsers);
                         return;
                     }
                     updateData.password = user.password;
@@ -192,7 +213,12 @@ const UsersManagementPage = () => {
                 setUsers(updatedUsers);
             }
         } catch (err) {
-            setError(err.response?.data?.message || err.message);
+            const updatedUsers = [...users];
+            updatedUsers[index] = {
+                ...user,
+                error: err.response?.data?.message || err.message
+            };
+            setUsers(updatedUsers);
         }
     };
 
@@ -302,143 +328,164 @@ const UsersManagementPage = () => {
                         <tbody className="bg-white">
                             {users.map((user, index) => {
                                 return (
-                                    <tr
-                                        key={
-                                            user.isNew
-                                                ? "new-user"
-                                                : user.originalUsername
-                                        }
-                                        className="border-b border-gray-100"
-                                    >
-                                        <td className="px-4 py-3">
-                                            <input
-                                                type="text"
-                                                value={user.username}
-                                                onChange={e =>
-                                                    handleFieldChange(
-                                                        index,
-                                                        "username",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                placeholder={
-                                                    user.isNew ? "Username" : ""
-                                                }
-                                                disabled={!user.isNew}
-                                                className={`w-full px-3 py-2 border border-gray-300 rounded-md text-sm outline-none ${
-                                                    user.isNew
-                                                        ? "focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                                                        : "bg-gray-100 cursor-not-allowed"
-                                                }`}
-                                            />
-                                        </td>
-                                        <td className="px-4 py-3">
-                                            <MultiSelect
-                                                value={user.userGroups}
-                                                onChange={value =>
-                                                    handleFieldChange(
-                                                        index,
-                                                        "userGroups",
-                                                        value
-                                                    )
-                                                }
-                                                placeholder={
-                                                    user.isNew
-                                                        ? "Select groups..."
-                                                        : ""
-                                                }
-                                                availableGroups={
-                                                    availableGroups
-                                                }
-                                            />
-                                        </td>
-                                        <td className="px-4 py-3">
-                                            <input
-                                                type="email"
-                                                value={user.email}
-                                                onChange={e =>
-                                                    handleFieldChange(
-                                                        index,
-                                                        "email",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                placeholder={
-                                                    user.isNew
-                                                        ? "user@example.com"
-                                                        : ""
-                                                }
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                                            />
-                                        </td>
-                                        <td className="px-4 py-3">
-                                            <input
-                                                type="password"
-                                                value={user.password || ""}
-                                                onChange={e =>
-                                                    handleFieldChange(
-                                                        index,
-                                                        "password",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                placeholder={
-                                                    user.isNew
-                                                        ? "Password"
-                                                        : "Leave blank"
-                                                }
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                                            />
-                                        </td>
-                                        <td className="px-4 py-3 text-center">
-                                            <label className="inline-flex items-center cursor-pointer">
-                                                <div className="relative">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={
-                                                            user.isActive === 1
+                                    <>
+                                        <tr
+                                            key={
+                                                user.isNew
+                                                    ? "new-user"
+                                                    : user.originalUsername
+                                            }
+                                            className="border-b border-gray-100"
+                                        >
+                                            <td className="px-4 py-3">
+                                                <input
+                                                    type="text"
+                                                    value={user.username}
+                                                    onChange={e =>
+                                                        handleFieldChange(
+                                                            index,
+                                                            "username",
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    placeholder={
+                                                        user.isNew
+                                                            ? "Username"
+                                                            : ""
+                                                    }
+                                                    disabled={!user.isNew}
+                                                    className={`w-full px-3 py-2 border border-gray-300 rounded-md text-sm outline-none ${
+                                                        user.isNew
+                                                            ? "focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                                            : "bg-gray-100 cursor-not-allowed"
+                                                    }`}
+                                                />
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                <MultiSelect
+                                                    value={user.userGroups}
+                                                    onChange={value =>
+                                                        handleFieldChange(
+                                                            index,
+                                                            "userGroups",
+                                                            value
+                                                        )
+                                                    }
+                                                    placeholder={
+                                                        user.isNew
+                                                            ? "Select groups..."
+                                                            : ""
+                                                    }
+                                                    availableGroups={
+                                                        availableGroups
+                                                    }
+                                                />
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                <input
+                                                    type="email"
+                                                    value={user.email}
+                                                    onChange={e =>
+                                                        handleFieldChange(
+                                                            index,
+                                                            "email",
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    placeholder={
+                                                        user.isNew
+                                                            ? "user@example.com"
+                                                            : ""
+                                                    }
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                                />
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                <input
+                                                    type="password"
+                                                    value={user.password || ""}
+                                                    onChange={e =>
+                                                        handleFieldChange(
+                                                            index,
+                                                            "password",
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    placeholder={
+                                                        user.isNew
+                                                            ? "Password"
+                                                            : "Leave blank"
+                                                    }
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                                />
+                                            </td>
+                                            <td className="px-4 py-3 text-center">
+                                                <label className="inline-flex items-center cursor-pointer">
+                                                    <div className="relative">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={
+                                                                user.isActive ===
+                                                                1
+                                                            }
+                                                            onChange={() =>
+                                                                handleActiveToggle(
+                                                                    index
+                                                                )
+                                                            }
+                                                            className="sr-only peer"
+                                                        />
+                                                        <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-colors"></div>
+                                                        <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform peer-checked:translate-x-5"></div>
+                                                    </div>
+                                                </label>
+                                            </td>
+                                            <td className="px-4 py-3 text-center">
+                                                {user.isNew ? (
+                                                    <button
+                                                        onClick={() =>
+                                                            handleSaveRow(index)
                                                         }
-                                                        onChange={() =>
-                                                            handleActiveToggle(
+                                                        className="px-6 py-2 !bg-emerald-500 text-white rounded-md text-sm font-medium hover:bg-green-500 transition-colors"
+                                                    >
+                                                        Add User
+                                                    </button>
+                                                ) : (
+                                                    <button
+                                                        onClick={() =>
+                                                            handleSaveRow(index)
+                                                        }
+                                                        disabled={
+                                                            !editedRows.has(
                                                                 index
                                                             )
                                                         }
-                                                        className="sr-only peer"
-                                                    />
-                                                    <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-colors"></div>
-                                                    <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform peer-checked:translate-x-5"></div>
-                                                </div>
-                                            </label>
-                                        </td>
-                                        <td className="px-4 py-3 text-center">
-                                            {user.isNew ? (
-                                                <button
-                                                    onClick={() =>
-                                                        handleSaveRow(index)
-                                                    }
-                                                    className="px-6 py-2 !bg-emerald-500 text-white rounded-md text-sm font-medium hover:bg-green-500 transition-colors"
+                                                        className={`px-8 py-2 rounded-md text-sm font-medium transition-colors ${
+                                                            editedRows.has(
+                                                                index
+                                                            )
+                                                                ? "!bg-blue-500 text-white hover:bg-blue-600 cursor-pointer"
+                                                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                                        }`}
+                                                    >
+                                                        Save
+                                                    </button>
+                                                )}
+                                            </td>
+                                        </tr>
+                                        {user.error && (
+                                            <tr>
+                                                <td
+                                                    colSpan="5"
+                                                    className="px-4 py-2 bg-red-50 border-b border-gray-200"
                                                 >
-                                                    Add User
-                                                </button>
-                                            ) : (
-                                                <button
-                                                    onClick={() =>
-                                                        handleSaveRow(index)
-                                                    }
-                                                    disabled={
-                                                        !editedRows.has(index)
-                                                    }
-                                                    className={`px-8 py-2 rounded-md text-sm font-medium transition-colors ${
-                                                        editedRows.has(index)
-                                                            ? "!bg-blue-500 text-white hover:bg-blue-600 cursor-pointer"
-                                                            : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                                    }`}
-                                                >
-                                                    Save
-                                                </button>
-                                            )}
-                                        </td>
-                                    </tr>
+                                                    <div className="text-sm text-red-600">
+                                                        {user.error}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </>
                                 );
                             })}
                         </tbody>
