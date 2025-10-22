@@ -68,7 +68,6 @@ const LoginPage = () => {
                                 id="username"
                                 name="username"
                                 type="text"
-                                required
                                 value={formData.username}
                                 onChange={handleChange}
                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
@@ -88,7 +87,6 @@ const LoginPage = () => {
                                 id="password"
                                 name="password"
                                 type="password"
-                                required
                                 value={formData.password}
                                 onChange={handleChange}
                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
