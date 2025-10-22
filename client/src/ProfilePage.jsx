@@ -183,7 +183,7 @@ const ProfilePage = () => {
                                 name="currentPassword"
                                 value={formData.currentPassword}
                                 onChange={handleChange}
-                                placeholder="Required to change password"
+                                placeholder="********"
                                 className="w-full px-4 py-2 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             />
                         </div>
@@ -197,13 +197,9 @@ const ProfilePage = () => {
                                 name="password"
                                 value={formData.password}
                                 onChange={handleChange}
-                                placeholder="Leave blank to keep current"
+                                placeholder="********"
                                 className="w-full px-4 py-2 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             />
-                            <p className="mt-1 text-xs text-gray-500">
-                                8-10 characters with letters, numbers, and
-                                special characters
-                            </p>
                         </div>
 
                         <div>
@@ -215,7 +211,7 @@ const ProfilePage = () => {
                                 name="confirmPassword"
                                 value={formData.confirmPassword}
                                 onChange={handleChange}
-                                placeholder="Confirm new password"
+                                placeholder="********"
                                 className="w-full px-4 py-2 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             />
                         </div>

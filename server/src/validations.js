@@ -217,11 +217,11 @@ export const validateProfileUpdate = (req, res, next) => {
         errors.push("Email is required");
     }
 
-    if (!currentPassword) {
-        errors.push("Current password is required");
-    }
-
     if (password) {
+        if (!currentPassword) {
+            errors.push("Current password is required");
+        }
+
         const passwordError = validatePassword(password);
         if (passwordError) {
             errors.push(passwordError);

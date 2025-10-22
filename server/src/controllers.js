@@ -75,7 +75,10 @@ export const updateCurrentUser = async (req, res, next) => {
             data: updatedUser
         });
     } catch (error) {
-        next(error);
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
     }
 };
 

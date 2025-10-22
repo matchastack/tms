@@ -64,8 +64,12 @@ export const updateUserProfile = async (username, profileData) => {
             username
         ]).then(results => results[0]);
 
-        if (!user) {
-            throw new Error("User not found");
+        const existingEmail = await query(
+            "SELECT * FROM accounts WHERE email = ?",
+            [email]
+        ).then(results => results[0]);
+        if (existingEmail) {
+            throw new Error("Email already exists");
         }
 
         if (password) {
