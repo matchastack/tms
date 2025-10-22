@@ -9,17 +9,17 @@ export const loginUser = async (username, password) => {
     ]).then(results => results[0]);
 
     if (!user) {
-        throw new Error("User does not exist");
+        throw new Error("Invalid username and/or password");
     }
 
     if (!user.isActive) {
-        throw new Error("User account is inactive");
+        throw new Error("Inactive account");
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
-        throw new Error("Invalid credentials");
+        throw new Error("Invalid username and/or password");
     }
 
     const accessToken = generateAccessToken({
