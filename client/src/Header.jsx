@@ -59,13 +59,22 @@ const getMenuOptions = userGroups => {
         }
     };
 
-    let options = [allOptions.apps, allOptions.profile];
+    let options = new Set([allOptions.profile]);
     for (const userGroup of userGroups) {
-        switch (userGroup?.toLowerCase()) {
-            case "admin":
-                options.push(allOptions.users);
+        if (userGroup === "admin") {
+            options.add(allOptions.users);
+        }
+
+        if (
+            userGroup === "project lead" ||
+            userGroup === "dev team" ||
+            userGroup === "project manager"
+        ) {
+            options.add(allOptions.apps);
         }
     }
+    options = Array.from(options);
+    options.sort((a, b) => a.label.localeCompare(b.label));
     return options;
 };
 
