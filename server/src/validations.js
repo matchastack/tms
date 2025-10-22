@@ -26,11 +26,6 @@ export const validatePassword = password => {
     );
 };
 
-export const validateEmail = email => {
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    return emailRegex.test(email);
-};
-
 export const validateLogin = (req, res, next) => {
     const { username, password } = req.body;
 
@@ -69,13 +64,6 @@ export const validateAccountCreation = (req, res, next) => {
         });
     }
 
-    if (!validateEmail(email)) {
-        return res.status(400).json({
-            success: false,
-            message: "Email must be valid"
-        });
-    }
-
     next();
 };
 
@@ -106,13 +94,6 @@ export const validateAccountUpdate = (req, res, next) => {
                     "Password must be 8-10 characters long and include at least one letter, one number, and one special character"
             });
         }
-    }
-
-    if (email && !validateEmail(email)) {
-        return res.status(400).json({
-            success: false,
-            message: "Email must be valid"
-        });
     }
 
     next();
@@ -224,10 +205,6 @@ export const validateProfileUpdate = (req, res, next) => {
 
     if (!email || !email.trim()) {
         errors.push("Email is required");
-    }
-
-    if (!validateEmail(email)) {
-        errors.push("Email must be valid");
     }
 
     if (password) {
