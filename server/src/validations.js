@@ -51,30 +51,26 @@ export const validateLogin = (req, res, next) => {
 
 export const validateAccountCreation = (req, res, next) => {
     const { username, email, password, userGroups } = req.body;
-    const errors = [];
 
-    if (!username) {
-        errors.push("Username is required");
-    }
-
-    if (!email) {
-        errors.push("Email is required");
-    }
-
-    if (!password) {
-        errors.push("Password is required");
-    } else {
-        const passwordError = validatePassword(password);
-        if (passwordError) {
-            errors.push(passwordError);
-        }
-    }
-
-    if (errors.length > 0) {
+    if (!username || !email || !password) {
         return res.status(400).json({
             success: false,
-            message: "Validation failed: " + errors.join(", "),
-            errors
+            message: "Fields(s) cannot be empty"
+        });
+    }
+
+    if (username.trim().length > 50) {
+        return res.status(400).json({
+            success: false,
+            message: "Username must not be longer than 50 characters"
+        });
+    }
+
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+        return res.status(401).json({
+            success: false,
+            message: passwordError
         });
     }
 

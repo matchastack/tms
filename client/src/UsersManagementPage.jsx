@@ -140,9 +140,7 @@ const UsersManagementPage = () => {
         try {
             if (user.isNew) {
                 if (!user.username || !user.email || !user.password) {
-                    setError(
-                        "Username, email, and password are required for new user"
-                    );
+                    setError("Field(s) cannot be empty");
                     return;
                 }
 
