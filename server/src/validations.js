@@ -17,23 +17,13 @@ export const validatePassword = password => {
         password
     );
 
-    if (password.length < minLength || password.length > maxLength) {
-        return `Password must be between ${minLength} and ${maxLength} characters`;
-    }
-
-    if (!hasLetter) {
-        return "Password must contain at least one letter";
-    }
-
-    if (!hasNumber) {
-        return "Password must contain at least one number";
-    }
-
-    if (!hasSpecialChar) {
-        return "Password must contain at least one special character";
-    }
-
-    return null;
+    return (
+        password.length < minLength &&
+        password.length > maxLength &&
+        !hasLetter &&
+        !hasNumber &&
+        !hasSpecialChar
+    );
 };
 
 export const validateEmail = email => {
@@ -71,11 +61,11 @@ export const validateAccountCreation = (req, res, next) => {
         });
     }
 
-    const passwordError = validatePassword(password);
-    if (passwordError) {
+    if (!validatePassword(password)) {
         return res.status(401).json({
             success: false,
-            message: passwordError
+            message:
+                "Password must be 8-10 characters long and include at least one letter, one number, and one special character"
         });
     }
 
@@ -109,11 +99,11 @@ export const validateAccountUpdate = (req, res, next) => {
     }
 
     if (password) {
-        const passwordError = validatePassword(password);
-        if (passwordError) {
-            return res.status(400).json({
+        if (!validatePassword(password)) {
+            return res.status(401).json({
                 success: false,
-                message: passwordError
+                message:
+                    "Password must be 8-10 characters long and include at least one letter, one number, and one special character"
             });
         }
     }
@@ -244,10 +234,10 @@ export const validateProfileUpdate = (req, res, next) => {
         if (!currentPassword) {
             errors.push("Current password is required");
         }
-
-        const passwordError = validatePassword(password);
-        if (passwordError) {
-            errors.push(passwordError);
+        if (!validatePassword(password)) {
+            errors.push(
+                "Password must be 8-10 characters long and include at least one letter, one number, and one special character"
+            );
         }
     }
 
