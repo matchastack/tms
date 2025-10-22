@@ -148,7 +148,7 @@ export const updateAccount = async (username, accountData) => {
     return await withTransaction(async connection => {
         if (username === "admin") {
             if (isActive === 0) {
-                throw new Error("Root admin account cannot be disabled");
+                throw new Error("Cannot deactivate the original admin");
             }
             if (userGroups && !userGroups.includes("admin")) {
                 throw new Error("Cannot remove admin role from root admin");

@@ -128,7 +128,7 @@ const UsersManagementPage = () => {
         const user = users[index];
         if (user.username === ROOT_ADMIN_USERNAME && !user.isNew) {
             if (user.isActive === 0) {
-                setError("Root admin account cannot be disabled");
+                setError("Cannot deactivate the original admin");
                 return;
             }
             if (!user.userGroups.includes("admin")) {
