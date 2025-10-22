@@ -184,6 +184,7 @@ const UsersManagementPage = () => {
     };
 
     const handleFieldChange = (index, field, value) => {
+        setError("");
         const updatedUsers = [...users];
         updatedUsers[index] = {
             ...updatedUsers[index],
@@ -279,9 +280,6 @@ const UsersManagementPage = () => {
                 setUsers(updatedUsers);
             }
         } catch (err) {
-            const errorMessage = err.response?.data?.errors
-                ? err.response.data.errors.join(", ")
-                : err.response?.data?.message || err.message;
             setError(err.response?.data?.message || err.message);
         }
     };
