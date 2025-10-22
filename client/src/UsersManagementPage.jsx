@@ -224,13 +224,10 @@ const UsersManagementPage = () => {
 
         try {
             if (user.isNew) {
-                if (
-                    !user.username ||
-                    !user.email ||
-                    !user.password ||
-                    !user.userGroups
-                ) {
-                    setError("All fields are required for new user");
+                if (!user.username || !user.email || !user.password) {
+                    setError(
+                        "Username, email, and password are required for new user"
+                    );
                     return;
                 }
 
