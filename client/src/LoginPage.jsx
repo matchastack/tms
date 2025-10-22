@@ -44,6 +44,9 @@ const LoginPage = () => {
             setError(
                 err.response?.data?.message || err.message || "Login failed"
             );
+            setTimeout(() => {
+                setError("");
+            }, 5000);
         } finally {
             setIsLoading(false);
         }

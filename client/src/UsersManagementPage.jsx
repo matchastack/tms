@@ -85,6 +85,9 @@ const UsersManagementPage = () => {
             setEditedRows(new Set());
         } catch (err) {
             setError(err.response?.data?.message || "Failed to fetch users");
+            setTimeout(() => {
+                setError("");
+            }, 5000);
         } finally {
             setIsLoading(false);
         }
@@ -136,6 +139,14 @@ const UsersManagementPage = () => {
                     error: "Cannot deactivate the original admin"
                 };
                 setUsers(updatedUsers);
+                setTimeout(() => {
+                    const clearedUsers = [...users];
+                    clearedUsers[index] = {
+                        ...clearedUsers[index],
+                        error: ""
+                    };
+                    setUsers(clearedUsers);
+                }, 5000);
                 return;
             }
             if (!user.userGroups.includes("admin")) {
@@ -145,6 +156,14 @@ const UsersManagementPage = () => {
                     error: "Cannot remove admin group from original admin"
                 };
                 setUsers(updatedUsers);
+                setTimeout(() => {
+                    const clearedUsers = [...users];
+                    clearedUsers[index] = {
+                        ...clearedUsers[index],
+                        error: ""
+                    };
+                    setUsers(clearedUsers);
+                }, 5000);
                 return;
             }
         }
@@ -158,6 +177,14 @@ const UsersManagementPage = () => {
                         error: "Field(s) cannot be empty"
                     };
                     setUsers(updatedUsers);
+                    setTimeout(() => {
+                        const clearedUsers = [...users];
+                        clearedUsers[index] = {
+                            ...clearedUsers[index],
+                            error: ""
+                        };
+                        setUsers(clearedUsers);
+                    }, 5000);
                     return;
                 }
 
@@ -166,6 +193,14 @@ const UsersManagementPage = () => {
                     const updatedUsers = [...users];
                     updatedUsers[index] = { ...user, error: passwordError };
                     setUsers(updatedUsers);
+                    setTimeout(() => {
+                        const clearedUsers = [...users];
+                        clearedUsers[index] = {
+                            ...clearedUsers[index],
+                            error: ""
+                        };
+                        setUsers(clearedUsers);
+                    }, 5000);
                     return;
                 }
 
@@ -191,6 +226,14 @@ const UsersManagementPage = () => {
                         const updatedUsers = [...users];
                         updatedUsers[index] = { ...user, error: passwordError };
                         setUsers(updatedUsers);
+                        setTimeout(() => {
+                            const clearedUsers = [...users];
+                            clearedUsers[index] = {
+                                ...clearedUsers[index],
+                                error: ""
+                            };
+                            setUsers(clearedUsers);
+                        }, 5000);
                         return;
                     }
                     updateData.password = user.password;
@@ -219,6 +262,14 @@ const UsersManagementPage = () => {
                 error: err.response?.data?.message || err.message
             };
             setUsers(updatedUsers);
+            setTimeout(() => {
+                const clearedUsers = [...users];
+                clearedUsers[index] = {
+                    ...clearedUsers[index],
+                    error: ""
+                };
+                setUsers(clearedUsers);
+            }, 5000);
         }
     };
 
@@ -237,6 +288,9 @@ const UsersManagementPage = () => {
             setError("");
         } catch (err) {
             setError(err.response?.data?.message || "Failed to create group");
+            setTimeout(() => {
+                setError("");
+            }, 5000);
         } finally {
             setIsCreatingGroup(false);
         }

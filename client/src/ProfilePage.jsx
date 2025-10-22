@@ -71,17 +71,26 @@ const ProfilePage = () => {
         if (formData.password) {
             if (!formData.currentPassword) {
                 setError("Current password is required to change password");
+                setTimeout(() => {
+                    setError("");
+                }, 5000);
                 return;
             }
 
             if (formData.password !== formData.confirmPassword) {
                 setError("Passwords do not match");
+                setTimeout(() => {
+                    setError("");
+                }, 5000);
                 return;
             }
 
             const passwordError = validatePassword(formData.password);
             if (passwordError) {
                 setError(passwordError);
+                setTimeout(() => {
+                    setError("");
+                }, 5000);
                 return;
             }
         }
@@ -116,6 +125,9 @@ const ProfilePage = () => {
                 ? err.response.data.errors.join(", ")
                 : err.response?.data?.message || "Failed to update profile";
             setError(errorMessage);
+            setTimeout(() => {
+                setError("");
+            }, 5000);
         } finally {
             setIsLoading(false);
         }
