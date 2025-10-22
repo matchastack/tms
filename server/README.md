@@ -401,7 +401,7 @@ requireRole(...allowedRoles);
 **Root Admin Protection:**
 
 -   Cannot disable root admin account
--   Cannot remove admin role from root admin
+-   Cannot remove admin group from original admin
 -   Special handling in update logic
 
 ---

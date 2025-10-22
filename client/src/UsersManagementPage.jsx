@@ -132,7 +132,7 @@ const UsersManagementPage = () => {
                 return;
             }
             if (!user.userGroups.includes("admin")) {
-                setError("Cannot remove admin role from root admin");
+                setError("Cannot remove admin group from original admin");
                 return;
             }
         }

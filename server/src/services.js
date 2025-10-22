@@ -151,7 +151,9 @@ export const updateAccount = async (username, accountData) => {
                 throw new Error("Cannot deactivate the original admin");
             }
             if (userGroups && !userGroups.includes("admin")) {
-                throw new Error("Cannot remove admin role from root admin");
+                throw new Error(
+                    "Cannot remove admin group from original admin"
+                );
             }
         }
 
