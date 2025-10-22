@@ -44,7 +44,6 @@ const ProfilePage = () => {
         confirmPassword: ""
     });
     const [error, setError] = useState("");
-    const [success, setSuccess] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
@@ -63,13 +62,11 @@ const ProfilePage = () => {
             [name]: value
         }));
         setError("");
-        setSuccess("");
     };
 
     const handleSubmit = async e => {
         e.preventDefault();
         setError("");
-        setSuccess("");
 
         if (formData.password) {
             if (!formData.currentPassword) {
@@ -108,7 +105,6 @@ const ProfilePage = () => {
                 ...updateData
             });
 
-            setSuccess("Profile updated successfully");
             setFormData(prev => ({
                 ...prev,
                 currentPassword: "",
@@ -219,12 +215,6 @@ const ProfilePage = () => {
                         {error && (
                             <div className="bg-red-50 text-red-600 px-4 py-3 rounded-md text-sm">
                                 {error}
-                            </div>
-                        )}
-
-                        {success && (
-                            <div className="bg-green-50 text-green-600 px-4 py-3 rounded-md text-sm">
-                                {success}
                             </div>
                         )}
 
