@@ -238,8 +238,8 @@ const UsersManagementPage = () => {
                 }
 
                 await axios.post("/accounts", {
-                    username: user.username,
-                    email: user.email,
+                    username: user.username.trim().toLowerCase(),
+                    email: user.email.trim(),
                     password: user.password,
                     userGroups: user.userGroups,
                     isActive: user.isActive
@@ -248,7 +248,7 @@ const UsersManagementPage = () => {
                 await fetchUsers();
             } else {
                 const updateData = {
-                    email: user.email,
+                    email: user.email.trim(),
                     userGroups: user.userGroups,
                     isActive: user.isActive
                 };
@@ -294,7 +294,7 @@ const UsersManagementPage = () => {
         setIsCreatingGroup(true);
         try {
             await axios.post("/user_groups", {
-                groupName: newGroupName.trim()
+                groupName: newGroupName.trim().toLowerCase()
             });
             await fetchGroups();
             setNewGroupName("");
