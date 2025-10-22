@@ -4,9 +4,9 @@ import { useAuth } from "./AuthContext";
 
 const getMenuOptions = userGroups => {
     const allOptions = {
-        home: {
-            label: "Home",
-            path: "/home",
+        apps: {
+            label: "Applications",
+            path: "/apps",
             icon: (
                 <svg
                     width="16"
@@ -59,7 +59,7 @@ const getMenuOptions = userGroups => {
         }
     };
 
-    let options = [allOptions.home, allOptions.profile];
+    let options = [allOptions.apps, allOptions.profile];
     for (const userGroup of userGroups) {
         switch (userGroup?.toLowerCase()) {
             case "admin":

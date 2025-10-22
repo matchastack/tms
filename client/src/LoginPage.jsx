@@ -19,7 +19,7 @@ const LoginPage = () => {
         if (isAuthenticated) {
             isOnlyAdmin
                 ? navigate("/user/accounts", { replace: true })
-                : navigate("/home", { replace: true });
+                : navigate("/apps", { replace: true });
         }
     }, [isAuthenticated, navigate]);
 
@@ -39,7 +39,7 @@ const LoginPage = () => {
 
         try {
             await login(formData.username, formData.password);
-            navigate("/home");
+            navigate("/apps", { replace: true });
         } catch (err) {
             setError(
                 err.response?.data?.message || err.message || "Login failed"

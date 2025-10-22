@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./AuthContext";
 import ProtectedRoute from "./ProtectedRoute";
 import LoginPage from "./LoginPage";
-import HomePage from "./HomePage";
+import AppPage from "./AppPage";
 import UsersManagementPage from "./UsersManagementPage";
 import ProfilePage from "./ProfilePage";
 
@@ -13,10 +13,10 @@ function App() {
                 <Routes>
                     <Route path="/" element={<LoginPage />} />
                     <Route
-                        path="/home"
+                        path="/apps"
                         element={
                             <ProtectedRoute>
-                                <HomePage />
+                                <AppPage />
                             </ProtectedRoute>
                         }
                     />

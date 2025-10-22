@@ -1,7 +1,7 @@
 import { useAuth } from "./AuthContext";
 import Header from "./Header";
 
-const HomePage = () => {
+const AppPage = () => {
     const { logout } = useAuth();
 
     const applications = [
@@ -37,4 +37,4 @@ const HomePage = () => {
     );
 };
 
-export default HomePage;
+export default AppPage;

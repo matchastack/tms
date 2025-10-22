@@ -28,7 +28,7 @@ client/
     ├── ProtectedRoute.jsx       # Route protection component
     ├── Header.jsx               # Reusable header component
     ├── LoginPage.jsx            # Login page component
-    ├── HomePage.jsx             # Home page component
+    ├── AppPage.jsx             # Home page component
     ├── ProfilePage.jsx          # User profile page
     └── UsersManagementPage.jsx  # Admin user management page
 ```
@@ -44,7 +44,7 @@ App (BrowserRouter + Routes)
   └── AuthProvider (Context)
        ├── LoginPage (/)
        └── ProtectedRoute
-            ├── HomePage (/home)
+            ├── AppPage (/apps)
             ├── ProfilePage (/user/profile)
             └── UsersManagementPage (/user/accounts) [Admin only]
 ```
@@ -73,7 +73,7 @@ The application uses React Context API for global authentication state:
 -   AuthContext sends POST to `/auth/login`
 -   Server returns JWT in HTTP-only cookie + user data
 -   AuthContext updates user state
--   User redirected to HomePage or admin page
+-   User redirected to AppPage or admin page
 
 **3. Protected Route Access:**
 
@@ -112,7 +112,7 @@ The application uses React Context API for global authentication state:
 | Path | Component | Protection | Description |
 |------|-----------|-----------|-------------|
 | `/` | LoginPage | Public | Login page |
-| `/home` | HomePage | Protected | Main dashboard |
+| `/apps` | AppPage | Protected | Main dashboard |
 | `/user/profile` | ProfilePage | Protected | User profile management |
 | `/user/accounts` | UsersManagementPage | Admin only | User management (admin) |
 | `*` | Navigate to `/` | - | Catch-all redirect |
@@ -211,7 +211,7 @@ const { user, isAuthenticated, login, logout } = useAuth();
     /* Any authenticated user */
 }
 <ProtectedRoute>
-    <HomePage />
+    <AppPage />
 </ProtectedRoute>;
 
 {
@@ -243,7 +243,7 @@ getMenuOptions(userGroups);
 ```
 
 -   Generates menu items based on user's groups
--   All users: Home, Profile
+-   All users: Apps, Profile
 -   Admin users: Additional "Users Management" option
 -   Each option includes label, path, and icon
 
@@ -294,7 +294,7 @@ handleMenuClick(path);
 -   Check if already authenticated
 -   Redirect based on user role:
     -   Admin-only → `/user/accounts`
-    -   Others → `/home`
+    -   Others → `/apps`
 
 **2. Form Submission:**
 
@@ -306,7 +306,7 @@ handleSubmit(e);
 -   Clears previous errors
 -   Sets loading state
 -   Calls `login()` from context
--   Handles success: navigate to `/home`
+-   Handles success: navigate to `/apps`
 -   Handles error: display error message
 
 **3. Form Validation:**
@@ -325,7 +325,7 @@ handleSubmit(e);
 
 ---
 
-### 6. HomePage.jsx
+### 6. AppPage.jsx
 
 **Purpose:** Main dashboard showing available applications.
 
@@ -517,7 +517,7 @@ validatePassword(password);
 
 ```javascript
 const navigate = useNavigate();
-navigate("/home");
+navigate("/apps");
 navigate("/user/profile");
 ```
 
@@ -539,7 +539,7 @@ navigate("/user/profile");
 
 1. Lands on LoginPage (`/`)
 2. Submits credentials
-3. Redirected to HomePage (`/home`)
+3. Redirected to AppPage (`/apps`)
 4. Can navigate via Header menu
 
 **Admin User Login:**
