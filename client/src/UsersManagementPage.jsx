@@ -19,20 +19,14 @@ const validatePassword = password => {
         return "Password is required";
     }
 
-    if (password.length < minLength || password.length > maxLength) {
-        return `Password must be between ${minLength} and ${maxLength} characters`;
-    }
-
-    if (!hasLetter) {
-        return "Password must contain at least one letter";
-    }
-
-    if (!hasNumber) {
-        return "Password must contain at least one number";
-    }
-
-    if (!hasSpecialChar) {
-        return "Password must contain at least one special character";
+    if (
+        password.length < minLength ||
+        password.length > maxLength ||
+        !hasLetter ||
+        !hasNumber ||
+        !hasSpecialChar
+    ) {
+        return `Password must be between ${minLength}-${maxLength} characters long and include at least one letter, one number, and one special character`;
     }
 
     return null;
