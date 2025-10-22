@@ -139,7 +139,10 @@ export const updateAccount = async (req, res, next) => {
             data: updatedAccount
         });
     } catch (error) {
-        next(error);
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
     }
 };
 

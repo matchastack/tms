@@ -157,6 +157,14 @@ export const updateAccount = async (username, accountData) => {
             }
         }
 
+        const existingEmail = await query(
+            "SELECT * FROM accounts WHERE email = ? AND username != ?",
+            [email, username]
+        ).then(results => results[0]);
+        if (existingEmail) {
+            throw new Error("Email already exists");
+        }
+
         let sql;
         let params;
 
