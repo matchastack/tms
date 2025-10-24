@@ -68,5 +68,11 @@ router.post(
     controllers.createApplication
 );
 
+router.get(
+    "/applications",
+    validations.authenticateToken,
+    controllers.getApplications
+);
+
 
 export default router;

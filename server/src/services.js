@@ -296,3 +296,7 @@ export const createApplication = async appData => {
     });
 };
 
+export const getAllApplications = async () => {
+    return await query("SELECT * FROM applications ORDER BY App_Acronym");
+};
+

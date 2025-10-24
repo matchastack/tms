@@ -191,3 +191,15 @@ export const createApplication = async (req, res, next) => {
     }
 };
 
+export const getApplications = async (req, res, next) => {
+    try {
+        const apps = await services.getAllApplications();
+        res.status(200).json({
+            success: true,
+            data: apps
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
