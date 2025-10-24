@@ -219,3 +219,20 @@ export const getApplicationByAcronym = async (req, res, next) => {
     }
 };
 
+export const updateApplication = async (req, res, next) => {
+    try {
+        const { acronym } = req.params;
+        const updatedApp = await services.updateApplication(acronym, req.body);
+        res.status(200).json({
+            success: true,
+            message: "Application updated successfully",
+            data: updatedApp
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+

@@ -313,3 +313,53 @@ export const getApplicationByAcronym = async acronym => {
     return app;
 };
 
+export const updateApplication = async (acronym, appData) => {
+    const {
+        App_Description,
+        App_startDate,
+        App_endDate,
+        App_permit_Create,
+        App_permit_Open,
+        App_permit_toDoList,
+        App_permit_Doing,
+        App_permit_Done
+    } = appData;
+
+    return await withTransaction(async connection => {
+        const existing = await query(
+            "SELECT App_Acronym FROM applications WHERE App_Acronym = ?",
+            [acronym]
+        ).then(results => results[0]);
+
+        if (!existing) {
+            throw new Error("Application not found");
+        }
+
+        await connection.execute(
+            `UPDATE applications SET
+                App_Description = ?,
+                App_startDate = ?,
+                App_endDate = ?,
+                App_permit_Create = ?,
+                App_permit_Open = ?,
+                App_permit_toDoList = ?,
+                App_permit_Doing = ?,
+                App_permit_Done = ?
+            WHERE App_Acronym = ?`,
+            [
+                App_Description,
+                App_startDate,
+                App_endDate,
+                JSON.stringify(Array.isArray(App_permit_Create) ? App_permit_Create : []),
+                JSON.stringify(Array.isArray(App_permit_Open) ? App_permit_Open : []),
+                JSON.stringify(Array.isArray(App_permit_toDoList) ? App_permit_toDoList : []),
+                JSON.stringify(Array.isArray(App_permit_Doing) ? App_permit_Doing : []),
+                JSON.stringify(Array.isArray(App_permit_Done) ? App_permit_Done : []),
+                acronym
+            ]
+        );
+
+        return await getApplicationByAcronym(acronym);
+    });
+};
+

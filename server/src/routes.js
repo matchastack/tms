@@ -80,5 +80,13 @@ router.get(
     controllers.getApplicationByAcronym
 );
 
+router.put(
+    "/applications/:acronym",
+    validations.authenticateToken,
+    validations.requireAdmin,
+    validations.validateApplicationUpdate,
+    controllers.updateApplication
+);
+
 
 export default router;
