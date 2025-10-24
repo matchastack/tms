@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import { config } from "./config/config.js";
+import * as services from "./services.js";
 
 const userHasGroup = (user, groupName) => {
     const userGroups = user.groups || [];
@@ -128,7 +129,7 @@ export const validateAccountUpdate = (req, res, next) => {
     next();
 };
 
-export const authenticateToken = (req, res, next) => {
+export const authenticateToken = async (req, res, next) => {
     const token = req.cookies.accessToken;
 
     if (!token) {
@@ -140,13 +141,44 @@ export const authenticateToken = (req, res, next) => {
 
     try {
         const decoded = jwt.verify(token, config.jwtSecret);
-        req.user = decoded;
+
+        // Verify token payload against database
+        const user = await services.getUserByUsername(decoded.username);
+
+        if (!user.isActive) {
+            return res.status(403).json({
+                success: false,
+                message: "Account is deactivated"
+            });
+        }
+
+        const jwtGroups = JSON.stringify((decoded.groups || []).sort());
+        const dbGroups = JSON.stringify((user.userGroups || []).sort());
+
+        if (jwtGroups !== dbGroups) {
+            return res.status(403).json({
+                success: false,
+                message: "Token permissions outdated. Please login again"
+            });
+        }
+
+        req.user = {
+            username: user.username,
+            groups: user.userGroups
+        };
+
         next();
     } catch (error) {
         if (error.name === "TokenExpiredError") {
             return res.status(401).json({
                 success: false,
                 message: "Token expired"
+            });
+        }
+        if (error.message === "User not found") {
+            return res.status(401).json({
+                success: false,
+                message: "User not found"
             });
         }
         return res.status(403).json({
