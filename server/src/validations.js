@@ -152,16 +152,6 @@ export const authenticateToken = async (req, res, next) => {
             });
         }
 
-        const jwtGroups = JSON.stringify((decoded.groups || []).sort());
-        const dbGroups = JSON.stringify((user.userGroups || []).sort());
-
-        if (jwtGroups !== dbGroups) {
-            return res.status(403).json({
-                success: false,
-                message: "Token permissions outdated. Please login again"
-            });
-        }
-
         req.user = {
             username: user.username,
             groups: user.userGroups

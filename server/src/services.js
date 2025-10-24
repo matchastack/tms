@@ -23,8 +23,7 @@ export const loginUser = async (username, password) => {
     }
 
     const accessToken = generateAccessToken({
-        username: user.username,
-        groups: user.userGroups // TODO: remove
+        username: user.username
     });
 
     return {
