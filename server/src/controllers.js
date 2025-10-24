@@ -172,3 +172,22 @@ export const createGroup = async (req, res, next) => {
         next(error);
     }
 };
+
+// ============= APPLICATION CONTROLLERS =============
+
+export const createApplication = async (req, res, next) => {
+    try {
+        const newApp = await services.createApplication(req.body);
+        res.status(201).json({
+            success: true,
+            message: "Application created successfully",
+            data: newApp
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+

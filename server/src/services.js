@@ -237,3 +237,62 @@ export const checkGroup = async (userId, groupName) => {
         group => group.toLowerCase() === groupName.toLowerCase()
     );
 };
+
+// ============= APPLICATION SERVICES =============
+
+export const createApplication = async appData => {
+    const {
+        App_Acronym,
+        App_Description,
+        App_startDate,
+        App_endDate,
+        App_permit_Create,
+        App_permit_Open,
+        App_permit_toDoList,
+        App_permit_Doing,
+        App_permit_Done
+    } = appData;
+
+    return await withTransaction(async connection => {
+        const existing = await query(
+            "SELECT App_Acronym FROM applications WHERE App_Acronym = ?",
+            [App_Acronym]
+        ).then(results => results[0]);
+
+        if (existing) {
+            throw new Error("Application acronym already exists");
+        }
+
+        await connection.execute(
+            `INSERT INTO applications (
+                App_Acronym, App_Description, App_Rnumber,
+                App_startDate, App_endDate,
+                App_permit_Create, App_permit_Open, App_permit_toDoList, App_permit_Doing, App_permit_Done
+            ) VALUES (?, ?, 0, ?, ?, ?, ?, ?, ?, ?)`,
+            [
+                App_Acronym,
+                App_Description,
+                App_startDate,
+                App_endDate,
+                JSON.stringify(Array.isArray(App_permit_Create) ? App_permit_Create : []),
+                JSON.stringify(Array.isArray(App_permit_Open) ? App_permit_Open : []),
+                JSON.stringify(Array.isArray(App_permit_toDoList) ? App_permit_toDoList : []),
+                JSON.stringify(Array.isArray(App_permit_Doing) ? App_permit_Doing : []),
+                JSON.stringify(Array.isArray(App_permit_Done) ? App_permit_Done : [])
+            ]
+        );
+
+        return {
+            App_Acronym,
+            App_Description,
+            App_startDate,
+            App_endDate,
+            App_permit_Create,
+            App_permit_Open,
+            App_permit_toDoList,
+            App_permit_Doing,
+            App_permit_Done
+        };
+    });
+};
+

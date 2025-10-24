@@ -58,4 +58,15 @@ router.post(
     controllers.createGroup
 );
 
+// ============= APPLICATION ROUTES =============
+
+router.post(
+    "/applications",
+    validations.authenticateToken,
+    validations.requireAdmin,
+    validations.validateApplicationCreation,
+    controllers.createApplication
+);
+
+
 export default router;
