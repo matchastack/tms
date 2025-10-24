@@ -74,5 +74,11 @@ router.get(
     controllers.getApplications
 );
 
+router.get(
+    "/applications/:acronym",
+    validations.authenticateToken,
+    controllers.getApplicationByAcronym
+);
+
 
 export default router;

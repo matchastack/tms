@@ -203,3 +203,19 @@ export const getApplications = async (req, res, next) => {
     }
 };
 
+export const getApplicationByAcronym = async (req, res, next) => {
+    try {
+        const { acronym } = req.params;
+        const app = await services.getApplicationByAcronym(acronym);
+        res.status(200).json({
+            success: true,
+            data: app
+        });
+    } catch (error) {
+        res.status(404).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+

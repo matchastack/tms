@@ -300,3 +300,16 @@ export const getAllApplications = async () => {
     return await query("SELECT * FROM applications ORDER BY App_Acronym");
 };
 
+export const getApplicationByAcronym = async acronym => {
+    const app = await query(
+        "SELECT * FROM applications WHERE App_Acronym = ?",
+        [acronym]
+    ).then(results => results[0]);
+
+    if (!app) {
+        throw new Error("Application not found");
+    }
+
+    return app;
+};
+
