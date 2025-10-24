@@ -73,7 +73,7 @@ const LoginPage = () => {
                                 type="text"
                                 value={formData.username}
                                 onChange={handleChange}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition placeholder:text-gray-400"
                                 placeholder="John Doe"
                                 autoComplete="off"
                             />
@@ -92,7 +92,7 @@ const LoginPage = () => {
                                 type="password"
                                 value={formData.password}
                                 onChange={handleChange}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition placeholder:text-gray-400"
                                 placeholder="••••••••"
                             />
                         </div>
