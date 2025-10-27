@@ -397,6 +397,10 @@ export const createPlan = async planData => {
     const { Plan_MVP_name, Plan_startDate, Plan_endDate, Plan_app_Acronym } =
         planData;
 
+    if (Plan_startDate > Plan_endDate) {
+        throw new Error("Start date cannot be after end date");
+    }
+
     return await withTransaction(async connection => {
         // Check if application exists
         const app = await query(
@@ -454,6 +458,9 @@ export const getPlanByName = async planName => {
 
 export const updatePlan = async (planName, planData) => {
     const { Plan_startDate, Plan_endDate } = planData;
+    if (Plan_startDate > Plan_endDate) {
+        throw new Error("Start date cannot be after end date");
+    }
 
     return await withTransaction(async connection => {
         const existing = await query(
