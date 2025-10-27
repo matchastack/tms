@@ -83,11 +83,7 @@ const getMenuOptions = userGroups => {
             options.add(allOptions.users);
         }
 
-        if (
-            userGroup === "project lead" ||
-            userGroup === "dev team" ||
-            userGroup === "project manager"
-        ) {
+        if (userGroup === "project lead") {
             options.add(allOptions.apps);
         }
     }

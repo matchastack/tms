@@ -16,7 +16,7 @@ function App() {
                     <Route
                         path="/apps"
                         element={
-                            <ProtectedRoute>
+                            <ProtectedRoute allowedRoles={["project lead"]}>
                                 <AppPage />
                             </ProtectedRoute>
                         }
