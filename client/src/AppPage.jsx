@@ -14,8 +14,6 @@ const AppPage = () => {
     const [editedRows, setEditedRows] = useState(new Set());
     const [availableGroups, setAvailableGroups] = useState([]);
 
-    const isProjectLead = user?.groups?.includes("project lead");
-
     useEffect(() => {
         fetchApplications();
         fetchGroups();
@@ -47,27 +45,24 @@ const AppPage = () => {
                     error: ""
                 }));
 
-                if (isProjectLead) {
-                    setApplications([
-                        {
-                            App_Acronym: "",
-                            App_Description: "",
-                            App_startDate: "",
-                            App_endDate: "",
-                            App_permit_Create: [],
-                            App_permit_Open: [],
-                            App_permit_toDoList: [],
-                            App_permit_Doing: [],
-                            App_permit_Done: [],
-                            App_Rnumber: 0,
-                            isNew: true,
-                            error: ""
-                        },
-                        ...existingApps
-                    ]);
-                } else {
-                    setApplications(existingApps);
-                }
+                setApplications([
+                    {
+                        App_Acronym: "",
+                        App_Description: "",
+                        App_startDate: "",
+                        App_endDate: "",
+                        App_permit_Create: [],
+                        App_permit_Open: [],
+                        App_permit_toDoList: [],
+                        App_permit_Doing: [],
+                        App_permit_Done: [],
+                        App_Rnumber: 0,
+                        isNew: true,
+                        error: ""
+                    },
+                    ...existingApps
+                ]);
+
                 setEditedRows(new Set());
             }
         } catch (err) {
