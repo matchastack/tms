@@ -358,7 +358,7 @@ const UsersManagementPage = () => {
                                                     isCreatingGroup ||
                                                     !newGroupName.trim()
                                                 }
-                                                className="px-2 py-1 text-xs !bg-green-400 text-black rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                                                className="px-2 py-1 text-xs bg-green-400 text-black rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
                                             >
                                                 {isCreatingGroup
                                                     ? "..."
@@ -500,7 +500,7 @@ const UsersManagementPage = () => {
                                                         onClick={() =>
                                                             handleSaveRow(index)
                                                         }
-                                                        className="px-6 py-2 !bg-emerald-500 text-white rounded-md text-sm font-medium hover:bg-green-500 transition-colors"
+                                                        className="px-6 py-2 bg-emerald-500 text-white rounded-md text-sm font-medium hover:bg-green-500 transition-colors"
                                                     >
                                                         Add User
                                                     </button>
@@ -518,7 +518,7 @@ const UsersManagementPage = () => {
                                                             editedRows.has(
                                                                 index
                                                             )
-                                                                ? "!bg-blue-500 text-white hover:bg-blue-600 cursor-pointer"
+                                                                ? "bg-blue-500 text-white hover:bg-blue-600 cursor-pointer"
                                                                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
                                                         }`}
                                                     >
