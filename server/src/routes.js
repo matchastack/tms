@@ -121,5 +121,17 @@ router.post(
     controllers.createTask
 );
 
+router.get(
+    "/tasks/:app_acronym",
+    validations.authenticateToken,
+    controllers.getTasks
+);
+
+router.get(
+    "/task/:task_id",
+    validations.authenticateToken,
+    controllers.getTask
+);
+
 
 export default router;

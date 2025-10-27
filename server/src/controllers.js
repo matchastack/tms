@@ -319,3 +319,40 @@ export const createTask = async (req, res, next) => {
     }
 };
 
+export const getTasks = async (req, res, next) => {
+    try {
+        const { app_acronym } = req.params;
+        const { state } = req.query;
+
+        let tasks;
+        if (state) {
+            tasks = await services.getTasksByState(app_acronym, state);
+        } else {
+            tasks = await services.getTasksByApp(app_acronym);
+        }
+
+        res.status(200).json({
+            success: true,
+            data: tasks
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const getTask = async (req, res, next) => {
+    try {
+        const { task_id } = req.params;
+        const task = await services.getTaskById(task_id);
+        res.status(200).json({
+            success: true,
+            data: task
+        });
+    } catch (error) {
+        res.status(404).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
