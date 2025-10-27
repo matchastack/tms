@@ -103,5 +103,7 @@ router.get(
     controllers.getPlans
 );
 
+router.get("/plan/:name", validations.authenticateToken, controllers.getPlan);
+
 
 export default router;

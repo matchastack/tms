@@ -440,3 +440,15 @@ export const getPlansByApp = async appAcronym => {
     );
 };
 
+export const getPlanByName = async planName => {
+    const plan = await query("SELECT * FROM plans WHERE Plan_MVP_name = ?", [
+        planName
+    ]).then(results => results[0]);
+
+    if (!plan) {
+        throw new Error("Plan not found");
+    }
+
+    return plan;
+};
+

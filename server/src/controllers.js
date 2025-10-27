@@ -267,3 +267,19 @@ export const getPlans = async (req, res, next) => {
     }
 };
 
+export const getPlan = async (req, res, next) => {
+    try {
+        const { name } = req.params;
+        const plan = await services.getPlanByName(name);
+        res.status(200).json({
+            success: true,
+            data: plan
+        });
+    } catch (error) {
+        res.status(404).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
