@@ -283,3 +283,20 @@ export const getPlan = async (req, res, next) => {
     }
 };
 
+export const updatePlan = async (req, res, next) => {
+    try {
+        const { name } = req.params;
+        const updatedPlan = await services.updatePlan(name, req.body);
+        res.status(200).json({
+            success: true,
+            message: "Plan updated successfully",
+            data: updatedPlan
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+

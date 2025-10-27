@@ -452,3 +452,25 @@ export const getPlanByName = async planName => {
     return plan;
 };
 
+export const updatePlan = async (planName, planData) => {
+    const { Plan_startDate, Plan_endDate } = planData;
+
+    return await withTransaction(async connection => {
+        const existing = await query(
+            "SELECT Plan_MVP_name FROM plans WHERE Plan_MVP_name = ?",
+            [planName]
+        ).then(results => results[0]);
+
+        if (!existing) {
+            throw new Error("Plan not found");
+        }
+
+        await connection.execute(
+            `UPDATE plans SET Plan_startDate = ?, Plan_endDate = ? WHERE Plan_MVP_name = ?`,
+            [Plan_startDate, Plan_endDate, planName]
+        );
+
+        return await getPlanByName(planName);
+    });
+};
+
