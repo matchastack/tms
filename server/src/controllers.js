@@ -402,3 +402,25 @@ export const demoteTask = async (req, res, next) => {
         });
     }
 };
+
+export const updateTask = async (req, res, next) => {
+    try {
+        const { task_id, plan_name } = req.body;
+        const username = req.user.username;
+        const updatedTask = await services.updateTaskPlan(
+            task_id,
+            plan_name,
+            username
+        );
+        res.status(200).json({
+            success: true,
+            message: "Task updated successfully",
+            data: updatedTask
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
+    }
+};

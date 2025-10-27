@@ -714,3 +714,46 @@ export const demoteTaskState = async (taskId, username, notes) => {
     });
 };
 
+export const updateTaskPlan = async (taskId, planName, username) => {
+    return await withTransaction(async connection => {
+        const task = await connection
+            .execute("SELECT * FROM tasks WHERE Task_id = ?", [taskId])
+            .then(([results]) => results[0]);
+
+        if (!task) {
+            throw new Error("Task not found");
+        }
+
+        // Validate plan exists and belongs to the same app
+        if (planName) {
+            const plan = await connection
+                .execute(
+                    "SELECT * FROM plans WHERE Plan_MVP_name = ? AND Plan_app_Acronym = ?",
+                    [planName, task.Task_app_Acronym]
+                )
+                .then(([results]) => results[0]);
+
+            if (!plan) {
+                throw new Error(
+                    "Plan not found or does not belong to this application"
+                );
+            }
+        }
+
+        // Update audit trail
+        const note = planName ? `Plan assigned: ${planName}` : "Plan removed";
+        const auditNotes = appendAuditNote(
+            task.Task_notes,
+            username,
+            task.Task_state,
+            note
+        );
+
+        await connection.execute(
+            "UPDATE tasks SET Task_plan = ?, Task_notes = ? WHERE Task_id = ?",
+            [planName || null, auditNotes, taskId]
+        );
+
+        return await getTaskById(taskId);
+    });
+};

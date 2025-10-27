@@ -145,5 +145,6 @@ router.post(
     controllers.demoteTask
 );
 
+router.put("/tasks", validations.authenticateToken, controllers.updateTask);
 
 export default router;
