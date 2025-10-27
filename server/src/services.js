@@ -253,6 +253,10 @@ export const createApplication = async appData => {
         App_permit_Done
     } = appData;
 
+    if (App.startDate > App_endDate) {
+        throw new Error("Start date cannot be after end date");
+    }
+
     return await withTransaction(async connection => {
         const existing = await query(
             "SELECT App_Acronym FROM applications WHERE App_Acronym = ?",
@@ -274,11 +278,23 @@ export const createApplication = async appData => {
                 App_Description,
                 App_startDate,
                 App_endDate,
-                JSON.stringify(Array.isArray(App_permit_Create) ? App_permit_Create : []),
-                JSON.stringify(Array.isArray(App_permit_Open) ? App_permit_Open : []),
-                JSON.stringify(Array.isArray(App_permit_toDoList) ? App_permit_toDoList : []),
-                JSON.stringify(Array.isArray(App_permit_Doing) ? App_permit_Doing : []),
-                JSON.stringify(Array.isArray(App_permit_Done) ? App_permit_Done : [])
+                JSON.stringify(
+                    Array.isArray(App_permit_Create) ? App_permit_Create : []
+                ),
+                JSON.stringify(
+                    Array.isArray(App_permit_Open) ? App_permit_Open : []
+                ),
+                JSON.stringify(
+                    Array.isArray(App_permit_toDoList)
+                        ? App_permit_toDoList
+                        : []
+                ),
+                JSON.stringify(
+                    Array.isArray(App_permit_Doing) ? App_permit_Doing : []
+                ),
+                JSON.stringify(
+                    Array.isArray(App_permit_Done) ? App_permit_Done : []
+                )
             ]
         );
 
@@ -350,11 +366,23 @@ export const updateApplication = async (acronym, appData) => {
                 App_Description,
                 App_startDate,
                 App_endDate,
-                JSON.stringify(Array.isArray(App_permit_Create) ? App_permit_Create : []),
-                JSON.stringify(Array.isArray(App_permit_Open) ? App_permit_Open : []),
-                JSON.stringify(Array.isArray(App_permit_toDoList) ? App_permit_toDoList : []),
-                JSON.stringify(Array.isArray(App_permit_Doing) ? App_permit_Doing : []),
-                JSON.stringify(Array.isArray(App_permit_Done) ? App_permit_Done : []),
+                JSON.stringify(
+                    Array.isArray(App_permit_Create) ? App_permit_Create : []
+                ),
+                JSON.stringify(
+                    Array.isArray(App_permit_Open) ? App_permit_Open : []
+                ),
+                JSON.stringify(
+                    Array.isArray(App_permit_toDoList)
+                        ? App_permit_toDoList
+                        : []
+                ),
+                JSON.stringify(
+                    Array.isArray(App_permit_Doing) ? App_permit_Doing : []
+                ),
+                JSON.stringify(
+                    Array.isArray(App_permit_Done) ? App_permit_Done : []
+                ),
                 acronym
             ]
         );
