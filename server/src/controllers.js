@@ -356,3 +356,49 @@ export const getTask = async (req, res, next) => {
     }
 };
 
+export const promoteTask = async (req, res, next) => {
+    try {
+        const { task_id, notes } = req.body;
+        const username = req.user.username;
+        const updatedTask = await services.promoteTaskState(
+            task_id,
+            username,
+            notes
+        );
+
+        // TODO: If promoted to "Done", send email notification
+
+        res.status(200).json({
+            success: true,
+            message: "Task promoted successfully",
+            data: updatedTask
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+export const demoteTask = async (req, res, next) => {
+    try {
+        const { task_id, notes } = req.body;
+        const username = req.user.username;
+        const updatedTask = await services.demoteTaskState(
+            task_id,
+            username,
+            notes
+        );
+        res.status(200).json({
+            success: true,
+            message: "Task demoted successfully",
+            data: updatedTask
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
+    }
+};

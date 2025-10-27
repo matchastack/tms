@@ -133,5 +133,17 @@ router.get(
     controllers.getTask
 );
 
+router.post(
+    "/tasks/promote",
+    validations.authenticateToken,
+    controllers.promoteTask
+);
+
+router.post(
+    "/tasks/demote",
+    validations.authenticateToken,
+    controllers.demoteTask
+);
+
 
 export default router;

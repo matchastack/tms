@@ -618,3 +618,99 @@ export const getTaskById = async taskId => {
     return task;
 };
 
+export const promoteTaskState = async (taskId, username, notes) => {
+    return await withTransaction(async connection => {
+        const task = await connection
+            .execute("SELECT * FROM tasks WHERE Task_id = ?", [taskId])
+            .then(([results]) => results[0]);
+
+        if (!task) {
+            throw new Error("Task not found");
+        }
+
+        // Determine next state
+        let newState;
+        switch (task.Task_state) {
+            case "Open":
+                newState = "To-Do";
+                break;
+            case "To-Do":
+                newState = "Doing";
+                break;
+            case "Doing":
+                newState = "Done";
+                break;
+            case "Done":
+                newState = "Closed";
+                break;
+            default:
+                throw new Error("Task is already in final state");
+        }
+
+        // Update audit trail
+        const auditNotes = appendAuditNote(
+            task.Task_notes,
+            username,
+            newState,
+            notes
+        );
+
+        await connection.execute(
+            "UPDATE tasks SET Task_state = ?, Task_owner = ?, Task_notes = ? WHERE Task_id = ?",
+            [newState, username, auditNotes, taskId]
+        );
+
+        return {
+            ...task,
+            Task_state: newState,
+            Task_owner: username,
+            Task_notes: auditNotes
+        };
+    });
+};
+
+export const demoteTaskState = async (taskId, username, notes) => {
+    return await withTransaction(async connection => {
+        const task = await connection
+            .execute("SELECT * FROM tasks WHERE Task_id = ?", [taskId])
+            .then(([results]) => results[0]);
+
+        if (!task) {
+            throw new Error("Task not found");
+        }
+
+        // Determine previous state
+        let newState;
+        switch (task.Task_state) {
+            case "Doing":
+                newState = "To-Do";
+                break;
+            case "Done":
+                newState = "Doing";
+                break;
+            default:
+                throw new Error("Cannot demote task from current state");
+        }
+
+        // Update audit trail
+        const auditNotes = appendAuditNote(
+            task.Task_notes,
+            username,
+            newState,
+            notes
+        );
+
+        await connection.execute(
+            "UPDATE tasks SET Task_state = ?, Task_owner = ?, Task_notes = ? WHERE Task_id = ?",
+            [newState, username, auditNotes, taskId]
+        );
+
+        return {
+            ...task,
+            Task_state: newState,
+            Task_owner: username,
+            Task_notes: auditNotes
+        };
+    });
+};
+
