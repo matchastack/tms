@@ -111,5 +111,15 @@ router.put(
     controllers.updatePlan
 );
 
+// ============= TASK ROUTES =============
+
+router.post(
+    "/tasks",
+    validations.authenticateToken,
+    validations.validateTaskCreation,
+    validations.requirePermitGroup("App_permit_Create"),
+    controllers.createTask
+);
+
 
 export default router;

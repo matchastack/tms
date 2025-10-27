@@ -300,3 +300,22 @@ export const updatePlan = async (req, res, next) => {
     }
 };
 
+// ============= TASK CONTROLLERS =============
+
+export const createTask = async (req, res, next) => {
+    try {
+        const username = req.user.username;
+        const newTask = await services.createTask(req.body, username);
+        res.status(201).json({
+            success: true,
+            message: "Task created successfully",
+            data: newTask
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+

@@ -372,3 +372,86 @@ export const validatePlanCreation = (req, res, next) => {
 
     next();
 };
+
+export const validateTaskCreation = (req, res, next) => {
+    const { Task_name, Task_app_Acronym } = req.body;
+
+    if (!Task_name || !Task_name.trim()) {
+        return res.status(400).json({
+            success: false,
+            message: "Task name is required"
+        });
+    }
+
+    if (!Task_app_Acronym || !Task_app_Acronym.trim()) {
+        return res.status(400).json({
+            success: false,
+            message: "Application acronym is required"
+        });
+    }
+
+    next();
+};
+
+export const requirePermitGroup = permitField => {
+    return async (req, res, next) => {
+        try {
+            const { app_acronym, task_id } = req.body;
+            let appAcronym = app_acronym;
+
+            // If task_id is provided, get the app acronym from the task
+            if (task_id && !appAcronym) {
+                const task = await services.getTaskById(task_id);
+                appAcronym = task.Task_app_Acronym;
+            }
+
+            if (!appAcronym) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Application acronym is required"
+                });
+            }
+
+            // Get application to check permissions
+            const app = await services.getApplicationByAcronym(appAcronym);
+            const requiredGroups = app[permitField];
+
+            if (
+                !requiredGroups ||
+                !Array.isArray(requiredGroups) ||
+                requiredGroups.length === 0
+            ) {
+                return res.status(500).json({
+                    success: false,
+                    message:
+                        "Permission groups not configured for this operation"
+                });
+            }
+
+            // Check if user is in any of the required groups
+            let hasPermission = false;
+            for (const group of requiredGroups) {
+                if (await services.checkGroup(req.user.username, group)) {
+                    hasPermission = true;
+                    break;
+                }
+            }
+
+            if (!hasPermission) {
+                return res.status(403).json({
+                    success: false,
+                    message: `Permission denied. Required groups: ${requiredGroups.join(
+                        ", "
+                    )}`
+                });
+            }
+
+            next();
+        } catch (error) {
+            return res.status(500).json({
+                success: false,
+                message: error.message
+            });
+        }
+    };
+};

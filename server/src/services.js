@@ -481,3 +481,110 @@ export const updatePlan = async (planName, planData) => {
     });
 };
 
+// ============= TASK SERVICES =============
+
+// Helper: Generate Task_id
+const generateTaskId = async (appAcronym, connection) => {
+    const app = await connection
+        .execute("SELECT App_Rnumber FROM applications WHERE App_Acronym = ?", [
+            appAcronym
+        ])
+        .then(([results]) => results[0]);
+
+    const newRnumber = app.App_Rnumber + 1;
+
+    await connection.execute(
+        "UPDATE applications SET App_Rnumber = ? WHERE App_Acronym = ?",
+        [newRnumber, appAcronym]
+    );
+
+    return `${appAcronym}_${newRnumber}`;
+};
+
+// Helper: Append audit note
+const appendAuditNote = (currentNotes, username, state, note) => {
+    const timestamp = new Date().toISOString();
+    const newNote = `\n[${username}] [${state}] [${timestamp}]\n${
+        note || "State transition"
+    }\n${"=".repeat(50)}`;
+    return (currentNotes || "") + newNote;
+};
+
+export const createTask = async (taskData, username) => {
+    const { Task_name, Task_description, Task_plan, Task_app_Acronym, notes } =
+        taskData;
+
+    return await withTransaction(async connection => {
+        // Check if application exists
+        const app = await connection
+            .execute("SELECT * FROM applications WHERE App_Acronym = ?", [
+                Task_app_Acronym
+            ])
+            .then(([results]) => results[0]);
+
+        if (!app) {
+            throw new Error("Application not found");
+        }
+
+        // Check if task name already exists
+        const existing = await connection
+            .execute("SELECT Task_name FROM tasks WHERE Task_name = ?", [
+                Task_name
+            ])
+            .then(([results]) => results[0]);
+
+        if (existing) {
+            throw new Error("Task name already exists");
+        }
+
+        // Validate plan if provided
+        if (Task_plan) {
+            const plan = await connection
+                .execute(
+                    "SELECT * FROM plans WHERE Plan_MVP_name = ? AND Plan_app_Acronym = ?",
+                    [Task_plan, Task_app_Acronym]
+                )
+                .then(([results]) => results[0]);
+
+            if (!plan) {
+                throw new Error(
+                    "Plan not found or does not belong to this application"
+                );
+            }
+        }
+
+        // Generate Task_id
+        const taskId = await generateTaskId(Task_app_Acronym, connection);
+
+        // Create audit trail
+        const auditNotes = appendAuditNote("", username, "Open", notes);
+
+        await connection.execute(
+            `INSERT INTO tasks (
+                Task_id, Task_name, Task_description, Task_notes, Task_plan,
+                Task_app_Acronym, Task_state, Task_creator, Task_owner
+            ) VALUES (?, ?, ?, ?, ?, ?, 'Open', ?, ?)`,
+            [
+                taskId,
+                Task_name,
+                Task_description,
+                auditNotes,
+                Task_plan || null,
+                Task_app_Acronym,
+                username,
+                username
+            ]
+        );
+
+        return {
+            Task_id: taskId,
+            Task_name,
+            Task_description,
+            Task_app_Acronym,
+            Task_state: "Open",
+            Task_creator: username,
+            Task_owner: username
+        };
+    });
+};
+
