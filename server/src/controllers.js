@@ -254,3 +254,16 @@ export const createPlan = async (req, res, next) => {
     }
 };
 
+export const getPlans = async (req, res, next) => {
+    try {
+        const { app_acronym } = req.params;
+        const plans = await services.getPlansByApp(app_acronym);
+        res.status(200).json({
+            success: true,
+            data: plans
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+

@@ -433,3 +433,10 @@ export const createPlan = async planData => {
     });
 };
 
+export const getPlansByApp = async appAcronym => {
+    return await query(
+        "SELECT * FROM plans WHERE Plan_app_Acronym = ? ORDER BY Plan_startDate",
+        [appAcronym]
+    );
+};
+

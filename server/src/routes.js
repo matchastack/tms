@@ -97,5 +97,11 @@ router.post(
     controllers.createPlan
 );
 
+router.get(
+    "/plans/:app_acronym",
+    validations.authenticateToken,
+    controllers.getPlans
+);
+
 
 export default router;
