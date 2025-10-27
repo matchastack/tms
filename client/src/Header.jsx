@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
+import KanbanBoardPage from "./KanbanBoardPage";
 
 const getMenuOptions = userGroups => {
     const allOptions = {
@@ -56,10 +57,27 @@ const getMenuOptions = userGroups => {
                     <circle cx="12" cy="7" r="4" />
                 </svg>
             )
+        },
+        kanban: {
+            label: "Kanban Board",
+            path: "/kanban",
+            icon: (
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                >
+                    <rect x="3" y="4" width="7" height="16" />
+                    <rect x="14" y="4" width="7" height="10" />
+                </svg>
+            )
         }
     };
 
-    let options = new Set([allOptions.profile]);
+    let options = new Set([allOptions.profile, allOptions.kanban]);
     for (const userGroup of userGroups) {
         if (userGroup === "admin") {
             options.add(allOptions.users);

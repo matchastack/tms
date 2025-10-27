@@ -5,6 +5,7 @@ import LoginPage from "./LoginPage";
 import AppPage from "./AppPage";
 import UsersManagementPage from "./UsersManagementPage";
 import ProfilePage from "./ProfilePage";
+import KanbanBoardPage from "./KanbanBoardPage";
 
 function App() {
     return (
@@ -33,6 +34,14 @@ function App() {
                         element={
                             <ProtectedRoute allowedRoles={["admin"]}>
                                 <UsersManagementPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/kanban"
+                        element={
+                            <ProtectedRoute>
+                                <KanbanBoardPage />
                             </ProtectedRoute>
                         }
                     />
