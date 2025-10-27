@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 import Header from "./Header";
 import MultiSelect from "./MultiSelect";
@@ -7,7 +6,6 @@ import axios from "axios";
 
 const AppPage = () => {
     const { logout, user } = useAuth();
-    const navigate = useNavigate();
     const [applications, setApplications] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -501,7 +499,7 @@ const AppPage = () => {
                                                     onClick={() =>
                                                         handleSaveRow(index)
                                                     }
-                                                    className="px-6 py-2 !bg-emerald-500 text-white rounded-md text-sm font-medium hover:bg-green-500 transition-colors"
+                                                    className="px-6 py-2 bg-emerald-500 text-white rounded-md text-sm font-medium hover:bg-green-500 transition-colors"
                                                 >
                                                     Add
                                                 </button>
