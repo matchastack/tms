@@ -77,14 +77,23 @@ const getMenuOptions = userGroups => {
         }
     };
 
-    let options = new Set([allOptions.profile, allOptions.kanban]);
+    let options = new Set([allOptions.profile]);
     for (const userGroup of userGroups) {
         if (userGroup === "admin") {
             options.add(allOptions.users);
         }
 
         if (userGroup === "project lead") {
+            options.add(allOptions.kanban);
             options.add(allOptions.apps);
+        }
+
+        if (userGroup === "dev team") {
+            options.add(allOptions.kanban);
+        }
+
+        if (userGroup === "project manager") {
+            options.add(allOptions.kanban);
         }
     }
     options = Array.from(options);
