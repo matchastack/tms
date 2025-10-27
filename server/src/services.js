@@ -589,25 +589,21 @@ export const createTask = async (taskData, username) => {
 };
 
 export const getTasksByApp = async appAcronym => {
-    const task = await query(
+    const tasks = await query(
         "SELECT * FROM tasks WHERE Task_app_Acronym = ? ORDER BY Task_createDate DESC",
         [appAcronym]
     );
 
-    if (!task) {
-        throw new Error("Tasks not found");
-    }
+    return tasks || [];
 };
 
 export const getTasksByState = async (appAcronym, state) => {
-    const task = await query(
+    const tasks = await query(
         "SELECT * FROM tasks WHERE Task_app_Acronym = ? AND Task_state = ? ORDER BY Task_createDate DESC",
         [appAcronym, state]
     );
 
-    if (!task) {
-        throw new Error("Tasks not found");
-    }
+    return tasks || [];
 };
 
 export const getTaskById = async taskId => {
