@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
-const MultiSelect = ({ value, onChange, placeholder, availableGroups }) => {
+const MultiSelect = ({ value, onChange, placeholder, availableGroups, disabled = false }) => {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
 
@@ -34,8 +34,12 @@ const MultiSelect = ({ value, onChange, placeholder, availableGroups }) => {
     return (
         <div className="relative" ref={dropdownRef}>
             <div
-                onClick={() => setIsOpen(!isOpen)}
-                className="min-h-[42px] w-full border border-gray-300 rounded-md px-3 py-2 bg-white cursor-pointer flex flex-wrap gap-2 items-center"
+                onClick={() => !disabled && setIsOpen(!isOpen)}
+                className={`min-h-[42px] w-full border border-gray-300 rounded-md px-3 py-2 flex flex-wrap gap-2 items-center ${
+                    disabled
+                        ? "bg-gray-100 cursor-not-allowed"
+                        : "bg-white cursor-pointer"
+                }`}
             >
                 {value.length > 0 ? (
                     value.map(group => (
@@ -44,13 +48,15 @@ const MultiSelect = ({ value, onChange, placeholder, availableGroups }) => {
                             className="inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded text-sm"
                         >
                             {group}
-                            <button
-                                type="button"
-                                onClick={e => handleRemoveTag(group, e)}
-                                className="text-gray-600 hover:text-gray-800 font-bold"
-                            >
-                                ×
-                            </button>
+                            {!disabled && (
+                                <button
+                                    type="button"
+                                    onClick={e => handleRemoveTag(group, e)}
+                                    className="text-gray-600 hover:text-gray-800 font-bold"
+                                >
+                                    ×
+                                </button>
+                            )}
                         </span>
                     ))
                 ) : (
@@ -60,7 +66,7 @@ const MultiSelect = ({ value, onChange, placeholder, availableGroups }) => {
                 )}
             </div>
 
-            {isOpen && (
+            {isOpen && !disabled && (
                 <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
                     {availableGroups.map(group => (
                         <label
