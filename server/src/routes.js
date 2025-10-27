@@ -88,5 +88,14 @@ router.put(
     controllers.updateApplication
 );
 
+// ============= PLAN ROUTES =============
+
+router.post(
+    "/plans",
+    validations.authenticateToken,
+    validations.validatePlanCreation,
+    controllers.createPlan
+);
+
 
 export default router;

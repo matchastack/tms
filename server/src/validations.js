@@ -323,3 +323,52 @@ export const validateApplicationCreation = (req, res, next) => {
     next();
 };
 
+export const validateApplicationUpdate = (req, res, next) => {
+    const {
+        App_permit_Create,
+        App_permit_Open,
+        App_permit_toDoList,
+        App_permit_Doing,
+        App_permit_Done
+    } = req.body;
+
+    // Validate that all permission fields are arrays with at least one group
+    const permissions = [
+        { field: App_permit_Create, name: "App_permit_Create" },
+        { field: App_permit_Open, name: "App_permit_Open" },
+        { field: App_permit_toDoList, name: "App_permit_toDoList" },
+        { field: App_permit_Doing, name: "App_permit_Doing" },
+        { field: App_permit_Done, name: "App_permit_Done" }
+    ];
+
+    for (const perm of permissions) {
+        if (!Array.isArray(perm.field) || perm.field.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: `${perm.name} must be an array with at least one group`
+            });
+        }
+    }
+
+    next();
+};
+
+export const validatePlanCreation = (req, res, next) => {
+    const { Plan_MVP_name, Plan_app_Acronym } = req.body;
+
+    if (!Plan_MVP_name || !Plan_MVP_name.trim()) {
+        return res.status(400).json({
+            success: false,
+            message: "Plan name is required"
+        });
+    }
+
+    if (!Plan_app_Acronym || !Plan_app_Acronym.trim()) {
+        return res.status(400).json({
+            success: false,
+            message: "Application acronym is required"
+        });
+    }
+
+    next();
+};

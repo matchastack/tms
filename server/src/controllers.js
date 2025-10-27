@@ -236,3 +236,21 @@ export const updateApplication = async (req, res, next) => {
     }
 };
 
+// ============= PLAN CONTROLLERS =============
+
+export const createPlan = async (req, res, next) => {
+    try {
+        const newPlan = await services.createPlan(req.body);
+        res.status(201).json({
+            success: true,
+            message: "Plan created successfully",
+            data: newPlan
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+

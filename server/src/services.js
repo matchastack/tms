@@ -391,3 +391,45 @@ export const updateApplication = async (acronym, appData) => {
     });
 };
 
+// ============= PLAN SERVICES =============
+
+export const createPlan = async planData => {
+    const { Plan_MVP_name, Plan_startDate, Plan_endDate, Plan_app_Acronym } =
+        planData;
+
+    return await withTransaction(async connection => {
+        // Check if application exists
+        const app = await query(
+            "SELECT App_Acronym FROM applications WHERE App_Acronym = ?",
+            [Plan_app_Acronym]
+        ).then(results => results[0]);
+
+        if (!app) {
+            throw new Error("Application not found");
+        }
+
+        // Check if plan name already exists
+        const existing = await query(
+            "SELECT Plan_MVP_name FROM plans WHERE Plan_MVP_name = ?",
+            [Plan_MVP_name]
+        ).then(results => results[0]);
+
+        if (existing) {
+            throw new Error("Plan name already exists");
+        }
+
+        await connection.execute(
+            `INSERT INTO plans (Plan_MVP_name, Plan_startDate, Plan_endDate, Plan_app_Acronym)
+             VALUES (?, ?, ?, ?)`,
+            [Plan_MVP_name, Plan_startDate, Plan_endDate, Plan_app_Acronym]
+        );
+
+        return {
+            Plan_MVP_name,
+            Plan_startDate,
+            Plan_endDate,
+            Plan_app_Acronym
+        };
+    });
+};
+
