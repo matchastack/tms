@@ -253,7 +253,7 @@ export const createApplication = async appData => {
         App_permit_Done
     } = appData;
 
-    if (App.startDate > App_endDate) {
+    if (App_startDate > App_endDate) {
         throw new Error("Start date cannot be after end date");
     }
 
