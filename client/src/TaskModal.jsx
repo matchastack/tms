@@ -8,7 +8,10 @@ const TaskModal = ({
     onSuccess,
     task = null,
     application,
-    plans = []
+    appAcronym,
+    applications = [],
+    plans = [],
+    onApplicationChange
 }) => {
     const { user } = useAuth();
     const [formData, setFormData] = useState({
@@ -229,73 +232,124 @@ const TaskModal = ({
                     )}
 
                     {isCreate ? (
-                        <form onSubmit={handleCreateTask} className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Task Name *
-                                </label>
-                                <input
-                                    type="text"
-                                    name="Task_name"
-                                    value={formData.Task_name}
-                                    onChange={handleChange}
-                                    required
-                                    maxLength={255}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="Enter task name"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Description
-                                </label>
-                                <textarea
-                                    name="Task_description"
-                                    value={formData.Task_description}
-                                    onChange={handleChange}
-                                    rows="4"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    placeholder="Task description"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Plan
-                                </label>
-                                <select
-                                    name="Task_plan"
-                                    value={formData.Task_plan}
-                                    onChange={handleChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                >
-                                    <option value="">No Plan</option>
-                                    {plans.map(plan => (
-                                        <option
-                                            key={plan.Plan_MVP_name}
-                                            value={plan.Plan_MVP_name}
+                        <form onSubmit={handleCreateTask}>
+                            <div className="grid grid-cols-2 gap-6">
+                                {/* Left Column */}
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Application
+                                        </label>
+                                        <select
+                                            value={appAcronym || ""}
+                                            onChange={(e) => onApplicationChange && onApplicationChange(e.target.value)}
+                                            required
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         >
-                                            {plan.Plan_MVP_name}
-                                        </option>
-                                    ))}
-                                </select>
+                                            <option value="">Select an application...</option>
+                                            {applications.map(app => (
+                                                <option key={app.App_Acronym} value={app.App_Acronym}>
+                                                    {app.App_Acronym}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Task Name
+                                        </label>
+                                        <input
+                                            type="text"
+                                            name="Task_name"
+                                            value={formData.Task_name}
+                                            onChange={handleChange}
+                                            required
+                                            maxLength={255}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Task Description
+                                        </label>
+                                        <textarea
+                                            name="Task_description"
+                                            value={formData.Task_description}
+                                            onChange={handleChange}
+                                            rows="6"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Plan (optional)
+                                        </label>
+                                        <select
+                                            name="Task_plan"
+                                            value={formData.Task_plan}
+                                            onChange={handleChange}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        >
+                                            <option value="">— No plan —</option>
+                                            {plans.map(plan => (
+                                                <option
+                                                    key={plan.Plan_MVP_name}
+                                                    value={plan.Plan_MVP_name}
+                                                >
+                                                    {plan.Plan_MVP_name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {/* Right Column */}
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Notes
+                                        </label>
+                                        <textarea
+                                            value="No entries"
+                                            disabled
+                                            rows="6"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 italic"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Entry
+                                        </label>
+                                        <textarea
+                                            name="notes"
+                                            value={formData.notes}
+                                            onChange={handleChange}
+                                            rows="6"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            placeholder="Insert Entry Here..."
+                                        />
+                                    </div>
+                                </div>
                             </div>
 
-                            <div className="flex justify-end gap-3 pt-4 border-t">
-                                <button
-                                    type="button"
-                                    onClick={onClose}
-                                    className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                                >
-                                    Cancel
-                                </button>
+                            <div className="flex justify-start gap-3 pt-6 mt-6 border-t">
                                 <button
                                     type="submit"
                                     disabled={loading}
                                     className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400"
                                 >
                                     {loading ? "Creating..." : "Create Task"}
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={onClose}
+                                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                >
+                                    Cancel
                                 </button>
                             </div>
                         </form>

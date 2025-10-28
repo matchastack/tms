@@ -10,10 +10,10 @@ const KanbanBoardPage = () => {
     const { logout, user } = useAuth();
     const [applications, setApplications] = useState([]);
     const [tasks, setTasks] = useState([]);
+    const [plans, setPlans] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [selectedTask, setSelectedTask] = useState(null);
-    const [selectedApp, setSelectedApp] = useState("all");
     const [showCreateTaskModal, setShowCreateTaskModal] = useState(false);
     const [showCreatePlanModal, setShowCreatePlanModal] = useState(false);
     const [createAppSelection, setCreateAppSelection] = useState("");
@@ -55,35 +55,60 @@ const KanbanBoardPage = () => {
     };
 
     const getTasksByState = state => {
-        let filtered = tasks.filter(task => task && task.Task_state === state);
-
-        // Filter by selected application if not "all"
-        if (selectedApp !== "all") {
-            filtered = filtered.filter(
-                task => task && task.Task_app_Acronym === selectedApp
-            );
-        }
-
-        return filtered;
+        return tasks.filter(task => task && task.Task_state === state);
     };
 
-    const handleTaskClick = task => {
+    const handleTaskClick = async task => {
         setSelectedTask(task);
+
+        // Fetch plans for the task's application
+        try {
+            const { data } = await axios.get(`/plans/${task.Task_app_Acronym}`);
+            if (data.success) {
+                setPlans(data.data || []);
+            }
+        } catch (err) {
+            setPlans([]);
+        }
     };
 
-    const handleCreateTask = () => {
-        if (selectedApp !== "all") {
-            setCreateAppSelection(selectedApp);
-        } else if (applications.length > 0) {
-            setCreateAppSelection(applications[0].App_Acronym);
+    const handleCreateTask = async () => {
+        let appAcronym = "";
+        if (applications.length > 0) {
+            appAcronym = applications[0].App_Acronym;
         }
+
+        if (appAcronym) {
+            setCreateAppSelection(appAcronym);
+            // Fetch plans for the selected application
+            await fetchPlansForApp(appAcronym);
+        }
+
         setShowCreateTaskModal(true);
     };
 
+    const fetchPlansForApp = async (appAcronym) => {
+        if (!appAcronym) {
+            setPlans([]);
+            return;
+        }
+        try {
+            const { data } = await axios.get(`/plans/${appAcronym}`);
+            if (data.success) {
+                setPlans(data.data || []);
+            }
+        } catch (err) {
+            setPlans([]);
+        }
+    };
+
+    const handleApplicationChange = async (newAppAcronym) => {
+        setCreateAppSelection(newAppAcronym);
+        await fetchPlansForApp(newAppAcronym);
+    };
+
     const handleCreatePlan = () => {
-        if (selectedApp !== "all") {
-            setCreateAppSelection(selectedApp);
-        } else if (applications.length > 0) {
+        if (applications.length > 0) {
             setCreateAppSelection(applications[0].App_Acronym);
         }
         setShowCreatePlanModal(true);
@@ -141,21 +166,6 @@ const KanbanBoardPage = () => {
                             >
                                 + Create Task
                             </button>
-                            <select
-                                value={selectedApp}
-                                onChange={e => setSelectedApp(e.target.value)}
-                                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            >
-                                <option value="all">All Applications</option>
-                                {applications.map(app => (
-                                    <option
-                                        key={app.App_Acronym}
-                                        value={app.App_Acronym}
-                                    >
-                                        {app.App_Acronym}
-                                    </option>
-                                ))}
-                            </select>
                         </div>
                     </div>
                 </div>
@@ -187,7 +197,7 @@ const KanbanBoardPage = () => {
                                         key={task.Task_id}
                                         task={task}
                                         onClick={() => handleTaskClick(task)}
-                                        showAppName={selectedApp === "all"}
+                                        showAppName={true}
                                     />
                                 ))}
                             </div>
@@ -201,21 +211,30 @@ const KanbanBoardPage = () => {
                 onClose={() => {
                     setShowCreateTaskModal(false);
                     setCreateAppSelection("");
+                    setPlans([]);
                 }}
                 onSuccess={() => {
                     fetchAllData();
                     setShowCreateTaskModal(false);
                     setCreateAppSelection("");
+                    setPlans([]);
                 }}
                 application={getSelectedApplication()}
                 appAcronym={createAppSelection}
+                applications={applications}
+                plans={plans}
+                onApplicationChange={handleApplicationChange}
             />
 
             <TaskModal
                 isOpen={!!selectedTask}
-                onClose={() => setSelectedTask(null)}
+                onClose={() => {
+                    setSelectedTask(null);
+                    setPlans([]);
+                }}
                 onSuccess={fetchAllData}
                 task={selectedTask}
+                plans={plans}
             />
 
             <PlanModal
