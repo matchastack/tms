@@ -72,22 +72,13 @@ const KanbanBoardPage = () => {
         }
     };
 
-    const handleCreateTask = async () => {
-        let appAcronym = "";
-        if (applications.length > 0) {
-            appAcronym = applications[0].App_Acronym;
-        }
-
-        if (appAcronym) {
-            setCreateAppSelection(appAcronym);
-            // Fetch plans for the selected application
-            await fetchPlansForApp(appAcronym);
-        }
-
+    const handleCreateTask = () => {
+        setCreateAppSelection("");
+        setPlans([]);
         setShowCreateTaskModal(true);
     };
 
-    const fetchPlansForApp = async (appAcronym) => {
+    const fetchPlansForApp = async appAcronym => {
         if (!appAcronym) {
             setPlans([]);
             return;
@@ -102,7 +93,7 @@ const KanbanBoardPage = () => {
         }
     };
 
-    const handleApplicationChange = async (newAppAcronym) => {
+    const handleApplicationChange = async newAppAcronym => {
         setCreateAppSelection(newAppAcronym);
         await fetchPlansForApp(newAppAcronym);
     };

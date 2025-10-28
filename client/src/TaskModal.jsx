@@ -98,6 +98,12 @@ const TaskModal = ({
     const handleCreateTask = async e => {
         e.preventDefault();
         setError("");
+
+        if (!appAcronym) {
+            setError("Please select an application");
+            return;
+        }
+
         setLoading(true);
 
         try {
@@ -105,7 +111,8 @@ const TaskModal = ({
                 Task_name: formData.Task_name,
                 Task_description: formData.Task_description,
                 Task_plan: formData.Task_plan || null,
-                app_acronym: application.App_Acronym
+                notes: formData.notes,
+                Task_app_Acronym: appAcronym
             });
 
             if (data.success) {
@@ -242,13 +249,23 @@ const TaskModal = ({
                                         </label>
                                         <select
                                             value={appAcronym || ""}
-                                            onChange={(e) => onApplicationChange && onApplicationChange(e.target.value)}
+                                            onChange={e =>
+                                                onApplicationChange &&
+                                                onApplicationChange(
+                                                    e.target.value
+                                                )
+                                            }
                                             required
                                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         >
-                                            <option value="">Select an application...</option>
+                                            <option value="">
+                                                Select an application...
+                                            </option>
                                             {applications.map(app => (
-                                                <option key={app.App_Acronym} value={app.App_Acronym}>
+                                                <option
+                                                    key={app.App_Acronym}
+                                                    value={app.App_Acronym}
+                                                >
                                                     {app.App_Acronym}
                                                 </option>
                                             ))}
@@ -293,7 +310,9 @@ const TaskModal = ({
                                             onChange={handleChange}
                                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         >
-                                            <option value="">— No plan —</option>
+                                            <option value="">
+                                                — No plan —
+                                            </option>
                                             {plans.map(plan => (
                                                 <option
                                                     key={plan.Plan_MVP_name}
