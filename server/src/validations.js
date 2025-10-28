@@ -386,9 +386,12 @@ export const validateTaskCreation = (req, res, next) => {
     if (!Task_app_Acronym || !Task_app_Acronym.trim()) {
         return res.status(400).json({
             success: false,
-            message: "Application acronym is required"
+            message: "Validation Error: Application acronym is required"
         });
     }
+
+    // Normalize appAcronym for subsequent middleware
+    req.body.appAcronym = Task_app_Acronym;
 
     next();
 };
@@ -396,8 +399,7 @@ export const validateTaskCreation = (req, res, next) => {
 export const requirePermitGroup = permitField => {
     return async (req, res, next) => {
         try {
-            const { app_acronym, task_id } = req.body;
-            let appAcronym = app_acronym;
+            const { appAcronym, task_id } = req.body;
 
             // If task_id is provided, get the app acronym from the task
             if (task_id && !appAcronym) {
@@ -408,7 +410,8 @@ export const requirePermitGroup = permitField => {
             if (!appAcronym) {
                 return res.status(400).json({
                     success: false,
-                    message: "Application acronym is required"
+                    message:
+                        "Require Permit Error: Application acronym is required"
                 });
             }
 
