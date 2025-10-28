@@ -139,25 +139,16 @@ const KanbanBoardPage = () => {
                 <div className="mb-6">
                     <div className="flex justify-between items-center mb-4">
                         <h1 className="text-3xl font-bold text-gray-900">
-                            All Tasks
+                            Kanban
                         </h1>
 
-                        <div className="flex items-center gap-4">
-                            <button
-                                onClick={handleCreatePlan}
-                                disabled={applications.length === 0}
-                                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
-                            >
-                                + Create Plan
-                            </button>
-                            <button
-                                onClick={handleCreateTask}
-                                disabled={applications.length === 0}
-                                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
-                            >
-                                + Create Task
-                            </button>
-                        </div>
+                        <button
+                            onClick={handleCreatePlan}
+                            disabled={applications.length === 0}
+                            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
+                        >
+                            + Add Plan
+                        </button>
                     </div>
                 </div>
 
@@ -175,12 +166,20 @@ const KanbanBoardPage = () => {
                                     state
                                 )} p-3`}
                             >
-                                <h2 className="font-semibold text-gray-900 text-center">
-                                    {state}
-                                </h2>
-                                <p className="text-sm text-gray-600 text-center">
-                                    {getTasksByState(state).length} tasks
-                                </p>
+                                <div className="flex items-center justify-between mb-2">
+                                    <h2 className="font-semibold text-gray-900">
+                                        {state}
+                                    </h2>
+                                    {state === "Open" && (
+                                        <button
+                                            onClick={handleCreateTask}
+                                            disabled={applications.length === 0}
+                                            className="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                                        >
+                                            + Add Task
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                             <div className="bg-white border-x border-b rounded-b-lg p-2 min-h-[500px] space-y-2">
                                 {getTasksByState(state).map(task => (
