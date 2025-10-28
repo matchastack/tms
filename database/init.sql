@@ -39,9 +39,9 @@ CREATE TABLE IF NOT EXISTS applications (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO applications (App_Acronym, App_Description, App_Rnumber, App_startDate, App_endDate, App_permit_Create, App_permit_Open, App_permit_toDoList, App_permit_Doing, App_permit_Done) VALUES
-('WEBAPP', 'Customer-facing web application with user authentication and dashboard features', 3, '2025-01-01', '2025-06-30', '["dev team", "project lead"]', '["project lead"]', '["project lead"]', '["dev team"]', '["project lead", "project manager"]'),
-('MOBILE', 'Cross-platform mobile application for iOS and Android', 2, '2025-02-01', '2025-08-31', '["dev team"]', '["project lead"]', '["project lead", "project manager"]', '["dev team"]', '["project manager"]'),
-('API', 'RESTful API service for third-party integrations', 2, '2025-01-15', '2025-05-15', '["dev team", "project lead"]', '["project lead", "admin"]', '["project lead"]', '["dev team", "project lead"]', '["admin"]');
+('WEBAPP', 'Customer-facing web application with user authentication and dashboard features', 1, '2025-01-01', '2025-06-30', '["dev team", "project lead"]', '["project lead"]', '["project lead"]', '["dev team"]', '["project lead", "project manager"]'),
+('MOBILE', 'Cross-platform mobile application for iOS and Android', 1, '2025-02-01', '2025-08-31', '["dev team"]', '["project lead"]', '["project lead", "project manager"]', '["dev team"]', '["project manager"]'),
+('API', 'RESTful API service for third-party integrations', 1, '2025-01-15', '2025-05-15', '["dev team", "project lead"]', '["project lead", "admin"]', '["project lead"]', '["dev team", "project lead"]', '["admin"]');
 
 -- Plan table
 CREATE TABLE IF NOT EXISTS plans (
