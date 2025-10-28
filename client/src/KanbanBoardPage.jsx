@@ -1,20 +1,20 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 import Header from "./Header";
 import TaskCard from "./TaskCard";
+import TaskModal from "./TaskModal";
 import PlanModal from "./PlanModal";
 import axios from "axios";
 
 const KanbanBoardPage = () => {
     const { logout, user } = useAuth();
-    const navigate = useNavigate();
     const [applications, setApplications] = useState([]);
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [selectedTask, setSelectedTask] = useState(null);
     const [selectedApp, setSelectedApp] = useState("all");
+    const [showCreateTaskModal, setShowCreateTaskModal] = useState(false);
     const [showCreatePlanModal, setShowCreatePlanModal] = useState(false);
     const [createAppSelection, setCreateAppSelection] = useState("");
 
@@ -55,12 +55,12 @@ const KanbanBoardPage = () => {
     };
 
     const getTasksByState = state => {
-        let filtered = tasks.filter(task => task.Task_state === state);
+        let filtered = tasks.filter(task => task && task.Task_state === state);
 
         // Filter by selected application if not "all"
         if (selectedApp !== "all") {
             filtered = filtered.filter(
-                task => task.Task_app_Acronym === selectedApp
+                task => task && task.Task_app_Acronym === selectedApp
             );
         }
 
@@ -70,6 +70,16 @@ const KanbanBoardPage = () => {
     const handleTaskClick = task => {
         setSelectedTask(task);
     };
+
+    const handleCreateTask = () => {
+        if (selectedApp !== "all") {
+            setCreateAppSelection(selectedApp);
+        } else if (applications.length > 0) {
+            setCreateAppSelection(applications[0].App_Acronym);
+        }
+        setShowCreateTaskModal(true);
+    };
+
     const handleCreatePlan = () => {
         if (selectedApp !== "all") {
             setCreateAppSelection(selectedApp);
@@ -123,6 +133,13 @@ const KanbanBoardPage = () => {
                                 className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
                             >
                                 + Create Plan
+                            </button>
+                            <button
+                                onClick={handleCreateTask}
+                                disabled={applications.length === 0}
+                                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
+                            >
+                                + Create Task
                             </button>
                             <select
                                 value={selectedApp}
@@ -179,11 +196,27 @@ const KanbanBoardPage = () => {
                 </div>
             </main>
 
-            {/* <TaskModal
+            <TaskModal
+                isOpen={showCreateTaskModal && !selectedTask}
+                onClose={() => {
+                    setShowCreateTaskModal(false);
+                    setCreateAppSelection("");
+                }}
+                onSuccess={() => {
+                    fetchAllData();
+                    setShowCreateTaskModal(false);
+                    setCreateAppSelection("");
+                }}
+                application={getSelectedApplication()}
+                appAcronym={createAppSelection}
+            />
+
+            <TaskModal
                 isOpen={!!selectedTask}
                 onClose={() => setSelectedTask(null)}
                 onSuccess={fetchAllData}
                 task={selectedTask}
+            />
 
             <PlanModal
                 isOpen={showCreatePlanModal}
