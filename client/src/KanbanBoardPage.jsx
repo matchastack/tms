@@ -20,6 +20,8 @@ const KanbanBoardPage = () => {
 
     const STATES = ["Open", "To-Do", "Doing", "Done", "Closed"];
 
+    const isProjectManager = user?.groups?.includes("project manager");
+
     useEffect(() => {
         fetchAllData();
     }, []);
@@ -142,13 +144,15 @@ const KanbanBoardPage = () => {
                             Kanban
                         </h1>
 
-                        <button
-                            onClick={handleCreatePlan}
-                            disabled={applications.length === 0}
-                            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
-                        >
-                            + Add Plan
-                        </button>
+                        {isProjectManager && (
+                            <button
+                                onClick={handleCreatePlan}
+                                disabled={applications.length === 0}
+                                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
+                            >
+                                + Add Plan
+                            </button>
+                        )}
                     </div>
                 </div>
 
