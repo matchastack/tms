@@ -358,12 +358,13 @@ export const getTask = async (req, res, next) => {
 
 export const promoteTask = async (req, res, next) => {
     try {
-        const { task_id, notes } = req.body;
+        const { task_id, notes, expected_state } = req.body;
         const username = req.user.username;
         const updatedTask = await services.promoteTaskState(
             task_id,
             username,
-            notes
+            notes,
+            expected_state
         );
 
         // TODO: If promoted to "Done", send email notification
@@ -383,12 +384,13 @@ export const promoteTask = async (req, res, next) => {
 
 export const demoteTask = async (req, res, next) => {
     try {
-        const { task_id, notes } = req.body;
+        const { task_id, notes, expected_state } = req.body;
         const username = req.user.username;
         const updatedTask = await services.demoteTaskState(
             task_id,
             username,
-            notes
+            notes,
+            expected_state
         );
         res.status(200).json({
             success: true,

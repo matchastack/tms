@@ -717,14 +717,22 @@ export const getTaskById = async taskId => {
     return task;
 };
 
-export const promoteTaskState = async (taskId, username, notes) => {
+export const promoteTaskState = async (taskId, username, notes, expectedState = null) => {
     return await withTransaction(async connection => {
+        // Lock the row for update to prevent race conditions
         const task = await connection
-            .execute("SELECT * FROM tasks WHERE Task_id = ?", [taskId])
+            .execute("SELECT * FROM tasks WHERE Task_id = ? FOR UPDATE", [taskId])
             .then(([results]) => results[0]);
 
         if (!task) {
             throw new Error("Task not found");
+        }
+
+        // Validate the task is in the expected state
+        if (expectedState && task.Task_state !== expectedState) {
+            throw new Error(
+                `Task state has changed from ${expectedState} to ${task.Task_state}. Please refresh and try again.`
+            );
         }
 
         const previousState = task.Task_state;
@@ -749,7 +757,10 @@ export const promoteTaskState = async (taskId, username, notes) => {
         }
 
         // Validate plan is assigned when releasing from Open to To-Do
-        if (task.Task_state === "Open" && (!task.Task_plan || !task.Task_plan.trim())) {
+        if (
+            task.Task_state === "Open" &&
+            (!task.Task_plan || !task.Task_plan.trim())
+        ) {
             throw new Error("Please select a plan before releasing this task");
         }
 
@@ -762,6 +773,7 @@ export const promoteTaskState = async (taskId, username, notes) => {
             previousState
         );
 
+        // Update task (row is already locked with FOR UPDATE)
         await connection.execute(
             "UPDATE tasks SET Task_state = ?, Task_owner = ?, Task_notes = ? WHERE Task_id = ?",
             [newState, username, auditNotes, taskId]
@@ -776,14 +788,22 @@ export const promoteTaskState = async (taskId, username, notes) => {
     });
 };
 
-export const demoteTaskState = async (taskId, username, notes) => {
+export const demoteTaskState = async (taskId, username, notes, expectedState = null) => {
     return await withTransaction(async connection => {
+        // Lock the row for update to prevent race conditions
         const task = await connection
-            .execute("SELECT * FROM tasks WHERE Task_id = ?", [taskId])
+            .execute("SELECT * FROM tasks WHERE Task_id = ? FOR UPDATE", [taskId])
             .then(([results]) => results[0]);
 
         if (!task) {
             throw new Error("Task not found");
+        }
+
+        // Validate the task is in the expected state
+        if (expectedState && task.Task_state !== expectedState) {
+            throw new Error(
+                `Task state has changed from ${expectedState} to ${task.Task_state}. Please refresh and try again.`
+            );
         }
 
         const previousState = task.Task_state;
@@ -810,6 +830,7 @@ export const demoteTaskState = async (taskId, username, notes) => {
             previousState
         );
 
+        // Update task (row is already locked with FOR UPDATE)
         await connection.execute(
             "UPDATE tasks SET Task_state = ?, Task_owner = ?, Task_notes = ? WHERE Task_id = ?",
             [newState, username, auditNotes, taskId]

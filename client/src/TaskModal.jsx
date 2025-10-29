@@ -190,7 +190,8 @@ const TaskModal = ({
         try {
             const { data } = await axios.post("/tasks/promote", {
                 task_id: task.Task_id,
-                notes: formData.notes || undefined
+                notes: formData.notes || undefined,
+                expected_state: task.Task_state
             });
 
             if (data.success) {
@@ -212,7 +213,8 @@ const TaskModal = ({
         try {
             const { data } = await axios.post("/tasks/demote", {
                 task_id: task.Task_id,
-                notes: formData.notes || undefined
+                notes: formData.notes || undefined,
+                expected_state: task.Task_state
             });
 
             if (data.success) {
