@@ -297,7 +297,7 @@ const KanbanBoardPage = () => {
                     setTaskApplication(null);
                     setPlans([]);
                 }}
-                onSuccess={handleTaskUpdate}
+                onSuccess={fetchAllData}
                 task={selectedTask}
                 application={taskApplication}
                 plans={plans}
