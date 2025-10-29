@@ -377,8 +377,7 @@ const TaskModal = ({
                                             Task Description:
                                         </label>
                                         <p className="text-gray-700 whitespace-pre-wrap">
-                                            {task.Task_description ||
-                                                "No description"}
+                                            {task.Task_description || ""}
                                         </p>
                                     </div>
 
