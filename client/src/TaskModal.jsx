@@ -139,7 +139,8 @@ const TaskModal = ({
         setError("");
         setLoading(true);
 
-        const planToUpdate = planValue !== null ? planValue : formData.Task_plan;
+        const planToUpdate =
+            planValue !== null ? planValue : formData.Task_plan;
 
         try {
             const { data } = await axios.put("/tasks", {
@@ -536,11 +537,11 @@ const TaskModal = ({
                                             {task.Task_state === "Open"
                                                 ? "Release Task"
                                                 : task.Task_state === "To-Do"
-                                                ? "Start Task"
+                                                ? "Take Task"
                                                 : task.Task_state === "Doing"
-                                                ? "Submit Task"
+                                                ? "Request Task Review"
                                                 : task.Task_state === "Done"
-                                                ? "Close Task"
+                                                ? "Approve Task"
                                                 : "Promote →"}
                                         </button>
                                     )}
@@ -551,7 +552,7 @@ const TaskModal = ({
                                         className="px-6 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 transition-colors disabled:bg-orange-400"
                                     >
                                         {task.Task_state === "Doing"
-                                            ? "Return Task"
+                                            ? "Drop Task"
                                             : task.Task_state === "Done"
                                             ? "Reject Task"
                                             : "← Demote"}
