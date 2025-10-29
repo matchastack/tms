@@ -46,7 +46,6 @@ router.put(
 router.get(
     "/user_groups",
     validations.authenticateToken,
-    validations.requireAdmin,
     controllers.getUserGroups
 );
 
