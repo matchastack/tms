@@ -1,7 +1,16 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-const PlanModal = ({ isOpen, onClose, onSuccess, plan = null, appAcronym }) => {
+const PlanModal = ({
+    isOpen,
+    onClose,
+    onSuccess,
+    plan = null,
+    appAcronym,
+    application,
+    applications = [],
+    onApplicationChange
+}) => {
     const [formData, setFormData] = useState({
         Plan_MVP_name: "",
         Plan_startDate: "",
@@ -39,6 +48,56 @@ const PlanModal = ({ isOpen, onClose, onSuccess, plan = null, appAcronym }) => {
     const handleSubmit = async e => {
         e.preventDefault();
         setError("");
+
+        if (!isEdit && !appAcronym) {
+            setError("Please select an application");
+            return;
+        }
+
+        // Validate plan dates are within application dates
+        if (application) {
+            const appStart = application.App_startDate
+                ? new Date(application.App_startDate)
+                : null;
+            const appEnd = application.App_endDate
+                ? new Date(application.App_endDate)
+                : null;
+            const planStart = formData.Plan_startDate
+                ? new Date(formData.Plan_startDate)
+                : null;
+            const planEnd = formData.Plan_endDate
+                ? new Date(formData.Plan_endDate)
+                : null;
+
+            if (planStart && appStart && planStart < appStart) {
+                setError(
+                    `Plan start date must be on or after application start date (${application.App_startDate})`
+                );
+                return;
+            }
+
+            if (planEnd && appEnd && planEnd > appEnd) {
+                setError(
+                    `Plan end date must be on or before application end date (${application.App_endDate})`
+                );
+                return;
+            }
+
+            if (planStart && appEnd && planStart > appEnd) {
+                setError(
+                    `Plan start date must be on or before application end date (${application.App_endDate})`
+                );
+                return;
+            }
+
+            if (planEnd && appStart && planEnd < appStart) {
+                setError(
+                    `Plan end date must be on or after application start date (${application.App_startDate})`
+                );
+                return;
+            }
+        }
+
         setLoading(true);
 
         try {
@@ -118,6 +177,35 @@ const PlanModal = ({ isOpen, onClose, onSuccess, plan = null, appAcronym }) => {
                             </p>
                         )}
                     </div>
+
+                    {!isEdit && (
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Application
+                            </label>
+                            <select
+                                value={appAcronym || ""}
+                                onChange={e =>
+                                    onApplicationChange &&
+                                    onApplicationChange(e.target.value)
+                                }
+                                required
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                <option value="">
+                                    Select an application...
+                                </option>
+                                {applications.map(app => (
+                                    <option
+                                        key={app.App_Acronym}
+                                        value={app.App_Acronym}
+                                    >
+                                        {app.App_Acronym}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">

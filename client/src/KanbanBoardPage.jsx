@@ -17,6 +17,7 @@ const KanbanBoardPage = () => {
     const [showCreateTaskModal, setShowCreateTaskModal] = useState(false);
     const [showCreatePlanModal, setShowCreatePlanModal] = useState(false);
     const [createAppSelection, setCreateAppSelection] = useState("");
+    const [selectedApplication, setSelectedApplication] = useState(null);
 
     const STATES = ["Open", "To-Do", "Doing", "Done", "Closed"];
 
@@ -119,10 +120,17 @@ const KanbanBoardPage = () => {
     };
 
     const handleCreatePlan = () => {
-        if (applications.length > 0) {
-            setCreateAppSelection(applications[0].App_Acronym);
-        }
+        // Don't pre-select an application - let user choose
+        setCreateAppSelection("");
+        setSelectedApplication(null);
         setShowCreatePlanModal(true);
+    };
+
+    const handlePlanApplicationChange = async (newAppAcronym) => {
+        setCreateAppSelection(newAppAcronym);
+        // Fetch the selected application
+        const app = applications.find(a => a.App_Acronym === newAppAcronym);
+        setSelectedApplication(app || null);
     };
 
     const getSelectedApplication = () => {
@@ -253,13 +261,18 @@ const KanbanBoardPage = () => {
                 onClose={() => {
                     setShowCreatePlanModal(false);
                     setCreateAppSelection("");
+                    setSelectedApplication(null);
                 }}
                 onSuccess={() => {
                     fetchAllData();
                     setShowCreatePlanModal(false);
                     setCreateAppSelection("");
+                    setSelectedApplication(null);
                 }}
                 appAcronym={createAppSelection}
+                application={selectedApplication}
+                applications={applications}
+                onApplicationChange={handlePlanApplicationChange}
             />
         </div>
     );

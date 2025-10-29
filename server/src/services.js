@@ -397,19 +397,56 @@ export const createPlan = async planData => {
     const { Plan_MVP_name, Plan_startDate, Plan_endDate, Plan_app_Acronym } =
         planData;
 
-    if (Plan_startDate > Plan_endDate) {
+    if (Plan_startDate && Plan_endDate && Plan_startDate > Plan_endDate) {
         throw new Error("Start date cannot be after end date");
     }
 
     return await withTransaction(async connection => {
-        // Check if application exists
+        // Check if application exists and get its date range
         const app = await query(
-            "SELECT App_Acronym FROM applications WHERE App_Acronym = ?",
+            "SELECT App_Acronym, App_startDate, App_endDate FROM applications WHERE App_Acronym = ?",
             [Plan_app_Acronym]
         ).then(results => results[0]);
 
         if (!app) {
             throw new Error("Application not found");
+        }
+
+        // Validate plan dates are within application dates
+        if (
+            Plan_startDate &&
+            app.App_startDate &&
+            Plan_startDate < app.App_startDate
+        ) {
+            throw new Error(
+                "Plan start and end date must be on or after application start date"
+            );
+        }
+
+        if (Plan_endDate && app.App_endDate && Plan_endDate > app.App_endDate) {
+            throw new Error(
+                "Plan end date must be on or before application end date"
+            );
+        }
+
+        if (
+            Plan_startDate &&
+            app.App_endDate &&
+            Plan_startDate > app.App_endDate
+        ) {
+            throw new Error(
+                "Plan start date must be on or before application end date"
+            );
+        }
+
+        if (
+            Plan_endDate &&
+            app.App_startDate &&
+            Plan_endDate < app.App_startDate
+        ) {
+            throw new Error(
+                "Plan end date must be on or after application start date"
+            );
         }
 
         // Check if plan name already exists
@@ -458,18 +495,65 @@ export const getPlanByName = async planName => {
 
 export const updatePlan = async (planName, planData) => {
     const { Plan_startDate, Plan_endDate } = planData;
-    if (Plan_startDate > Plan_endDate) {
+    if (Plan_startDate && Plan_endDate && Plan_startDate > Plan_endDate) {
         throw new Error("Start date cannot be after end date");
     }
 
     return await withTransaction(async connection => {
         const existing = await query(
-            "SELECT Plan_MVP_name FROM plans WHERE Plan_MVP_name = ?",
+            "SELECT Plan_MVP_name, Plan_app_Acronym FROM plans WHERE Plan_MVP_name = ?",
             [planName]
         ).then(results => results[0]);
 
         if (!existing) {
             throw new Error("Plan not found");
+        }
+
+        // Get application date range
+        const app = await query(
+            "SELECT App_startDate, App_endDate FROM applications WHERE App_Acronym = ?",
+            [existing.Plan_app_Acronym]
+        ).then(results => results[0]);
+
+        if (!app) {
+            throw new Error("Associated application not found");
+        }
+
+        // Validate plan dates are within application dates
+        if (
+            Plan_startDate &&
+            app.App_startDate &&
+            Plan_startDate < app.App_startDate
+        ) {
+            throw new Error(
+                "Plan start date must be on or after application start date"
+            );
+        }
+
+        if (Plan_endDate && app.App_endDate && Plan_endDate > app.App_endDate) {
+            throw new Error(
+                "Plan end date must be on or before application end date"
+            );
+        }
+
+        if (
+            Plan_startDate &&
+            app.App_endDate &&
+            Plan_startDate > app.App_endDate
+        ) {
+            throw new Error(
+                "Plan start date must be on or before application end date"
+            );
+        }
+
+        if (
+            Plan_endDate &&
+            app.App_startDate &&
+            Plan_endDate < app.App_startDate
+        ) {
+            throw new Error(
+                "Plan end date must be on or after application start date"
+            );
         }
 
         await connection.execute(
