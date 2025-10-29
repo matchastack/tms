@@ -576,7 +576,7 @@ const TaskModal = ({
                                                 !formData.notes.trim() ||
                                                 task.Task_state === "Closed"
                                             }
-                                            className="mt-2 px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+                                            className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-gray-500 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
                                         >
                                             Add Note
                                         </button>
