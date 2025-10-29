@@ -23,14 +23,14 @@ router.put(
 router.get(
     "/accounts",
     validations.authenticateToken,
-    validations.requireAdmin,
+    validations.requireUserGroup("admin"),
     controllers.getAccounts
 );
 
 router.post(
     "/accounts",
     validations.authenticateToken,
-    validations.requireAdmin,
+    validations.requireUserGroup("admin"),
     validations.validateAccountCreation,
     controllers.createAccount
 );
@@ -38,7 +38,10 @@ router.post(
 router.put(
     "/accounts",
     validations.authenticateToken,
-    validations.requireSelfOrAdmin,
+    validations.requireUserGroup(
+        "admin",
+        req => req.body.username === req.user.username
+    ),
     validations.validateAccountUpdate,
     controllers.updateAccount
 );
@@ -52,7 +55,7 @@ router.get(
 router.post(
     "/user_groups",
     validations.authenticateToken,
-    validations.requireAdmin,
+    validations.requireUserGroup("admin"),
     validations.validateGroupCreation,
     controllers.createGroup
 );
@@ -62,7 +65,7 @@ router.post(
 router.post(
     "/applications",
     validations.authenticateToken,
-    validations.requireAdmin,
+    validations.requireUserGroup("project lead"),
     validations.validateApplicationCreation,
     controllers.createApplication
 );
@@ -82,7 +85,7 @@ router.get(
 router.put(
     "/applications/:acronym",
     validations.authenticateToken,
-    validations.requireAdmin,
+    validations.requireUserGroup("project lead"),
     validations.validateApplicationUpdate,
     controllers.updateApplication
 );

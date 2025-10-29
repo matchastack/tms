@@ -178,6 +178,50 @@ export const authenticateToken = async (req, res, next) => {
     }
 };
 
+/**
+ * Generalized user group validation middleware factory
+ * @param {string|string[]} groups - Single group or array of groups (OR logic)
+ * @param {Function} selfCheck - Optional callback(req) => boolean to check if user is accessing own resource
+ * @returns {Function} Express middleware function
+ *
+ * Examples:
+ * - requireUserGroup('admin') - requires admin group
+ * - requireUserGroup(['admin', 'project manager']) - requires admin OR project manager
+ * - requireUserGroup('admin', (req) => req.body.username === req.user.username) - requires admin OR self
+ */
+export const requireUserGroup = (groups, selfCheck = null) => {
+    return (req, res, next) => {
+        if (!req.user) {
+            return res.status(401).json({
+                success: false,
+                message: "Authentication required"
+            });
+        }
+
+        // Normalize groups to array
+        const allowedGroups = Array.isArray(groups) ? groups : [groups];
+
+        // Check if user is in any of the allowed groups
+        const hasGroup = allowedGroups.some(group => userHasGroup(req.user, group));
+
+        // Check self access if selfCheck callback is provided
+        const isSelf = selfCheck ? selfCheck(req) : false;
+
+        if (!hasGroup && !isSelf) {
+            const groupList = allowedGroups.join(", ");
+            return res.status(403).json({
+                success: false,
+                message: selfCheck
+                    ? "Access denied"
+                    : `Access denied. Required groups: ${groupList}`
+            });
+        }
+
+        next();
+    };
+};
+
+// Legacy function - use requireUserGroup('admin') instead
 export const requireAdmin = (req, res, next) => {
     if (!req.user) {
         return res.status(401).json({
@@ -219,6 +263,7 @@ export const requireRole = (...allowedRoles) => {
     };
 };
 
+// Legacy function - use requireUserGroup('admin', (req) => req.body.username === req.user.username) instead
 export const requireSelfOrAdmin = (req, res, next) => {
     if (!req.user) {
         return res.status(401).json({
