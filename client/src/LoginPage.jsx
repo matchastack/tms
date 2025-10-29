@@ -19,7 +19,7 @@ const LoginPage = () => {
         if (isAuthenticated) {
             isOnlyAdmin
                 ? navigate("/user/accounts", { replace: true })
-                : navigate("/apps", { replace: true });
+                : navigate("/kanban", { replace: true });
         }
     }, [isAuthenticated, navigate]);
 
