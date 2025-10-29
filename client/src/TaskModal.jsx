@@ -476,6 +476,48 @@ const TaskModal = ({
                                                 );
                                             })}
                                         </select>
+                                        {/* Action Buttons */}
+                                        <div className="flex justify-start gap-3 pt-4">
+                                            {canPromote() &&
+                                                task.Task_state !==
+                                                    "Closed" && (
+                                                    <button
+                                                        onClick={handlePromote}
+                                                        disabled={loading}
+                                                        className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors disabled:bg-blue-400"
+                                                    >
+                                                        {task.Task_state ===
+                                                        "Open"
+                                                            ? "Release Task"
+                                                            : task.Task_state ===
+                                                              "To-Do"
+                                                            ? "Take Task"
+                                                            : task.Task_state ===
+                                                              "Doing"
+                                                            ? "Request Task Review"
+                                                            : task.Task_state ===
+                                                              "Done"
+                                                            ? "Approve Task"
+                                                            : "Promote →"}
+                                                    </button>
+                                                )}
+                                            {canDemote() &&
+                                                task.Task_state !== "Open" && (
+                                                    <button
+                                                        onClick={handleDemote}
+                                                        disabled={loading}
+                                                        className="px-6 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 transition-colors disabled:bg-orange-400"
+                                                    >
+                                                        {task.Task_state ===
+                                                        "Doing"
+                                                            ? "Drop Task"
+                                                            : task.Task_state ===
+                                                              "Done"
+                                                            ? "Reject Task"
+                                                            : "← Demote"}
+                                                    </button>
+                                                )}
+                                        </div>
                                     </div>
                                 </div>
 
@@ -523,41 +565,6 @@ const TaskModal = ({
                                         </button>
                                     </div>
                                 </div>
-                            </div>
-
-                            {/* Action Buttons */}
-                            <div className="flex justify-start gap-3 pt-4 border-t">
-                                {canPromote() &&
-                                    task.Task_state !== "Closed" && (
-                                        <button
-                                            onClick={handlePromote}
-                                            disabled={loading}
-                                            className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors disabled:bg-blue-400"
-                                        >
-                                            {task.Task_state === "Open"
-                                                ? "Release Task"
-                                                : task.Task_state === "To-Do"
-                                                ? "Take Task"
-                                                : task.Task_state === "Doing"
-                                                ? "Request Task Review"
-                                                : task.Task_state === "Done"
-                                                ? "Approve Task"
-                                                : "Promote →"}
-                                        </button>
-                                    )}
-                                {canDemote() && task.Task_state !== "Open" && (
-                                    <button
-                                        onClick={handleDemote}
-                                        disabled={loading}
-                                        className="px-6 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 transition-colors disabled:bg-orange-400"
-                                    >
-                                        {task.Task_state === "Doing"
-                                            ? "Drop Task"
-                                            : task.Task_state === "Done"
-                                            ? "Reject Task"
-                                            : "← Demote"}
-                                    </button>
-                                )}
                             </div>
                         </div>
                     )}
