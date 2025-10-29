@@ -126,15 +126,17 @@ const TaskModal = ({
         }
     };
 
-    const handleUpdatePlan = async () => {
+    const handleUpdatePlan = async (planValue = null) => {
         if (!task) return;
         setError("");
         setLoading(true);
 
+        const planToUpdate = planValue !== null ? planValue : formData.Task_plan;
+
         try {
             const { data } = await axios.put("/tasks", {
                 task_id: task.Task_id,
-                plan_name: formData.Task_plan || null
+                plan_name: planToUpdate || null
             });
 
             if (data.success) {
@@ -416,11 +418,9 @@ const TaskModal = ({
                                             name="Task_plan"
                                             value={formData.Task_plan}
                                             onChange={e => {
+                                                const newPlan = e.target.value;
                                                 handleChange(e);
-                                                setTimeout(
-                                                    () => handleUpdatePlan(),
-                                                    0
-                                                );
+                                                handleUpdatePlan(newPlan);
                                             }}
                                             className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         >
