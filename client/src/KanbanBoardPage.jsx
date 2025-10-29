@@ -22,6 +22,20 @@ const KanbanBoardPage = () => {
 
     const isProjectManager = user?.groups?.includes("project manager");
 
+    // Filter applications where user can create tasks
+    const getCreateableApplications = () => {
+        if (!user?.groups) return [];
+
+        return applications.filter(app => {
+            const permitGroups = Array.isArray(app.App_permit_Create)
+                ? app.App_permit_Create
+                : [];
+            return permitGroups.some(group => user.groups.includes(group));
+        });
+    };
+
+    const createableApplications = getCreateableApplications();
+
     useEffect(() => {
         fetchAllData();
     }, []);
@@ -75,6 +89,10 @@ const KanbanBoardPage = () => {
     };
 
     const handleCreateTask = () => {
+        if (createableApplications.length === 0) {
+            setError("You don't have permission to create tasks for any application");
+            return;
+        }
         setCreateAppSelection("");
         setPlans([]);
         setShowCreateTaskModal(true);
@@ -174,11 +192,10 @@ const KanbanBoardPage = () => {
                                     <h2 className="font-semibold text-gray-900">
                                         {state}
                                     </h2>
-                                    {state === "Open" && (
+                                    {state === "Open" && createableApplications.length > 0 && (
                                         <button
                                             onClick={handleCreateTask}
-                                            disabled={applications.length === 0}
-                                            className="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                                            className="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-700 transition-colors"
                                         >
                                             + Add Task
                                         </button>
@@ -215,7 +232,7 @@ const KanbanBoardPage = () => {
                 }}
                 application={getSelectedApplication()}
                 appAcronym={createAppSelection}
-                applications={applications}
+                applications={createableApplications}
                 plans={plans}
                 onApplicationChange={handleApplicationChange}
             />
