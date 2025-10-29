@@ -431,9 +431,9 @@ const TaskModal = ({
                                                 handleChange(e);
                                                 handleUpdatePlan(newPlan);
                                             }}
-                                            disabled={!canEditPlan()}
+                                            disabled={!canEditPlan() || task.Task_state === "Closed"}
                                             className={`w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                                                !canEditPlan()
+                                                !canEditPlan() || task.Task_state === "Closed"
                                                     ? "bg-gray-100 cursor-not-allowed"
                                                     : ""
                                             }`}
@@ -550,14 +550,24 @@ const TaskModal = ({
                                             value={formData.notes}
                                             onChange={handleChange}
                                             rows="4"
-                                            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                                            placeholder="Insert Entry Here..."
+                                            disabled={task.Task_state === "Closed"}
+                                            className={`w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none ${
+                                                task.Task_state === "Closed"
+                                                    ? "bg-gray-100 cursor-not-allowed"
+                                                    : ""
+                                            }`}
+                                            placeholder={
+                                                task.Task_state === "Closed"
+                                                    ? "Task is closed - no edits allowed"
+                                                    : "Insert Entry Here..."
+                                            }
                                         />
                                         <button
                                             onClick={handleAddNote}
                                             disabled={
                                                 loading ||
-                                                !formData.notes.trim()
+                                                !formData.notes.trim() ||
+                                                task.Task_state === "Closed"
                                             }
                                             className="mt-2 px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
                                         >

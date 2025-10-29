@@ -845,6 +845,11 @@ export const updateTaskPlan = async (taskId, planName, username) => {
             throw new Error("Application not found");
         }
 
+        // Prevent editing closed tasks
+        if (task.Task_state === "Closed") {
+            throw new Error("Cannot modify closed tasks");
+        }
+
         // Check if user has permission to change plan (must be in App_permit_Open)
         const permitOpenGroups = app.App_permit_Open || [];
 
@@ -913,6 +918,11 @@ export const addTaskNote = async (taskId, note, username) => {
 
         if (!task) {
             throw new Error("Task not found");
+        }
+
+        // Prevent adding notes to closed tasks
+        if (task.Task_state === "Closed") {
+            throw new Error("Cannot add notes to closed tasks");
         }
 
         // Add user note to audit trail
