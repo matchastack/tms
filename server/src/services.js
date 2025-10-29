@@ -593,7 +593,17 @@ const appendAuditNote = (
     note,
     previousState = null
 ) => {
-    const timestamp = new Date().toISOString();
+    const timestamp = new Date()
+        .toLocaleString("en-SG", {
+            timeZone: "Asia/Singapore",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false
+        })
+        .replace(/(\d+)\/(\d+)\/(\d+),\s(\d+):(\d+)/, "$3-$1-$2 $4:$5");
     let noteText = note;
 
     // If no note provided and previousState is given, generate transition message
@@ -603,9 +613,7 @@ const appendAuditNote = (
         noteText = "";
     }
 
-    const newNote = `\n[${username}] [${state}] [${timestamp}]\n${noteText}\n${"=".repeat(
-        50
-    )}`;
+    const newNote = `\n[${timestamp}] ${state} - ${username}\n${noteText}\n`;
     return (currentNotes || "") + newNote;
 };
 
@@ -717,11 +725,18 @@ export const getTaskById = async taskId => {
     return task;
 };
 
-export const promoteTaskState = async (taskId, username, notes, expectedState = null) => {
+export const promoteTaskState = async (
+    taskId,
+    username,
+    notes,
+    expectedState = null
+) => {
     return await withTransaction(async connection => {
         // Lock the row for update to prevent race conditions
         const task = await connection
-            .execute("SELECT * FROM tasks WHERE Task_id = ? FOR UPDATE", [taskId])
+            .execute("SELECT * FROM tasks WHERE Task_id = ? FOR UPDATE", [
+                taskId
+            ])
             .then(([results]) => results[0]);
 
         if (!task) {
@@ -788,11 +803,18 @@ export const promoteTaskState = async (taskId, username, notes, expectedState = 
     });
 };
 
-export const demoteTaskState = async (taskId, username, notes, expectedState = null) => {
+export const demoteTaskState = async (
+    taskId,
+    username,
+    notes,
+    expectedState = null
+) => {
     return await withTransaction(async connection => {
         // Lock the row for update to prevent race conditions
         const task = await connection
-            .execute("SELECT * FROM tasks WHERE Task_id = ? FOR UPDATE", [taskId])
+            .execute("SELECT * FROM tasks WHERE Task_id = ? FOR UPDATE", [
+                taskId
+            ])
             .then(([results]) => results[0]);
 
         if (!task) {
