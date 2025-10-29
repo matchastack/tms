@@ -18,6 +18,7 @@ const KanbanBoardPage = () => {
     const [showCreatePlanModal, setShowCreatePlanModal] = useState(false);
     const [createAppSelection, setCreateAppSelection] = useState("");
     const [selectedApplication, setSelectedApplication] = useState(null);
+    const [taskApplication, setTaskApplication] = useState(null);
 
     const STATES = ["Open", "To-Do", "Doing", "Done", "Closed"];
 
@@ -78,6 +79,10 @@ const KanbanBoardPage = () => {
     const handleTaskClick = async task => {
         setSelectedTask(task);
 
+        // Get the application for this task
+        const app = applications.find(a => a.App_Acronym === task.Task_app_Acronym);
+        setTaskApplication(app || null);
+
         // Fetch plans for the task's application
         try {
             const { data } = await axios.get(`/plans/${task.Task_app_Acronym}`);
@@ -98,6 +103,9 @@ const KanbanBoardPage = () => {
                 const { data } = await axios.get(`/task/${selectedTask.Task_id}`);
                 if (data.success && data.data) {
                     setSelectedTask(data.data);
+                    // Update the application for this task
+                    const app = applications.find(a => a.App_Acronym === data.data.Task_app_Acronym);
+                    setTaskApplication(app || null);
                 }
             } catch (err) {
                 console.error("Failed to refresh selected task:", err);
@@ -265,10 +273,12 @@ const KanbanBoardPage = () => {
                 isOpen={!!selectedTask}
                 onClose={() => {
                     setSelectedTask(null);
+                    setTaskApplication(null);
                     setPlans([]);
                 }}
                 onSuccess={handleTaskUpdate}
                 task={selectedTask}
+                application={taskApplication}
                 plans={plans}
             />
 
