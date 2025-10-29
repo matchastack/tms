@@ -259,7 +259,7 @@ const AppPage = () => {
                     </div>
                 )}
 
-                <div className="bg-white rounded-lg shadow-sm overflow-x-auto border border-gray-200">
+                <div className="bg-white rounded-lg shadow-sm overflow-visible border border-gray-200">
                     <table className="w-full border-collapse">
                         <thead>
                             <tr className="bg-gray-50">
