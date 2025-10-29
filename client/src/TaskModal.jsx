@@ -95,6 +95,14 @@ const TaskModal = ({
         return permitGroups.some(group => user.groups.includes(group));
     };
 
+    const canEditPlan = () => {
+        if (!task || !application || !user?.groups) return false;
+        const permitGroups = Array.isArray(application.App_permit_Open)
+            ? application.App_permit_Open
+            : [];
+        return permitGroups.some(group => user.groups.includes(group));
+    };
+
     const handleCreateTask = async e => {
         e.preventDefault();
         setError("");
@@ -422,7 +430,12 @@ const TaskModal = ({
                                                 handleChange(e);
                                                 handleUpdatePlan(newPlan);
                                             }}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            disabled={!canEditPlan()}
+                                            className={`w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                                !canEditPlan()
+                                                    ? "bg-gray-100 cursor-not-allowed"
+                                                    : ""
+                                            }`}
                                         >
                                             <option value=""></option>
                                             {plans.map(plan => {

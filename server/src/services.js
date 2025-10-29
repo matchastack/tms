@@ -586,7 +586,13 @@ const generateTaskId = async (appAcronym, connection) => {
 };
 
 // Helper: Append audit note
-const appendAuditNote = (currentNotes, username, state, note, previousState = null) => {
+const appendAuditNote = (
+    currentNotes,
+    username,
+    state,
+    note,
+    previousState = null
+) => {
     const timestamp = new Date().toISOString();
     let noteText = note;
 
@@ -594,10 +600,12 @@ const appendAuditNote = (currentNotes, username, state, note, previousState = nu
     if (!note && previousState) {
         noteText = `Task moved from ${previousState} to ${state}`;
     } else if (!note) {
-        noteText = "State transition";
+        noteText = "";
     }
 
-    const newNote = `\n[${username}] [${state}] [${timestamp}]\n${noteText}\n${"=".repeat(50)}`;
+    const newNote = `\n[${username}] [${state}] [${timestamp}]\n${noteText}\n${"=".repeat(
+        50
+    )}`;
     return (currentNotes || "") + newNote;
 };
 
@@ -819,6 +827,34 @@ export const updateTaskPlan = async (taskId, planName, username) => {
 
         if (!task) {
             throw new Error("Task not found");
+        }
+
+        // Get the application to check permissions
+        const app = await connection
+            .execute("SELECT * FROM applications WHERE App_Acronym = ?", [
+                task.Task_app_Acronym
+            ])
+            .then(([results]) => results[0]);
+
+        if (!app) {
+            throw new Error("Application not found");
+        }
+
+        // Check if user has permission to change plan (must be in App_permit_Open)
+        const permitOpenGroups = app.App_permit_Open || [];
+
+        let hasPermission = false;
+        for (const group of permitOpenGroups) {
+            if (await checkGroup(username, group)) {
+                hasPermission = true;
+                break;
+            }
+        }
+
+        if (!hasPermission) {
+            throw new Error(
+                "You don't have permission to change the plan for this task"
+            );
         }
 
         // Check if plan has actually changed
