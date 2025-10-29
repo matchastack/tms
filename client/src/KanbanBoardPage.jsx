@@ -89,6 +89,22 @@ const KanbanBoardPage = () => {
         }
     };
 
+    const handleTaskUpdate = async () => {
+        // Refresh all data first
+        await fetchAllData();
+        // Then refresh the selected task specifically
+        if (selectedTask) {
+            try {
+                const { data } = await axios.get(`/task/${selectedTask.Task_id}`);
+                if (data.success && data.data) {
+                    setSelectedTask(data.data);
+                }
+            } catch (err) {
+                console.error("Failed to refresh selected task:", err);
+            }
+        }
+    };
+
     const handleCreateTask = () => {
         if (createableApplications.length === 0) {
             setError("You don't have permission to create tasks for any application");
@@ -251,7 +267,7 @@ const KanbanBoardPage = () => {
                     setSelectedTask(null);
                     setPlans([]);
                 }}
-                onSuccess={fetchAllData}
+                onSuccess={handleTaskUpdate}
                 task={selectedTask}
                 plans={plans}
             />

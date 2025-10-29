@@ -158,7 +158,8 @@ const TaskModal = ({
         try {
             const { data } = await axios.put("/tasks", {
                 task_id: task.Task_id,
-                notes: formData.notes
+                notes: formData.notes,
+                plan_name: formData.Task_plan || null
             });
 
             if (data.success) {
