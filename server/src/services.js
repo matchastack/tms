@@ -608,7 +608,7 @@ const appendAuditNote = (
 
     // If no note provided and previousState is given, generate transition message
     if (!note && previousState) {
-        noteText = `Task moved from ${previousState} to ${state}`;
+        noteText = `Task moved from "${previousState}" to "${state}".`;
     } else if (!note) {
         noteText = "";
     }

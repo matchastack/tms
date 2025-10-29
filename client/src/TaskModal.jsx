@@ -147,7 +147,7 @@ const TaskModal = ({
                 Task_name: formData.Task_name,
                 Task_description: formData.Task_description,
                 Task_plan: formData.Task_plan || null,
-                notes: formData.notes,
+                notes: "Task created.",
                 Task_app_Acronym: appAcronym
             });
 
@@ -218,7 +218,16 @@ const TaskModal = ({
         try {
             const { data } = await axios.post("/tasks/promote", {
                 task_id: task.Task_id,
-                notes: formData.notes || undefined,
+                notes:
+                    task.Task_state === "Open"
+                        ? "Task released."
+                        : task.Task_state === "To-Do"
+                        ? "Task taken."
+                        : task.Task_state === "Doing"
+                        ? "Task review requested."
+                        : task.Task_state === "Done"
+                        ? "Task approved."
+                        : formData.notes || undefined,
                 expected_state: task.Task_state
             });
 
@@ -241,7 +250,12 @@ const TaskModal = ({
         try {
             const { data } = await axios.post("/tasks/demote", {
                 task_id: task.Task_id,
-                notes: formData.notes || undefined,
+                notes:
+                    task.Task_state === "Doing"
+                        ? "Task dropped."
+                        : task.Task_state === "Done"
+                        ? "Task rejected."
+                        : formData.notes || undefined,
                 expected_state: task.Task_state
             });
 
