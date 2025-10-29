@@ -586,11 +586,18 @@ const generateTaskId = async (appAcronym, connection) => {
 };
 
 // Helper: Append audit note
-const appendAuditNote = (currentNotes, username, state, note) => {
+const appendAuditNote = (currentNotes, username, state, note, previousState = null) => {
     const timestamp = new Date().toISOString();
-    const newNote = `\n[${username}] [${state}] [${timestamp}]\n${
-        note || "State transition"
-    }\n${"=".repeat(50)}`;
+    let noteText = note;
+
+    // If no note provided and previousState is given, generate transition message
+    if (!note && previousState) {
+        noteText = `Task moved from ${previousState} to ${state}`;
+    } else if (!note) {
+        noteText = "State transition";
+    }
+
+    const newNote = `\n[${username}] [${state}] [${timestamp}]\n${noteText}\n${"=".repeat(50)}`;
     return (currentNotes || "") + newNote;
 };
 
@@ -712,6 +719,8 @@ export const promoteTaskState = async (taskId, username, notes) => {
             throw new Error("Task not found");
         }
 
+        const previousState = task.Task_state;
+
         // Determine next state
         let newState;
         switch (task.Task_state) {
@@ -736,7 +745,8 @@ export const promoteTaskState = async (taskId, username, notes) => {
             task.Task_notes,
             username,
             newState,
-            notes
+            notes,
+            previousState
         );
 
         await connection.execute(
@@ -763,6 +773,8 @@ export const demoteTaskState = async (taskId, username, notes) => {
             throw new Error("Task not found");
         }
 
+        const previousState = task.Task_state;
+
         // Determine previous state
         let newState;
         switch (task.Task_state) {
@@ -781,7 +793,8 @@ export const demoteTaskState = async (taskId, username, notes) => {
             task.Task_notes,
             username,
             newState,
-            notes
+            notes,
+            previousState
         );
 
         await connection.execute(
@@ -808,6 +821,15 @@ export const updateTaskPlan = async (taskId, planName, username) => {
             throw new Error("Task not found");
         }
 
+        // Check if plan has actually changed
+        const currentPlan = task.Task_plan || null;
+        const newPlan = planName || null;
+
+        // If plan hasn't changed, just return the task without updating
+        if (currentPlan === newPlan) {
+            return await getTaskById(taskId);
+        }
+
         // Validate plan exists and belongs to the same app
         if (planName) {
             const plan = await connection
@@ -824,7 +846,7 @@ export const updateTaskPlan = async (taskId, planName, username) => {
             }
         }
 
-        // Update audit trail
+        // Update audit trail only if plan changed
         const note = planName ? `Plan assigned: ${planName}` : "Plan removed";
         const auditNotes = appendAuditNote(
             task.Task_notes,
@@ -836,6 +858,33 @@ export const updateTaskPlan = async (taskId, planName, username) => {
         await connection.execute(
             "UPDATE tasks SET Task_plan = ?, Task_notes = ? WHERE Task_id = ?",
             [planName || null, auditNotes, taskId]
+        );
+
+        return await getTaskById(taskId);
+    });
+};
+
+export const addTaskNote = async (taskId, note, username) => {
+    return await withTransaction(async connection => {
+        const task = await connection
+            .execute("SELECT * FROM tasks WHERE Task_id = ?", [taskId])
+            .then(([results]) => results[0]);
+
+        if (!task) {
+            throw new Error("Task not found");
+        }
+
+        // Add user note to audit trail
+        const auditNotes = appendAuditNote(
+            task.Task_notes,
+            username,
+            task.Task_state,
+            note
+        );
+
+        await connection.execute(
+            "UPDATE tasks SET Task_notes = ? WHERE Task_id = ?",
+            [auditNotes, taskId]
         );
 
         return await getTaskById(taskId);

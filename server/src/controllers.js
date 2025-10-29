@@ -405,13 +405,29 @@ export const demoteTask = async (req, res, next) => {
 
 export const updateTask = async (req, res, next) => {
     try {
-        const { task_id, plan_name } = req.body;
+        const { task_id, plan_name, notes } = req.body;
         const username = req.user.username;
-        const updatedTask = await services.updateTaskPlan(
-            task_id,
-            plan_name,
-            username
-        );
+
+        let updatedTask;
+
+        // If notes are provided, add them
+        if (notes && notes.trim()) {
+            updatedTask = await services.addTaskNote(
+                task_id,
+                notes,
+                username
+            );
+        }
+
+        // If plan_name is provided (could be changed or same), update plan
+        if (plan_name !== undefined) {
+            updatedTask = await services.updateTaskPlan(
+                task_id,
+                plan_name,
+                username
+            );
+        }
+
         res.status(200).json({
             success: true,
             message: "Task updated successfully",
