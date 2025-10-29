@@ -103,6 +103,34 @@ const TaskModal = ({
         return permitGroups.some(group => user.groups.includes(group));
     };
 
+    const canAddNotes = () => {
+        if (!task || !application || !user?.groups) return false;
+        if (task.Task_state === "Closed") return false;
+
+        const state = task.Task_state;
+        let permitGroups = [];
+
+        if (state === "Open") {
+            permitGroups = Array.isArray(application.App_permit_Open)
+                ? application.App_permit_Open
+                : [];
+        } else if (state === "To-Do") {
+            permitGroups = Array.isArray(application.App_permit_toDoList)
+                ? application.App_permit_toDoList
+                : [];
+        } else if (state === "Doing") {
+            permitGroups = Array.isArray(application.App_permit_Doing)
+                ? application.App_permit_Doing
+                : [];
+        } else if (state === "Done") {
+            permitGroups = Array.isArray(application.App_permit_Done)
+                ? application.App_permit_Done
+                : [];
+        }
+
+        return permitGroups.some(group => user.groups.includes(group));
+    };
+
     const handleCreateTask = async e => {
         e.preventDefault();
         setError("");
@@ -545,41 +573,31 @@ const TaskModal = ({
                                         </div>
                                     </div>
 
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Entry
-                                        </label>
-                                        <textarea
-                                            name="notes"
-                                            value={formData.notes}
-                                            onChange={handleChange}
-                                            rows="4"
-                                            disabled={
-                                                task.Task_state === "Closed"
-                                            }
-                                            className={`w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none ${
-                                                task.Task_state === "Closed"
-                                                    ? "bg-gray-100 cursor-not-allowed"
-                                                    : ""
-                                            }`}
-                                            placeholder={
-                                                task.Task_state === "Closed"
-                                                    ? "Task is closed - no edits allowed"
-                                                    : "Insert Entry Here..."
-                                            }
-                                        />
-                                        <button
-                                            onClick={handleAddNote}
-                                            disabled={
-                                                loading ||
-                                                !formData.notes.trim() ||
-                                                task.Task_state === "Closed"
-                                            }
-                                            className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-gray-500 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
-                                        >
-                                            Add Note
-                                        </button>
-                                    </div>
+                                    {canAddNotes() && (
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                Entry
+                                            </label>
+                                            <textarea
+                                                name="notes"
+                                                value={formData.notes}
+                                                onChange={handleChange}
+                                                rows="4"
+                                                className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                                                placeholder="Insert Entry Here..."
+                                            />
+                                            <button
+                                                onClick={handleAddNote}
+                                                disabled={
+                                                    loading ||
+                                                    !formData.notes.trim()
+                                                }
+                                                className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-gray-500 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+                                            >
+                                                Add Note
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
