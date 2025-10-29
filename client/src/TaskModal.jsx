@@ -6,6 +6,7 @@ const TaskModal = ({
     isOpen,
     onClose,
     onSuccess,
+    onTaskUpdate = null,
     task = null,
     application,
     appAcronym,
@@ -177,7 +178,11 @@ const TaskModal = ({
             });
 
             if (data.success) {
-                onSuccess();
+                if (onTaskUpdate) {
+                    onTaskUpdate();
+                } else {
+                    onSuccess();
+                }
                 setError("");
             }
         } catch (err) {
@@ -199,7 +204,11 @@ const TaskModal = ({
             });
 
             if (data.success) {
-                onSuccess();
+                if (onTaskUpdate) {
+                    onTaskUpdate();
+                } else {
+                    onSuccess();
+                }
                 setFormData(prev => ({ ...prev, notes: "" }));
                 setError("");
             }
