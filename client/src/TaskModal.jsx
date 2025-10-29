@@ -257,12 +257,6 @@ const TaskModal = ({
                 </div>
 
                 <div className="p-6 space-y-4">
-                    {error && (
-                        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-                            {error}
-                        </div>
-                    )}
-
                     {isCreate ? (
                         <form onSubmit={handleCreateTask}>
                             <div>
@@ -431,9 +425,13 @@ const TaskModal = ({
                                                 handleChange(e);
                                                 handleUpdatePlan(newPlan);
                                             }}
-                                            disabled={!canEditPlan() || task.Task_state === "Closed"}
+                                            disabled={
+                                                !canEditPlan() ||
+                                                task.Task_state === "Closed"
+                                            }
                                             className={`w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                                                !canEditPlan() || task.Task_state === "Closed"
+                                                !canEditPlan() ||
+                                                task.Task_state === "Closed"
                                                     ? "bg-gray-100 cursor-not-allowed"
                                                     : ""
                                             }`}
@@ -476,6 +474,11 @@ const TaskModal = ({
                                                 );
                                             })}
                                         </select>
+                                        {error && (
+                                            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mt-4">
+                                                {error}
+                                            </div>
+                                        )}
                                         {/* Action Buttons */}
                                         <div className="flex justify-start gap-3 pt-4">
                                             {canPromote() &&
@@ -550,7 +553,9 @@ const TaskModal = ({
                                             value={formData.notes}
                                             onChange={handleChange}
                                             rows="4"
-                                            disabled={task.Task_state === "Closed"}
+                                            disabled={
+                                                task.Task_state === "Closed"
+                                            }
                                             className={`w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none ${
                                                 task.Task_state === "Closed"
                                                     ? "bg-gray-100 cursor-not-allowed"
