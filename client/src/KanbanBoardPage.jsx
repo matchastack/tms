@@ -11,6 +11,7 @@ const KanbanBoardPage = () => {
     const [applications, setApplications] = useState([]);
     const [tasks, setTasks] = useState([]);
     const [plans, setPlans] = useState([]);
+    const [allPlans, setAllPlans] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [selectedTask, setSelectedTask] = useState(null);
@@ -64,6 +65,20 @@ const KanbanBoardPage = () => {
                 );
 
                 setTasks(allTasks);
+
+                // Fetch plans for all applications
+                const planPromises = apps.map(app =>
+                    axios
+                        .get(`/plans/${app.App_Acronym}`)
+                        .catch(() => ({ data: { data: [] } }))
+                );
+
+                const planResults = await Promise.all(planPromises);
+                const allPlansData = planResults.flatMap(res =>
+                    res.data.success ? res.data.data : []
+                );
+
+                setAllPlans(allPlansData);
             }
         } catch (err) {
             setError(err.response?.data?.message || "Failed to load data");
@@ -74,6 +89,11 @@ const KanbanBoardPage = () => {
 
     const getTasksByState = state => {
         return tasks.filter(task => task && task.Task_state === state);
+    };
+
+    const getPlanDetails = planName => {
+        if (!planName) return null;
+        return allPlans.find(plan => plan.Plan_MVP_name === planName) || null;
     };
 
     const handleTaskClick = async task => {
@@ -241,6 +261,7 @@ const KanbanBoardPage = () => {
                                         task={task}
                                         onClick={() => handleTaskClick(task)}
                                         showAppName={true}
+                                        planDetails={getPlanDetails(task.Task_plan)}
                                     />
                                 ))}
                             </div>
