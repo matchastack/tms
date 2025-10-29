@@ -748,6 +748,11 @@ export const promoteTaskState = async (taskId, username, notes) => {
                 throw new Error("Task is already in final state");
         }
 
+        // Validate plan is assigned when releasing from Open to To-Do
+        if (task.Task_state === "Open" && (!task.Task_plan || !task.Task_plan.trim())) {
+            throw new Error("Please select a plan before releasing this task");
+        }
+
         // Update audit trail
         const auditNotes = appendAuditNote(
             task.Task_notes,
