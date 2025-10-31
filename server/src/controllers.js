@@ -1,3 +1,4 @@
+import nodemailer from "nodemailer";
 import * as services from "./services.js";
 
 export const login = async (req, res, next) => {
@@ -367,7 +368,62 @@ export const promoteTask = async (req, res, next) => {
             expected_state
         );
 
-        // TODO: If promoted to "Done", send email notification
+        // If promoted to "Done", send email notification
+        if (updatedTask.Task_state === "Done") {
+            try {
+                // Get application details to find users to notify
+                const app = await services.getApplicationByAcronym(
+                    updatedTask.Task_app_Acronym
+                );
+
+                // Get all accounts to find users in App_permit_Done group
+                const allAccounts = await services.getAllAccounts();
+                const permitDoneGroups = app.App_permit_Done || [];
+
+                // Find users who are in any of the permit_Done groups
+                const usersToNotify = allAccounts.filter(account => {
+                    const userGroups = account.userGroups || [];
+                    return permitDoneGroups.some(group =>
+                        userGroups.includes(group)
+                    );
+                });
+
+                // Get email addresses
+                const emailAddresses = usersToNotify
+                    .map(user => user.email)
+                    .filter(email => email);
+
+                if (emailAddresses.length > 0) {
+                    const transporter = nodemailer.createTransport({
+                        host: "smtp.ethereal.email",
+                        port: 587,
+                        auth: {
+                            user: process.env.EMAIL_USERNAME,
+                            pass: process.env.EMAIL_PASSWORD
+                        }
+                    });
+
+                    const mailOptions = {
+                        from: process.env.EMAIL_USERNAME,
+                        to: emailAddresses.join(", "),
+                        subject: `Task ${updatedTask.Task_id} Ready for Review`,
+                        text: `Task "${updatedTask.Task_name}" (${updatedTask.Task_id}) has been moved to "Done" state and is ready for approval.\n\nApplication: ${updatedTask.Task_app_Acronym}\nTask Owner: ${updatedTask.Task_owner || "N/A"}\n\nPlease review and approve or reject the task.`,
+                        html: `<h2>Task Ready for Review</h2>
+                        <p>Task <strong>"${updatedTask.Task_name}"</strong> (${updatedTask.Task_id}) has been moved to <strong>"Done"</strong> state and is ready for approval.</p>
+                        <ul>
+                            <li><strong>Application:</strong> ${updatedTask.Task_app_Acronym}</li>
+                            <li><strong>Task Owner:</strong> ${updatedTask.Task_owner || "N/A"}</li>
+                        </ul>
+                        <p>Please review and approve or reject the task.</p>`
+                    };
+
+                    await transporter.sendMail(mailOptions);
+                }
+            } catch (emailError) {
+                // Log email error but don't fail the task promotion
+                console.error("Failed to send email notification:", emailError);
+            }
+        }
 
         res.status(200).json({
             success: true,
@@ -414,11 +470,7 @@ export const updateTask = async (req, res, next) => {
 
         // If notes are provided, add them
         if (notes && notes.trim()) {
-            updatedTask = await services.addTaskNote(
-                task_id,
-                notes,
-                username
-            );
+            updatedTask = await services.addTaskNote(task_id, notes, username);
         }
 
         // If plan_name is provided (could be changed or same), update plan
