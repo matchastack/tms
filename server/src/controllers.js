@@ -104,7 +104,7 @@ export const createAccount = async (req, res, next) => {
             username,
             email,
             password,
-            userGroups: Array.isArray(userGroups) ? userGroups : [], // TODO: default should be handled at higher level or frontend
+            userGroups,
             isActive
         });
 
@@ -129,7 +129,7 @@ export const updateAccount = async (req, res, next) => {
         const updatedAccount = await services.updateAccount(username, {
             email,
             password,
-            userGroups: Array.isArray(userGroups) ? userGroups : [], // TODO: default should be handled at higher level or frontend
+            userGroups,
             isActive,
             newUsername
         });
