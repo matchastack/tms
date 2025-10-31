@@ -229,13 +229,13 @@ const TaskModal = ({
                 task_id: task.Task_id,
                 notes:
                     task.Task_state === "Open"
-                        ? "Task released."
+                        ? "Task released: Open → To-Do."
                         : task.Task_state === "To-Do"
-                        ? "Task taken."
+                        ? "Task taken: To-Do → Doing."
                         : task.Task_state === "Doing"
-                        ? "Task review requested."
+                        ? "Task reviewed: Doing → Done."
                         : task.Task_state === "Done"
-                        ? "Task approved."
+                        ? "Task approved: Done → Closed."
                         : formData.notes || undefined,
                 expected_state: task.Task_state
             });
@@ -261,9 +261,9 @@ const TaskModal = ({
                 task_id: task.Task_id,
                 notes:
                     task.Task_state === "Doing"
-                        ? "Task dropped."
+                        ? "Task dropped: Doing → To-Do."
                         : task.Task_state === "Done"
-                        ? "Task rejected."
+                        ? "Task rejected: Done → Doing."
                         : formData.notes || undefined,
                 expected_state: task.Task_state
             });
@@ -479,11 +479,13 @@ const TaskModal = ({
                                             }}
                                             disabled={
                                                 !canEditPlan() ||
-                                                (task.Task_state !== "Open" && task.Task_state !== "Done")
+                                                (task.Task_state !== "Open" &&
+                                                    task.Task_state !== "Done")
                                             }
                                             className={`w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                                                 !canEditPlan() ||
-                                                (task.Task_state !== "Open" && task.Task_state !== "Done")
+                                                (task.Task_state !== "Open" &&
+                                                    task.Task_state !== "Done")
                                                     ? "bg-gray-100 cursor-not-allowed"
                                                     : ""
                                             }`}
