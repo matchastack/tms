@@ -221,69 +221,6 @@ export const requireUserGroup = (groups, selfCheck = null) => {
     };
 };
 
-// Legacy function - use requireUserGroup('admin') instead
-export const requireAdmin = (req, res, next) => {
-    if (!req.user) {
-        return res.status(401).json({
-            success: false,
-            message: "Authentication required"
-        });
-    }
-
-    if (!userHasGroup(req.user, "admin")) {
-        return res.status(403).json({
-            success: false,
-            message: "Admin access required"
-        });
-    }
-
-    next();
-};
-
-export const requireRole = (...allowedRoles) => {
-    return (req, res, next) => {
-        if (!req.user) {
-            return res.status(401).json({
-                success: false,
-                message: "Authentication required"
-            });
-        }
-
-        const hasPermission = allowedRoles.some(role =>
-            userHasGroup(req.user, role)
-        );
-        if (!hasPermission) {
-            return res.status(403).json({
-                success: false,
-                message: "Insufficient permissions"
-            });
-        }
-
-        next();
-    };
-};
-
-// Legacy function - use requireUserGroup('admin', (req) => req.body.username === req.user.username) instead
-export const requireSelfOrAdmin = (req, res, next) => {
-    if (!req.user) {
-        return res.status(401).json({
-            success: false,
-            message: "Authentication required"
-        });
-    }
-
-    const isAdmin = userHasGroup(req.user, "admin");
-    const isSelf = req.body.username === req.user.username;
-
-    if (!isAdmin && !isSelf) {
-        return res.status(403).json({
-            success: false,
-            message: "Access denied"
-        });
-    }
-    next();
-};
-
 export const validateGroupCreation = (req, res, next) => {
     const { groupName } = req.body;
     if (!groupName || !groupName.trim()) {

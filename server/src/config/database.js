@@ -32,5 +32,3 @@ export const withTransaction = async callback => {
         connection.release();
     }
 };
-
-export default pool;
