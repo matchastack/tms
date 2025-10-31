@@ -888,9 +888,9 @@ export const updateTaskPlan = async (taskId, planName, username) => {
             throw new Error("Application not found");
         }
 
-        // Prevent editing closed tasks
-        if (task.Task_state === "Closed") {
-            throw new Error("Cannot modify closed tasks");
+        // Plan can only be changed in Open or Done state
+        if (task.Task_state !== "Open" && task.Task_state !== "Done") {
+            throw new Error("Plan can only be changed when task is in Open or Done state");
         }
 
         // Check if user has permission to change plan (must be in App_permit_Open)
