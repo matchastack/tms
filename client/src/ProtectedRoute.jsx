@@ -1,8 +1,9 @@
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
     const { isAuthenticated, isLoading, user } = useAuth();
+    const navigate = useNavigate();
 
     if (isLoading) {
         return (
@@ -13,7 +14,7 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
     }
 
     if (!isAuthenticated) {
-        return <Navigate to="/" replace />;
+        return navigate("/", { replace: true });
     }
 
     if (
@@ -29,6 +30,12 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
                     <p className="text-gray-600">
                         You don't have permission to access this page.
                     </p>
+                    <button
+                        onClick={() => navigate("/", { replace: true })}
+                        className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                    >
+                        Back to Home Page
+                    </button>
                 </div>
             </div>
         );
