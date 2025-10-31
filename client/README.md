@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a React single-page application (SPA) that provides a user interface for authentication and user management. The application uses React Router for navigation, Context API for state management, and Axios for API communication with the backend server.
+This is a React 19 single-page application (SPA) that provides a modern user interface for the Task Management System. The application features JWT authentication with HTTP-only cookies, role-based access control, and a complete Kanban-style task management workflow with permission-based state transitions.
 
 **Tech Stack:**
 
@@ -20,17 +20,29 @@ This is a React single-page application (SPA) that provides a user interface for
 client/
 ├── index.html                   # HTML entry point
 ├── vite.config.js               # Vite configuration
+├── tailwind.config.js          # Tailwind CSS configuration
 ├── package.json
 └── src/
     ├── main.jsx                 # React entry point
     ├── App.jsx                  # Main app component with routing
+    ├── index.css                # Global styles
+    │
     ├── AuthContext.jsx          # Authentication context provider
     ├── ProtectedRoute.jsx       # Route protection component
-    ├── Header.jsx               # Reusable header component
-    ├── LoginPage.jsx            # Login page component
-    ├── AppPage.jsx             # Home page component
-    ├── ProfilePage.jsx          # User profile page
-    └── UsersManagementPage.jsx  # Admin user management page
+    ├── Header.jsx               # Navigation header component
+    │
+    ├── LoginPage.jsx            # Login page
+    ├── ProfilePage.jsx          # User profile management
+    ├── UsersManagementPage.jsx  # Admin user management
+    │
+    ├── AppPage.jsx              # Applications management with inline editing
+    │
+    ├── KanbanBoardPage.jsx      # Unified Kanban board (all tasks)
+    ├── TaskCard.jsx             # Task card component
+    ├── TaskModal.jsx            # Create/view/edit task modal
+    ├── PlanModal.jsx            # Create/edit plan modal
+    │
+    └── MultiSelect.jsx          # Multi-select dropdown component
 ```
 
 ---
@@ -44,7 +56,10 @@ App (BrowserRouter + Routes)
   └── AuthProvider (Context)
        ├── LoginPage (/)
        └── ProtectedRoute
-            ├── AppPage (/apps)
+            ├── KanbanBoardPage (/kanban) [Default Home - All Users]
+            │   ├── TaskModal (Create/View/Edit Tasks)
+            │   └── PlanModal (Create Plans)
+            ├── AppPage (/apps) [Project Leads]
             ├── ProfilePage (/user/profile)
             └── UsersManagementPage (/user/accounts) [Admin only]
 ```
@@ -73,7 +88,7 @@ The application uses React Context API for global authentication state:
 -   AuthContext sends POST to `/auth/login`
 -   Server returns JWT in HTTP-only cookie + user data
 -   AuthContext updates user state
--   User redirected to AppPage or admin page
+-   User redirected to KanbanBoardPage (/kanban) - the default home page
 
 **3. Protected Route Access:**
 
@@ -112,7 +127,8 @@ The application uses React Context API for global authentication state:
 | Path | Component | Protection | Description |
 |------|-----------|-----------|-------------|
 | `/` | LoginPage | Public | Login page |
-| `/apps` | AppPage | Protected | Main dashboard |
+| `/kanban` | KanbanBoardPage | Protected | Unified Kanban board showing all tasks |
+| `/apps` | AppPage | Protected | Applications management with inline editing |
 | `/user/profile` | ProfilePage | Protected | User profile management |
 | `/user/accounts` | UsersManagementPage | Admin only | User management (admin) |
 | `*` | Navigate to `/` | - | Catch-all redirect |
@@ -243,8 +259,8 @@ getMenuOptions(userGroups);
 ```
 
 -   Generates menu items based on user's groups
--   All users: Apps, Profile
--   Admin users: Additional "Users Management" option
+-   All users: Applications, Profile
+-   Admin users: Additional "User Accounts" option
 -   Each option includes label, path, and icon
 
 **User Menu:**
@@ -292,9 +308,7 @@ handleMenuClick(path);
 **1. Initial Render:**
 
 -   Check if already authenticated
--   Redirect based on user role:
-    -   Admin-only → `/user/accounts`
-    -   Others → `/apps`
+-   Redirect to default home page (`/kanban`) for all users
 
 **2. Form Submission:**
 
@@ -306,7 +320,7 @@ handleSubmit(e);
 -   Clears previous errors
 -   Sets loading state
 -   Calls `login()` from context
--   Handles success: navigate to `/apps`
+-   Handles success: navigate to `/kanban` (default home)
 -   Handles error: display error message
 
 **3. Form Validation:**
@@ -327,37 +341,53 @@ handleSubmit(e);
 
 ### 6. AppPage.jsx
 
-**Purpose:** Main dashboard showing available applications.
+**Purpose:** Application management with inline table editing (similar to UsersManagementPage pattern).
+
+**State:**
+
+```javascript
+{
+  applications: array,
+  loading: boolean,
+  error: string,
+  editedRows: Set,
+  availableGroups: array
+}
+```
 
 **Features:**
 
--   Header with logout functionality
--   Grid layout for application cards
--   Placeholder application data (expandable)
+**Inline Editing Pattern:**
 
-**Layout:**
+-   **First Row (Project Leads only)**: Add new application with all fields editable
+-   **Existing Rows**: Edit fields in-place (project leads only)
+-   **Edit Tracking**: Tracks modified rows, enables "Save" button only when changed
+-   **Permission Fields**: MultiSelect dropdowns for 5 permission types (App_permit_Create, Open, toDoList, Doing, Done)
 
--   Full-height container with gray background
--   Header component at top
--   Main content area with padding
--   Responsive grid (1-3 columns based on screen size)
+**Table Columns:**
 
-**Application Cards:**
+-   Acronym (editable only for new applications)
+-   Description (text input)
+-   Start Date (date picker)
+-   End Date (date picker)
+-   Create, Open, To Do, Doing, Done (multi-select permission dropdowns)
+-   Tasks (displays App_Rnumber - task count)
+-   Actions (Save button for project leads, View Tasks button for all)
 
--   Gray background with rounded corners
--   Hover effects (darker background, border)
--   Cursor pointer for interactivity
--   Ready for future functionality
+**Validation:**
 
-**Responsive Grid:**
+-   Acronym is required for new applications
+-   All 5 permission fields must have at least one group selected
+-   Errors display inline below the row with auto-clear after 5 seconds
 
-```css
-grid-cols-1 sm:grid-cols-2 lg:grid-cols-3
-```
+**Date Formatting:**
 
--   1 column on mobile
--   2 columns on small screens
--   3 columns on large screens
+-   Input: YYYY-MM-DD format for date pickers
+-   Helper function `formatDateForInput()` handles various date formats from server
+
+**Permission Logic:**
+
+-   Only users with "project lead" group can access the page to create/edit applications
 
 ---
 
@@ -509,6 +539,406 @@ validatePassword(password);
 
 ---
 
+### 9. KanbanBoardPage.jsx
+
+**Purpose:** Unified Kanban board showing all tasks from all applications (default home page).
+
+**State:**
+
+```javascript
+{
+  applications: array,
+  tasks: array,
+  loading: boolean,
+  error: string,
+  selectedApp: string,
+  showCreateTaskModal: boolean,
+  createAppSelection: string,
+  selectedTask: object | null
+}
+```
+
+**Features:**
+
+**Unified View:**
+
+-   Default home page at `/kanban` route
+-   Shows all tasks from all applications in one board
+-   No permission required to view tasks (permission-based editing only)
+
+**5-Column Kanban Layout:**
+
+-   Open (Gray)
+-   To-Do (Blue)
+-   Doing (Yellow)
+-   Done (Green)
+-   Closed (Purple)
+
+**Each Column:**
+
+-   Color-coded header
+-   Task count display (dynamically filtered)
+-   Scrollable task list
+-   Minimum height for empty columns
+
+**Application Filter:**
+
+-   Dropdown to filter tasks by application
+-   "All Applications" option shows tasks from all apps
+-   Task cards show app name when viewing "All Applications"
+-   Filter updates all columns dynamically
+
+**Action Buttons:**
+
+-   **Create Task** - Opens TaskModal for selected application
+-   **Create Plan** - Opens PlanModal for selected application
+-   Both buttons disabled when no applications exist
+-   Default to selected app filter or first application
+
+**Permission Logic:**
+Task viewing is open to all users. Editing/state transitions use permission checks in TaskModal:
+
+```javascript
+// Task cards show app name when viewing all applications
+<TaskCard
+    task={task}
+    onClick={() => handleTaskClick(task)}
+    showAppName={selectedApp === "all"}
+/>
+```
+
+**Data Loading:**
+
+-   Fetches all applications on mount
+-   Fetches tasks for ALL applications in parallel
+-   Uses `Promise.all` for efficient loading
+-   Merges all tasks into single array
+-   Filters tasks client-side based on selected app
+
+---
+
+### 10. TaskCard.jsx
+
+**Purpose:** Display task information in Kanban column.
+
+**Props:**
+
+-   `task`: Task object
+-   `onClick`: Click handler function
+-   `showAppName`: Boolean - displays app acronym when viewing all applications (default: false)
+
+**Display Elements:**
+
+-   Task_id (small, monospace font)
+-   Task_app_Acronym (with folder icon, shown when `showAppName={true}`)
+-   Task_name (bold, primary text)
+-   Task_description (truncated to 2 lines)
+-   Task_plan (with icon, if assigned)
+-   Task_owner (with user icon)
+-   Task_createDate (formatted)
+-   State badge (color-coded)
+
+**Styling:**
+
+-   White background card
+-   Border with hover effect
+-   Shadow on hover
+-   Rounded corners
+-   Click cursor indicator
+
+**State Colors:**
+
+-   Open: Gray
+-   To-Do: Blue
+-   Doing: Yellow
+-   Done: Green
+-   Closed: Purple
+
+---
+
+### 11. TaskModal.jsx
+
+**Purpose:** Comprehensive task create/view/edit modal with state transitions.
+
+**Props:**
+
+-   `isOpen`: Boolean
+-   `onClose`: Close handler
+-   `onSuccess`: Success callback
+-   `task`: Task object (null for create mode)
+-   `application`: Application object
+-   `plans`: Array of plans
+
+**Two Modes:**
+
+**1. Create Mode (`task === null`):**
+
+-   Form to create new task
+-   Fields: Task_name (required), Task_description, Task_plan
+-   Creates task in "Open" state
+-   Auto-generates Task_id on server
+
+**2. View/Edit Mode (`task !== null`):**
+
+-   View all task details (read-only)
+-   Update task plan (inline save, only when task is in Open or Done state)
+-   Add custom notes (permission-based on current state)
+-   Promote/Demote buttons (permission-based) with auto-generated notes
+-   Complete audit trail display
+
+**Permission-Based Actions:**
+
+**Promote Button Logic:**
+
+```javascript
+const canPromote = () => {
+    const state = task.Task_state;
+    let permitGroups = [];
+
+    if (state === "Open") permitGroups = application.App_permit_Open;
+    else if (state === "To-Do") permitGroups = application.App_permit_toDoList;
+    else if (state === "Doing") permitGroups = application.App_permit_Doing;
+    else if (state === "Done") permitGroups = application.App_permit_Done;
+
+    return permitGroups.some(group => user.groups.includes(group));
+};
+```
+
+**Demote Button Logic:**
+
+-   Only available for "Doing" and "Done" states
+-   Requires same permissions as promote
+
+**State Transitions with Auto-Generated Notes:**
+
+-   **Promote**:
+    -   Open → To-Do: "Task released: Open → To-Do."
+    -   To-Do → Doing: "Task taken: To-Do → Doing."
+    -   Doing → Done: "Task reviewed: Doing → Done."
+    -   Done → Closed: "Task approved: Done → Closed."
+-   **Demote**:
+    -   Doing → To-Do: "Task dropped: Doing → To-Do."
+    -   Done → Doing: "Task rejected: Done → Doing."
+
+**Audit Trail Display:**
+
+-   Shows Task_notes in monospace font
+-   Read-only text area
+-   Scrollable for long histories
+-   Formatted entries with username, state, timestamp
+
+**Plan Update:**
+
+-   Dropdown to change plan assignment
+-   Only enabled when task is in Open or Done state
+-   Disabled (grayed out) for To-Do, Doing, and Closed states
+-   Requires `App_permit_Open` permission
+-   Updates immediately via PUT `/tasks` on selection change
+
+---
+
+### 12. PlanModal.jsx
+
+**Purpose:** Modal dialog for creating/editing plans.
+
+**Props:**
+
+-   `isOpen`: Boolean to show/hide modal
+-   `onClose`: Close handler function
+-   `onSuccess`: Success callback to refresh data
+-   `plan`: Plan object for edit mode (null for create)
+-   `appAcronym`: Application acronym to associate plan with
+
+**State:**
+
+```javascript
+{
+  formData: {
+    Plan_MVP_name,
+    Plan_startDate,
+    Plan_endDate
+  },
+  loading: boolean,
+  error: string
+}
+```
+
+**Features:**
+
+**Two Modes:**
+
+-   **Create**: All fields editable, requires appAcronym
+-   **Edit**: Plan_MVP_name disabled (immutable)
+
+**Form Fields:**
+
+-   Plan Name (required, max 255 chars, immutable after creation)
+-   Start Date (optional, date picker)
+-   End Date (optional, date picker)
+
+**Validation:**
+
+-   Plan name required for creation
+-   Dates are optional
+-   Error messages displayed inline
+
+**API Calls:**
+
+-   POST `/plans` for create (includes Plan_app_Acronym)
+-   PUT `/plan/:name` for update (only dates can be updated)
+
+**Usage:**
+
+```jsx
+<PlanModal
+    isOpen={showCreatePlanModal}
+    onClose={() => setShowCreatePlanModal(false)}
+    onSuccess={fetchAllData}
+    appAcronym="WEBAPP"
+/>
+```
+
+---
+
+### 13. MultiSelect.jsx
+
+**Purpose:** Reusable multi-select dropdown with tag display.
+
+**Props:**
+
+-   `value`: Array of selected items
+-   `onChange`: Callback with new selection array
+-   `placeholder`: Placeholder text
+-   `availableGroups`: Array of available options
+-   `disabled`: Boolean - disables interaction (default: false)
+
+**Features:**
+
+**Tag Display:**
+
+-   Shows selected items as removable tags
+-   Click × to remove individual tag (when not disabled)
+-   Placeholder shown when empty
+-   Gray background when disabled
+
+**Dropdown:**
+
+-   Checkbox-based selection
+-   Click checkbox or label to toggle
+-   Opens on field click (when not disabled)
+-   Closes on outside click (useRef + effect)
+-   Dropdown hidden when disabled
+
+**Interaction:**
+
+-   Multi-select (not single)
+-   Toggle selection on click
+-   Immediate visual feedback
+-   Clean, modern design
+-   Disabled state for read-only views
+
+**Usage Example:**
+
+```jsx
+<MultiSelect
+    value={formData.App_permit_Open}
+    onChange={value =>
+        setFormData(prev => ({
+            ...prev,
+            App_permit_Open: value
+        }))
+    }
+    placeholder="Select groups..."
+    availableGroups={userGroups}
+/>
+```
+
+---
+
+## Task Management Workflow
+
+### State Machine
+
+**Task Lifecycle:**
+
+```
+Open → To-Do → Doing → Done → Closed
+   ↓      ↓       ↑       ↑
+   └──────┴───────┘       │
+          (Demote)        └─ (No demote from Done)
+```
+
+**State Transitions:**
+
+**Create:**
+
+-   New Task → Open state (Requires `App_permit_Create` permission)
+
+**Promote:**
+
+-   Open → To-Do (Requires `App_permit_Open` permission)
+-   To-Do → Doing (Requires `App_permit_toDoList` permission)
+-   Doing → Done (Requires `App_permit_Doing` permission)
+-   Done → Closed (Requires `App_permit_Done` permission)
+
+**Demote:**
+
+-   Doing → To-Do (Requires `App_permit_Doing` permission)
+-   Done → Doing (Requires `App_permit_Done` permission)
+
+**Business Rules:**
+
+-   User must be in permitted group array for action
+-   Notes are auto-generated with descriptive messages for state changes
+-   Task_owner only updates when "Taking Task" (To-Do → Doing) or "Dropping Task" (Doing → To-Do)
+-   All changes logged in Task_notes audit trail
+-   Plans can only be changed when task is in Open or Done state
+
+### Permission System
+
+**Application-Level Permissions (JSON Arrays):**
+
+-   `App_permit_Create`: Groups that can create new tasks
+-   `App_permit_Open`: Groups that can promote Open → To-Do AND change task plans
+-   `App_permit_toDoList`: Groups that can promote To-Do → Doing
+-   `App_permit_Doing`: Groups that can promote Doing → Done
+-   `App_permit_Done`: Groups that can close tasks (Done → Closed) AND receive email notifications
+
+**Permission Check Logic:**
+
+```javascript
+// User can perform action if they're in ANY of the permitted groups
+const hasPermission = permittedGroups.some(group =>
+    user.groups.includes(group)
+);
+```
+
+**Benefits:**
+
+-   Flexible permission assignment
+-   Multiple groups can share responsibility
+-   Easy to update without code changes
+-   Clear UI feedback
+
+### Task Ownership Model
+
+**Task Owner Behavior:**
+
+-   `Task_creator`: Set when task is created, never changes
+-   `Task_owner`: Represents the user currently working on the task
+    -   Set to `null` when task is created (Open state)
+    -   Set to current user when "Taking Task" (To-Do → Doing)
+    -   Set to `null` when "Dropping Task" (Doing → To-Do)
+    -   Remains unchanged for all other transitions (Open→To-Do, Doing→Done, Done→Closed, Done→Doing)
+
+**Display:**
+
+-   Shows as empty when `null`
+-   Updates are reflected immediately in the UI
+-   Visible in task cards and task detail modal
+
+---
+
 ## Routing & Navigation Flow
 
 ### Navigation Patterns:
@@ -539,15 +969,15 @@ navigate("/user/profile");
 
 1. Lands on LoginPage (`/`)
 2. Submits credentials
-3. Redirected to AppPage (`/apps`)
+3. Redirected to KanbanBoardPage (`/kanban`) - default home
 4. Can navigate via Header menu
 
 **Admin User Login:**
 
 1. Lands on LoginPage (`/`)
 2. Submits admin credentials
-3. Redirected to UsersManagementPage (`/user/accounts`) if admin-only
-4. Has access to all routes
+3. Redirected to KanbanBoardPage (`/kanban`) - default home
+4. Has access to all routes including UsersManagementPage
 
 **Unauthorized Access Attempt:**
 
@@ -577,16 +1007,45 @@ axios.defaults.withCredentials = true;
 
 ### API Endpoints Used:
 
-| Method | Endpoint       | Purpose           | Used By                          |
+**Authentication:**
+| Method | Endpoint | Purpose | Used By |
 | ------ | -------------- | ----------------- | -------------------------------- |
-| POST   | `/auth/login`  | User login        | AuthContext                      |
-| POST   | `/auth/logout` | User logout       | AuthContext                      |
-| GET    | `/profile`     | Get current user  | AuthContext                      |
-| GET    | `/accounts`    | List all accounts | UsersManagementPage              |
-| POST   | `/accounts`    | Create account    | UsersManagementPage              |
-| PUT    | `/accounts`    | Update account    | ProfilePage, UsersManagementPage |
-| GET    | `/user_groups` | List groups       | UsersManagementPage              |
-| POST   | `/user_groups` | Create group      | UsersManagementPage              |
+| POST | `/auth/login` | User login | AuthContext |
+| POST | `/auth/logout` | User logout | AuthContext |
+| GET | `/profile` | Get current user | AuthContext |
+
+**User Management:**
+| Method | Endpoint | Purpose | Used By |
+| ------ | -------------- | ----------------- | -------------------------------- |
+| GET | `/accounts` | List all accounts | UsersManagementPage |
+| POST | `/accounts` | Create account | UsersManagementPage |
+| PUT | `/accounts` | Update account | ProfilePage, UsersManagementPage |
+| GET | `/user_groups` | List groups | UsersManagementPage, ApplicationModal |
+| POST | `/user_groups` | Create group | UsersManagementPage |
+
+**Applications:**
+| Method | Endpoint | Purpose | Used By |
+| ------ | --------------------------- | -------------------- | ----------------- |
+| GET | `/applications` | List all applications | AppPage |
+| GET | `/applications/:acronym` | Get single application | KanbanBoardPage |
+| POST | `/applications` | Create application | ApplicationModal |
+| PUT | `/applications/:acronym` | Update application | ApplicationModal |
+
+**Plans:**
+| Method | Endpoint | Purpose | Used By |
+| ------ | --------------------- | --------------------- | -------------- |
+| GET | `/plans/:app_acronym` | List plans for app | KanbanBoardPage |
+| POST | `/plans` | Create plan | PlanModal |
+| PUT | `/plan/:name` | Update plan | PlanModal |
+
+**Tasks:**
+| Method | Endpoint | Purpose | Used By |
+| ------ | --------------------- | -------------------- | --------------- |
+| GET | `/tasks/:app_acronym` | List tasks for app | KanbanBoardPage |
+| POST | `/tasks` | Create task | TaskModal |
+| POST | `/tasks/promote` | Promote task state | TaskModal |
+| POST | `/tasks/demote` | Demote task state | TaskModal |
+| PUT | `/tasks` | Update task plan | TaskModal |
 
 ### Error Handling Pattern:
 
