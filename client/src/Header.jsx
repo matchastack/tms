@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
-import KanbanBoardPage from "./KanbanBoardPage";
 
 const getMenuOptions = userGroups => {
     const allOptions = {

@@ -32,17 +32,13 @@ const validatePassword = password => {
     return null;
 };
 
-const AVAILABLE_GROUPS_INITIAL = [];
-
 const UsersManagementPage = () => {
     const { logout } = useAuth();
     const [users, setUsers] = useState([]);
     const [editedRows, setEditedRows] = useState(new Set());
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
-    const [availableGroups, setAvailableGroups] = useState(
-        AVAILABLE_GROUPS_INITIAL
-    );
+    const [availableGroups, setAvailableGroups] = useState([]);
     const [newGroupName, setNewGroupName] = useState("");
     const [isCreatingGroup, setIsCreatingGroup] = useState(false);
 
