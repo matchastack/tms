@@ -340,17 +340,8 @@ const AppPage = () => {
                                                         e.target.value
                                                     )
                                                 }
-                                                placeholder={
-                                                    app.isNew
-                                                        ? "Description"
-                                                        : ""
-                                                }
-                                                disabled={!app.isNew}
-                                                className={`w-full px-3 py-2 border border-gray-300 rounded-md text-sm outline-none ${
-                                                    app.isNew
-                                                        ? "focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                                                        : "bg-gray-100 cursor-not-allowed"
-                                                }`}
+                                                placeholder="Description"
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                                             />
                                         </td>
                                         <td className="px-4 py-3">
@@ -366,12 +357,7 @@ const AppPage = () => {
                                                         e.target.value
                                                     )
                                                 }
-                                                disabled={!app.isNew}
-                                                className={`w-full px-3 py-2 border border-gray-300 rounded-md text-sm outline-none ${
-                                                    app.isNew
-                                                        ? "focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                                                        : "bg-gray-100 cursor-not-allowed"
-                                                }`}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                                             />
                                         </td>
                                         <td className="px-4 py-3">
@@ -387,12 +373,7 @@ const AppPage = () => {
                                                         e.target.value
                                                     )
                                                 }
-                                                disabled={!app.isNew}
-                                                className={`w-full px-3 py-2 border border-gray-300 rounded-md text-sm outline-none ${
-                                                    app.isNew
-                                                        ? "focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                                                        : "bg-gray-100 cursor-not-allowed"
-                                                }`}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                                             />
                                         </td>
                                         <td className="px-4 py-3">
@@ -411,7 +392,6 @@ const AppPage = () => {
                                                 availableGroups={
                                                     availableGroups
                                                 }
-                                                disabled={!app.isNew}
                                             />
                                         </td>
                                         <td className="px-4 py-3">
@@ -430,7 +410,6 @@ const AppPage = () => {
                                                 availableGroups={
                                                     availableGroups
                                                 }
-                                                disabled={!app.isNew}
                                             />
                                         </td>
                                         <td className="px-4 py-3">
@@ -449,7 +428,6 @@ const AppPage = () => {
                                                 availableGroups={
                                                     availableGroups
                                                 }
-                                                disabled={!app.isNew}
                                             />
                                         </td>
                                         <td className="px-4 py-3">
@@ -468,7 +446,6 @@ const AppPage = () => {
                                                 availableGroups={
                                                     availableGroups
                                                 }
-                                                disabled={!app.isNew}
                                             />
                                         </td>
                                         <td className="px-4 py-3">
@@ -487,7 +464,6 @@ const AppPage = () => {
                                                 availableGroups={
                                                     availableGroups
                                                 }
-                                                disabled={!app.isNew}
                                             />
                                         </td>
                                         <td className="px-4 py-3 text-center text-sm text-gray-600">
