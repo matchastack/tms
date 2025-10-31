@@ -216,9 +216,7 @@ const AppPage = () => {
                     App_permit_Done: app.App_permit_Done
                 });
 
-                const newEditedRows = new Set(editedRows);
-                newEditedRows.delete(index);
-                setEditedRows(newEditedRows);
+                await fetchApplications();
             }
         } catch (err) {
             const updatedApps = [...applications];
@@ -321,7 +319,6 @@ const AppPage = () => {
                                                 placeholder={
                                                     app.isNew ? "Acronym" : ""
                                                 }
-                                                disabled={!app.isNew}
                                                 className={`w-full px-3 py-2 border border-gray-300 rounded-md text-sm outline-none ${
                                                     app.isNew
                                                         ? "focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
@@ -475,11 +472,42 @@ const AppPage = () => {
                                                     onClick={() =>
                                                         handleSaveRow(index)
                                                     }
-                                                    className="px-6 py-2 bg-emerald-500 text-white rounded-md text-sm font-medium hover:bg-green-500 transition-colors"
+                                                    className="px-6 py-2 bg-blue-500 text-white rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
                                                 >
-                                                    Add
+                                                    +
                                                 </button>
-                                            ) : null}
+                                            ) : (
+                                                <button
+                                                    onClick={() =>
+                                                        handleSaveRow(index)
+                                                    }
+                                                    disabled={
+                                                        !editedRows.has(index)
+                                                    }
+                                                    className={`px-8 py-2 rounded-md text-sm font-medium transition-colors ${
+                                                        editedRows.has(index)
+                                                            ? "bg-blue-500 text-white hover:bg-blue-600 cursor-pointer"
+                                                            : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                                    }`}
+                                                >
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        className="w-5 h-5"
+                                                        viewBox="0 0 24 24"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        strokeWidth="2.25"
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        aria-hidden="true"
+                                                    >
+                                                        {" "}
+                                                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />{" "}
+                                                        <polyline points="17 21 17 13 7 13 7 21" />{" "}
+                                                        <polyline points="7 3 7 8 15 8" />{" "}
+                                                    </svg>
+                                                </button>
+                                            )}
                                         </td>
                                     </tr>
                                     {app.error && (
