@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS tasks (
     Task_app_Acronym VARCHAR(50) NOT NULL,
     Task_state ENUM('Open', 'To-Do', 'Doing', 'Done', 'Closed') DEFAULT 'Open',
     Task_creator VARCHAR(50) NOT NULL,
-    Task_owner VARCHAR(50) NOT NULL,
+    Task_owner VARCHAR(50),
     Task_createDate DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (Task_app_Acronym) REFERENCES applications(App_Acronym) ON DELETE CASCADE,
     FOREIGN KEY (Task_plan) REFERENCES plans(Plan_MVP_name) ON DELETE SET NULL,

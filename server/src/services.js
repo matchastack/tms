@@ -679,7 +679,7 @@ export const createTask = async (taskData, username) => {
                 Task_plan || null,
                 Task_app_Acronym,
                 username,
-                username
+                null
             ]
         );
 
@@ -690,7 +690,7 @@ export const createTask = async (taskData, username) => {
             Task_app_Acronym,
             Task_state: "Open",
             Task_creator: username,
-            Task_owner: username
+            Task_owner: null
         };
     });
 };
@@ -788,16 +788,19 @@ export const promoteTaskState = async (
             previousState
         );
 
+        // Task_owner is only set when "Taking Task" (To-Do → Doing)
+        const newOwner = previousState === "To-Do" ? username : task.Task_owner;
+
         // Update task (row is already locked with FOR UPDATE)
         await connection.execute(
             "UPDATE tasks SET Task_state = ?, Task_owner = ?, Task_notes = ? WHERE Task_id = ?",
-            [newState, username, auditNotes, taskId]
+            [newState, newOwner, auditNotes, taskId]
         );
 
         return {
             ...task,
             Task_state: newState,
-            Task_owner: username,
+            Task_owner: newOwner,
             Task_notes: auditNotes
         };
     });
@@ -852,16 +855,20 @@ export const demoteTaskState = async (
             previousState
         );
 
+        // Task_owner is set to null when "Dropping Task" (Doing → To-Do)
+        // Otherwise keep current owner
+        const newOwner = previousState === "Doing" ? null : task.Task_owner;
+
         // Update task (row is already locked with FOR UPDATE)
         await connection.execute(
             "UPDATE tasks SET Task_state = ?, Task_owner = ?, Task_notes = ? WHERE Task_id = ?",
-            [newState, username, auditNotes, taskId]
+            [newState, newOwner, auditNotes, taskId]
         );
 
         return {
             ...task,
             Task_state: newState,
-            Task_owner: username,
+            Task_owner: newOwner,
             Task_notes: auditNotes
         };
     });
