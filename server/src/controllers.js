@@ -284,23 +284,6 @@ export const getPlan = async (req, res, next) => {
     }
 };
 
-export const updatePlan = async (req, res, next) => {
-    try {
-        const { name } = req.params;
-        const updatedPlan = await services.updatePlan(name, req.body);
-        res.status(200).json({
-            success: true,
-            message: "Plan updated successfully",
-            data: updatedPlan
-        });
-    } catch (error) {
-        res.status(400).json({
-            success: false,
-            message: error.message
-        });
-    }
-};
-
 // ============= TASK CONTROLLERS =============
 
 export const createTask = async (req, res, next) => {
@@ -407,12 +390,24 @@ export const promoteTask = async (req, res, next) => {
                         from: process.env.EMAIL_USERNAME,
                         to: emailAddresses.join(", "),
                         subject: `Task ${updatedTask.Task_id} Ready for Review`,
-                        text: `Task "${updatedTask.Task_name}" (${updatedTask.Task_id}) has been moved to "Done" state and is ready for approval.\n\nApplication: ${updatedTask.Task_app_Acronym}\nTask Owner: ${updatedTask.Task_owner || "N/A"}\n\nPlease review and approve or reject the task.`,
+                        text: `Task "${updatedTask.Task_name}" (${
+                            updatedTask.Task_id
+                        }) has been moved to "Done" state and is ready for approval.\n\nApplication: ${
+                            updatedTask.Task_app_Acronym
+                        }\nTask Owner: ${
+                            updatedTask.Task_owner || "N/A"
+                        }\n\nPlease review and approve or reject the task.`,
                         html: `<h2>Task Ready for Review</h2>
-                        <p>Task <strong>"${updatedTask.Task_name}"</strong> (${updatedTask.Task_id}) has been moved to <strong>"Done"</strong> state and is ready for approval.</p>
+                        <p>Task <strong>"${updatedTask.Task_name}"</strong> (${
+                            updatedTask.Task_id
+                        }) has been moved to <strong>"Done"</strong> state and is ready for approval.</p>
                         <ul>
-                            <li><strong>Application:</strong> ${updatedTask.Task_app_Acronym}</li>
-                            <li><strong>Task Owner:</strong> ${updatedTask.Task_owner || "N/A"}</li>
+                            <li><strong>Application:</strong> ${
+                                updatedTask.Task_app_Acronym
+                            }</li>
+                            <li><strong>Task Owner:</strong> ${
+                                updatedTask.Task_owner || "N/A"
+                            }</li>
                         </ul>
                         <p>Please review and approve or reject the task.</p>`
                     };

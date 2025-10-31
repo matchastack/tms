@@ -19,8 +19,6 @@ const PlanModal = ({
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    const isEdit = !!plan;
-
     useEffect(() => {
         if (isOpen) {
             if (plan) {
@@ -49,7 +47,7 @@ const PlanModal = ({
         e.preventDefault();
         setError("");
 
-        if (!isEdit && !appAcronym) {
+        if (!appAcronym) {
             setError("Please select an application");
             return;
         }
@@ -101,29 +99,15 @@ const PlanModal = ({
         setLoading(true);
 
         try {
-            if (isEdit) {
-                const { data } = await axios.put(
-                    `/plan/${formData.Plan_MVP_name}`,
-                    {
-                        Plan_startDate: formData.Plan_startDate || null,
-                        Plan_endDate: formData.Plan_endDate || null
-                    }
-                );
-                if (data.success) {
-                    onSuccess();
-                    onClose();
-                }
-            } else {
-                const { data } = await axios.post("/plans", {
-                    Plan_MVP_name: formData.Plan_MVP_name,
-                    Plan_startDate: formData.Plan_startDate || null,
-                    Plan_endDate: formData.Plan_endDate || null,
-                    Plan_app_Acronym: appAcronym
-                });
-                if (data.success) {
-                    onSuccess();
-                    onClose();
-                }
+            const { data } = await axios.post("/plans", {
+                Plan_MVP_name: formData.Plan_MVP_name,
+                Plan_startDate: formData.Plan_startDate || null,
+                Plan_endDate: formData.Plan_endDate || null,
+                Plan_app_Acronym: appAcronym
+            });
+            if (data.success) {
+                onSuccess();
+                onClose();
             }
         } catch (err) {
             setError(err.response?.data?.message || "Failed to save plan");
@@ -139,7 +123,7 @@ const PlanModal = ({
             <div className="bg-white rounded-lg shadow-xl max-w-md w-full overflow-y-auto">
                 <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
                     <h2 className="text-2xl font-bold text-gray-900">
-                        {isEdit ? "Edit Plan" : "Create Plan"}
+                        Create Plan
                     </h2>
                     <button
                         onClick={onClose}
@@ -166,46 +150,36 @@ const PlanModal = ({
                             value={formData.Plan_MVP_name}
                             onChange={handleChange}
                             required
-                            disabled={isEdit}
                             maxLength={255}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
                             placeholder="e.g., Sprint 1"
                         />
-                        {isEdit && (
-                            <p className="text-xs text-gray-500 mt-1">
-                                Plan name cannot be changed
-                            </p>
-                        )}
                     </div>
 
-                    {!isEdit && (
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Application
-                            </label>
-                            <select
-                                value={appAcronym || ""}
-                                onChange={e =>
-                                    onApplicationChange &&
-                                    onApplicationChange(e.target.value)
-                                }
-                                required
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            >
-                                <option value="">
-                                    Select an application...
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Application
+                        </label>
+                        <select
+                            value={appAcronym || ""}
+                            onChange={e =>
+                                onApplicationChange &&
+                                onApplicationChange(e.target.value)
+                            }
+                            required
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                            <option value="">Select an application...</option>
+                            {applications.map(app => (
+                                <option
+                                    key={app.App_Acronym}
+                                    value={app.App_Acronym}
+                                >
+                                    {app.App_Acronym}
                                 </option>
-                                {applications.map(app => (
-                                    <option
-                                        key={app.App_Acronym}
-                                        value={app.App_Acronym}
-                                    >
-                                        {app.App_Acronym}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    )}
+                            ))}
+                        </select>
+                    </div>
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -246,11 +220,7 @@ const PlanModal = ({
                             disabled={loading}
                             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400"
                         >
-                            {loading
-                                ? "Saving..."
-                                : isEdit
-                                ? "Update"
-                                : "Create"}
+                            {loading ? "Saving..." : "Create"}
                         </button>
                     </div>
                 </form>

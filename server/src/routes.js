@@ -38,10 +38,7 @@ router.post(
 router.put(
     "/accounts",
     validations.authenticateToken,
-    validations.requireUserGroup(
-        "admin",
-        req => req.body.username === req.user.username
-    ),
+    validations.requireUserGroup("admin"),
     validations.validateAccountUpdate,
     controllers.updateAccount
 );
@@ -95,6 +92,7 @@ router.put(
 router.post(
     "/plans",
     validations.authenticateToken,
+    validations.requireUserGroup("project manager"),
     validations.validatePlanCreation,
     controllers.createPlan
 );
@@ -106,12 +104,6 @@ router.get(
 );
 
 router.get("/plan/:name", validations.authenticateToken, controllers.getPlan);
-
-router.put(
-    "/plan/:name",
-    validations.authenticateToken,
-    controllers.updatePlan
-);
 
 // ============= TASK ROUTES =============
 
