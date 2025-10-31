@@ -4,8 +4,12 @@ import * as validations from "./validations.js";
 
 const router = express.Router();
 
+// ============= AUTH ROUTES =============
+
 router.post("/auth/login", validations.validateLogin, controllers.login);
 router.post("/auth/logout", validations.authenticateToken, controllers.logout);
+
+// ============= USER ROUTES =============
 
 router.get(
     "/profile",
@@ -19,6 +23,8 @@ router.put(
     validations.validateProfileUpdate,
     controllers.updateCurrentUser
 );
+
+// ============= ADMIN ROUTES =============
 
 router.get(
     "/accounts",

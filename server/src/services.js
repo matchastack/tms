@@ -3,6 +3,8 @@ import jwt from "jsonwebtoken";
 import { query, withTransaction } from "./config/database.js";
 import { config } from "./config/config.js";
 
+// ============= AUTH SERVICES =============
+
 export const loginUser = async (username, password) => {
     const user = await query("SELECT * FROM accounts WHERE username = ?", [
         username
@@ -42,6 +44,8 @@ const generateAccessToken = payload => {
         expiresIn: config.jwtExpiration
     });
 };
+
+// ============= USER SERVICES =============
 
 export const getUserByUsername = async username => {
     const user = await query(
@@ -102,6 +106,8 @@ export const updateUserProfile = async (username, profileData) => {
         };
     });
 };
+
+// ============= ADMIN SERVICES =============
 
 export const getAllAccounts = async () => {
     return await query(

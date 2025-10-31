@@ -1,6 +1,8 @@
 import nodemailer from "nodemailer";
 import * as services from "./services.js";
 
+// ============= AUTH CONTROLLERS =============
+
 export const login = async (req, res, next) => {
     try {
         const { username, password } = req.body;
@@ -38,6 +40,8 @@ export const logout = (req, res) => {
         message: "Logout successful"
     });
 };
+
+// ============= USER CONTROLLERS =============
 
 export const getCurrentUser = async (req, res) => {
     try {
@@ -83,6 +87,8 @@ export const updateCurrentUser = async (req, res, next) => {
     }
 };
 
+// ============= ADMIN CONTROLLERS =============
+
 export const getAccounts = async (req, res, next) => {
     try {
         const accounts = await services.getAllAccounts();
@@ -92,7 +98,10 @@ export const getAccounts = async (req, res, next) => {
             message: "Accounts retrieved successfully"
         });
     } catch (error) {
-        next(error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to retrieve accounts"
+        });
     }
 };
 
@@ -156,7 +165,10 @@ export const getUserGroups = async (req, res, next) => {
             message: "User groups retrieved successfully"
         });
     } catch (error) {
-        next(error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to retrieve user groups"
+        });
     }
 };
 
@@ -170,7 +182,10 @@ export const createGroup = async (req, res, next) => {
             data: newGroup
         });
     } catch (error) {
-        next(error);
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
     }
 };
 
@@ -264,7 +279,10 @@ export const getPlans = async (req, res, next) => {
             data: plans
         });
     } catch (error) {
-        next(error);
+        res.status(404).json({
+            success: false,
+            message: "Failed to retrieve plans"
+        });
     }
 };
 
@@ -320,7 +338,10 @@ export const getTasks = async (req, res, next) => {
             data: tasks
         });
     } catch (error) {
-        next(error);
+        res.status(404).json({
+            success: false,
+            message: "Failed to retrieve tasks"
+        });
     }
 };
 
