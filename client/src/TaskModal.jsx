@@ -543,7 +543,7 @@ const TaskModal = ({
                                                             ? "Release Task"
                                                             : task.Task_state ===
                                                               "To-Do"
-                                                            ? "Take Task"
+                                                            ? "Start Task"
                                                             : task.Task_state ===
                                                               "Doing"
                                                             ? "Request Task Review"
@@ -562,7 +562,7 @@ const TaskModal = ({
                                                     >
                                                         {task.Task_state ===
                                                         "Doing"
-                                                            ? "Drop Task"
+                                                            ? "Return Task"
                                                             : task.Task_state ===
                                                               "Done"
                                                             ? "Reject Task"
