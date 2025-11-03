@@ -359,7 +359,7 @@ export const validateTaskCreation = (req, res, next) => {
     if (!Task_name || !Task_name.trim()) {
         return res.status(400).json({
             success: false,
-            message: "Task name is required"
+            message: "Task_app_Acronym is required"
         });
     }
 
