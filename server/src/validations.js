@@ -354,19 +354,26 @@ export const validatePlanCreation = (req, res, next) => {
 };
 
 export const validateTaskCreation = (req, res, next) => {
-    const { Task_name, Task_app_Acronym } = req.body;
+    const { Task_name, Task_app_Acronym, Task_description } = req.body;
 
-    if (!Task_name || !Task_name.trim()) {
+    if (!Task_app_Acronym || !Task_app_Acronym.trim()) {
         return res.status(400).json({
             success: false,
             message: "Task_app_Acronym is required"
         });
     }
 
-    if (!Task_app_Acronym || !Task_app_Acronym.trim()) {
+    if (!Task_name || !Task_name.trim()) {
         return res.status(400).json({
             success: false,
-            message: "Validation Error: Application acronym is required"
+            message: "Task name is required"
+        });
+    }
+
+    if (Task_description && Task_description.length > 255) {
+        return res.status(400).json({
+            success: false,
+            message: "Description cannot exceed 255 characters"
         });
     }
 
