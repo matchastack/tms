@@ -144,6 +144,7 @@ const KanbanBoardPage = () => {
             setError(
                 "You don't have permission to create tasks for any application"
             );
+            setTimeout(() => setError(""), 5000);
             return;
         }
         setCreateAppSelection("");
