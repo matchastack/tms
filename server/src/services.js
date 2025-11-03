@@ -259,6 +259,10 @@ export const createApplication = async appData => {
         App_permit_Done
     } = appData;
 
+    if (App_Acronym.length > 50) {
+        throw new Error("Field must be between 1-50 characters");
+    }
+
     if (App_startDate > App_endDate) {
         throw new Error("Start date cannot be after end date");
     }
