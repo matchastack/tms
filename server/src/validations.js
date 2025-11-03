@@ -282,7 +282,14 @@ export const validateApplicationCreation = (req, res, next) => {
     if (!App_Acronym || !App_Acronym.trim()) {
         return res.status(400).json({
             success: false,
-            message: "Application acronym is required"
+            message: "App acronym is required"
+        });
+    }
+
+    if (App_Acronym.length > 50) {
+        return res.status(400).json({
+            success: false,
+            message: "App acronym must be between 1-50 characters"
         });
     }
 

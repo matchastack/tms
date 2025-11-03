@@ -259,10 +259,6 @@ export const createApplication = async appData => {
         App_permit_Done
     } = appData;
 
-    if (App_Acronym.length > 50) {
-        throw new Error("Field must be between 1-50 characters");
-    }
-
     return await withTransaction(async connection => {
         const existing = await query(
             "SELECT App_Acronym FROM applications WHERE App_Acronym = ?",
