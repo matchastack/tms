@@ -705,14 +705,6 @@ export const promoteTaskState = async (
                 throw new Error("Task is already in final state");
         }
 
-        // Validate plan is assigned when releasing from Open to To-Do
-        if (
-            task.Task_state === "Open" &&
-            (!task.Task_plan || !task.Task_plan.trim())
-        ) {
-            throw new Error("Please select a plan before releasing this task");
-        }
-
         // Update audit trail
         const auditNotes = appendAuditNote(
             task.Task_notes,
@@ -829,10 +821,10 @@ export const updateTaskPlan = async (taskId, planName, username) => {
             throw new Error("Application not found");
         }
 
-        // Plan can only be changed in Open or Done state
-        if (task.Task_state !== "Open" && task.Task_state !== "Done") {
+        // Plan can only be changed in Open, To-Do or Done state
+        if (task.Task_state === "Doing" || task.Task_state === "Closed") {
             throw new Error(
-                "Plan can only be changed when task is in Open or Done state"
+                "Plan can only be changed when task is in Open, To-Do or Done state"
             );
         }
 

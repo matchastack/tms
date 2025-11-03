@@ -479,13 +479,13 @@ const TaskModal = ({
                                             }}
                                             disabled={
                                                 !canEditPlan() ||
-                                                (task.Task_state !== "Open" &&
-                                                    task.Task_state !== "Done")
+                                                task.Task_state === "Doing" ||
+                                                task.Task_state === "Closed"
                                             }
                                             className={`w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                                                 !canEditPlan() ||
-                                                (task.Task_state !== "Open" &&
-                                                    task.Task_state !== "Done")
+                                                task.Task_state === "Doing" ||
+                                                task.Task_state === "Closed"
                                                     ? "bg-gray-100 cursor-not-allowed"
                                                     : ""
                                             }`}
