@@ -12,6 +12,7 @@ The Task Management System implements a Kanban-style workflow for managing proje
 -   MySQL (mysql2 with Promises)
 -   JWT for authentication
 -   bcryptjs for password hashing
+-   nodemailer for email notifications
 -   ES Modules
 
 ---
@@ -84,6 +85,7 @@ server/
 -   Manages database transactions
 -   Implements TMS workflow state machine
 -   Generates task IDs and audit trails
+-   Sends email notifications for task state changes
 
 **7. Database Layer (config/database.js)**
 
