@@ -826,9 +826,9 @@ export const updateTaskPlan = async (taskId, planName, username) => {
         }
 
         // Plan can only be changed in Open, To-Do or Done state
-        if (task.Task_state === "Doing" || task.Task_state === "Closed") {
+        if (task.Task_state !== "Open" || task.Task_state !== "Done") {
             throw new Error(
-                "Plan can only be changed when task is in Open, To-Do or Done state"
+                "Plan can only be changed when task is in Open or Done state"
             );
         }
 
