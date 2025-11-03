@@ -334,7 +334,8 @@ export const validateApplicationUpdate = (req, res, next) => {
 };
 
 export const validatePlanCreation = (req, res, next) => {
-    const { Plan_MVP_name, Plan_app_Acronym } = req.body;
+    const { Plan_MVP_name, Plan_app_Acronym, Plan_startDate, Plan_endDate } =
+        req.body;
 
     if (!Plan_MVP_name || !Plan_MVP_name.trim()) {
         return res.status(400).json({
@@ -343,10 +344,24 @@ export const validatePlanCreation = (req, res, next) => {
         });
     }
 
+    if (Plan_MVP_name.length > 50) {
+        return res.status(400).json({
+            success: false,
+            message: "Plan MVP name cannot exceed 50 characters"
+        });
+    }
+
     if (!Plan_app_Acronym || !Plan_app_Acronym.trim()) {
         return res.status(400).json({
             success: false,
             message: "Application acronym is required"
+        });
+    }
+
+    if (!Plan_startDate || !Plan_endDate) {
+        return res.status(400).json({
+            success: false,
+            message: "Plan start and end date are required"
         });
     }
 

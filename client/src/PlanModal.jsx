@@ -47,11 +47,6 @@ const PlanModal = ({
         e.preventDefault();
         setError("");
 
-        if (!appAcronym) {
-            setError("Please select an application");
-            return;
-        }
-
         // Validate plan dates are within application dates
         if (application) {
             const appStart = application.App_startDate
@@ -134,12 +129,6 @@ const PlanModal = ({
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
-                    {error && (
-                        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-                            {error}
-                        </div>
-                    )}
-
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             Plan Name *
@@ -149,7 +138,6 @@ const PlanModal = ({
                             name="Plan_MVP_name"
                             value={formData.Plan_MVP_name}
                             onChange={handleChange}
-                            required
                             maxLength={255}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
                             placeholder="e.g., Sprint 1"
@@ -166,7 +154,6 @@ const PlanModal = ({
                                 onApplicationChange &&
                                 onApplicationChange(e.target.value)
                             }
-                            required
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             <option value="">Select an application...</option>
@@ -223,6 +210,11 @@ const PlanModal = ({
                             {loading ? "Saving..." : "Create"}
                         </button>
                     </div>
+                    {error && (
+                        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                            {error}
+                        </div>
+                    )}
                 </form>
             </div>
         </div>

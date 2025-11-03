@@ -458,7 +458,9 @@ export const createPlan = async planData => {
         ).then(results => results[0]);
 
         if (existing) {
-            throw new Error("Plan name already exists");
+            throw new Error(
+                "Plan MVP name already exists in selected Application"
+            );
         }
 
         await connection.execute(
