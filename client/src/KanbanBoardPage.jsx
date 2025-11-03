@@ -100,7 +100,9 @@ const KanbanBoardPage = () => {
         setSelectedTask(task);
 
         // Get the application for this task
-        const app = applications.find(a => a.App_Acronym === task.Task_app_Acronym);
+        const app = applications.find(
+            a => a.App_Acronym === task.Task_app_Acronym
+        );
         setTaskApplication(app || null);
 
         // Fetch plans for the task's application
@@ -120,11 +122,15 @@ const KanbanBoardPage = () => {
         // Then refresh the selected task specifically
         if (selectedTask) {
             try {
-                const { data } = await axios.get(`/task/${selectedTask.Task_id}`);
+                const { data } = await axios.get(
+                    `/task/${selectedTask.Task_id}`
+                );
                 if (data.success && data.data) {
                     setSelectedTask(data.data);
                     // Update the application for this task
-                    const app = applications.find(a => a.App_Acronym === data.data.Task_app_Acronym);
+                    const app = applications.find(
+                        a => a.App_Acronym === data.data.Task_app_Acronym
+                    );
                     setTaskApplication(app || null);
                 }
             } catch (err) {
@@ -135,7 +141,9 @@ const KanbanBoardPage = () => {
 
     const handleCreateTask = () => {
         if (createableApplications.length === 0) {
-            setError("You don't have permission to create tasks for any application");
+            setError(
+                "You don't have permission to create tasks for any application"
+            );
             return;
         }
         setCreateAppSelection("");
@@ -170,7 +178,7 @@ const KanbanBoardPage = () => {
         setShowCreatePlanModal(true);
     };
 
-    const handlePlanApplicationChange = async (newAppAcronym) => {
+    const handlePlanApplicationChange = async newAppAcronym => {
         setCreateAppSelection(newAppAcronym);
         // Fetch the selected application
         const app = applications.find(a => a.App_Acronym === newAppAcronym);
@@ -244,7 +252,7 @@ const KanbanBoardPage = () => {
                                     <h2 className="font-semibold text-gray-900">
                                         {state}
                                     </h2>
-                                    {state === "Open" && createableApplications.length > 0 && (
+                                    {state === "Open" && (
                                         <button
                                             onClick={handleCreateTask}
                                             className="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-700 transition-colors"
@@ -261,7 +269,9 @@ const KanbanBoardPage = () => {
                                         task={task}
                                         onClick={() => handleTaskClick(task)}
                                         showAppName={true}
-                                        planDetails={getPlanDetails(task.Task_plan)}
+                                        planDetails={getPlanDetails(
+                                            task.Task_plan
+                                        )}
                                     />
                                 ))}
                             </div>
