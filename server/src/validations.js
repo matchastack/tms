@@ -293,6 +293,13 @@ export const validateApplicationCreation = (req, res, next) => {
         });
     }
 
+    if (App_Description && App_Description.length > 255) {
+        return res.status(400).json({
+            success: false,
+            message: "Field cannot exceed 255 characters"
+        });
+    }
+
     // Validate that all permission fields are arrays with at least one group
     const permissions = [
         { field: App_permit_Create, name: "App_permit_Create" },
