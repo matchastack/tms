@@ -142,26 +142,6 @@ const AppPage = () => {
                     { field: app.App_permit_Done, name: "Done" }
                 ];
 
-                for (const perm of permissionFields) {
-                    if (!Array.isArray(perm.field) || perm.field.length === 0) {
-                        const updatedApps = [...applications];
-                        updatedApps[index] = {
-                            ...app,
-                            error: `${perm.name} permission must have at least one group`
-                        };
-                        setApplications(updatedApps);
-                        setTimeout(() => {
-                            const clearedApps = [...applications];
-                            clearedApps[index] = {
-                                ...clearedApps[index],
-                                error: ""
-                            };
-                            setApplications(clearedApps);
-                        }, 5000);
-                        return;
-                    }
-                }
-
                 await axios.post("/applications", {
                     App_Acronym: app.App_Acronym.trim(),
                     App_Description: app.App_Description.trim(),
@@ -184,26 +164,6 @@ const AppPage = () => {
                     { field: app.App_permit_Doing, name: "Doing" },
                     { field: app.App_permit_Done, name: "Done" }
                 ];
-
-                for (const perm of permissionFields) {
-                    if (!Array.isArray(perm.field) || perm.field.length === 0) {
-                        const updatedApps = [...applications];
-                        updatedApps[index] = {
-                            ...app,
-                            error: `${perm.name} permission must have at least one group`
-                        };
-                        setApplications(updatedApps);
-                        setTimeout(() => {
-                            const clearedApps = [...applications];
-                            clearedApps[index] = {
-                                ...clearedApps[index],
-                                error: ""
-                            };
-                            setApplications(clearedApps);
-                        }, 5000);
-                        return;
-                    }
-                }
 
                 await axios.put(`/applications/${app.App_Acronym}`, {
                     App_Description: app.App_Description.trim(),

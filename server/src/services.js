@@ -263,10 +263,6 @@ export const createApplication = async appData => {
         throw new Error("Field must be between 1-50 characters");
     }
 
-    if (App_startDate > App_endDate) {
-        throw new Error("Start date cannot be after end date");
-    }
-
     return await withTransaction(async connection => {
         const existing = await query(
             "SELECT App_Acronym FROM applications WHERE App_Acronym = ?",

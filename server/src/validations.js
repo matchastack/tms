@@ -202,7 +202,9 @@ export const requireUserGroup = (groups, selfCheck = null) => {
         const allowedGroups = Array.isArray(groups) ? groups : [groups];
 
         // Check if user is in any of the allowed groups
-        const hasGroup = allowedGroups.some(group => userHasGroup(req.user, group));
+        const hasGroup = allowedGroups.some(group =>
+            userHasGroup(req.user, group)
+        );
 
         // Check self access if selfCheck callback is provided
         const isSelf = selfCheck ? selfCheck(req) : false;
@@ -293,15 +295,6 @@ export const validateApplicationCreation = (req, res, next) => {
         { field: App_permit_Done, name: "App_permit_Done" }
     ];
 
-    for (const perm of permissions) {
-        if (!Array.isArray(perm.field) || perm.field.length === 0) {
-            return res.status(400).json({
-                success: false,
-                message: `${perm.name} must be an array with at least one group`
-            });
-        }
-    }
-
     next();
 };
 
@@ -322,15 +315,6 @@ export const validateApplicationUpdate = (req, res, next) => {
         { field: App_permit_Doing, name: "App_permit_Doing" },
         { field: App_permit_Done, name: "App_permit_Done" }
     ];
-
-    for (const perm of permissions) {
-        if (!Array.isArray(perm.field) || perm.field.length === 0) {
-            return res.status(400).json({
-                success: false,
-                message: `${perm.name} must be an array with at least one group`
-            });
-        }
-    }
 
     next();
 };
