@@ -146,6 +146,12 @@ router.post(
 );
 
 router.post(
+    "/tasks/promote2done",
+    validations.authenticateToken,
+    controllers.PromoteTask2Done
+);
+
+router.post(
     "/tasks/demote",
     validations.authenticateToken,
     controllers.demoteTask

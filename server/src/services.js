@@ -813,6 +813,89 @@ export const demoteTaskState = async (
     });
 };
 
+export const promoteTask2Done = async (taskId, username, notes) => {
+    return await withTransaction(async connection => {
+        // Lock the row for update to prevent race conditions
+        const task = await connection
+            .execute("SELECT * FROM tasks WHERE Task_id = ? FOR UPDATE", [
+                taskId
+            ])
+            .then(([results]) => results[0]);
+
+        if (!task) {
+            throw new Error("Task not found");
+        }
+
+        // Validate task is in "Doing" state
+        if (task.Task_state !== "Doing") {
+            throw new Error(
+                `Task must be in "Doing" state to promote to "Done". Current state: ${task.Task_state}`
+            );
+        }
+
+        // Get application to check permissions
+        const app = await connection
+            .execute("SELECT * FROM applications WHERE App_Acronym = ?", [
+                task.Task_app_Acronym
+            ])
+            .then(([results]) => results[0]);
+
+        if (!app) {
+            throw new Error("Application not found");
+        }
+
+        // Get user details to check permissions
+        const user = await connection
+            .execute("SELECT * FROM accounts WHERE username = ?", [username])
+            .then(([results]) => results[0]);
+
+        if (!user) {
+            throw new Error("User not found");
+        }
+
+        // Check if user has App_permit_Doing permission
+        const permitDoingGroups = app.App_permit_Doing || [];
+        const userGroups = user.userGroups || [];
+        const hasPermission = permitDoingGroups.some(group =>
+            userGroups.includes(group)
+        );
+
+        if (!hasPermission) {
+            throw new Error(
+                "You do not have permission to promote this task to Done"
+            );
+        }
+
+        const previousState = task.Task_state;
+        const newState = "Done";
+
+        // Update audit trail
+        const auditNotes = appendAuditNote(
+            task.Task_notes,
+            username,
+            newState,
+            notes,
+            previousState
+        );
+
+        // Task_owner remains unchanged when promoting from Doing to Done
+        const newOwner = task.Task_owner;
+
+        // Update task (row is already locked with FOR UPDATE)
+        await connection.execute(
+            "UPDATE tasks SET Task_state = ?, Task_owner = ?, Task_notes = ? WHERE Task_id = ?",
+            [newState, newOwner, auditNotes, taskId]
+        );
+
+        return {
+            ...task,
+            Task_state: newState,
+            Task_owner: newOwner,
+            Task_notes: auditNotes
+        };
+    });
+};
+
 export const updateTaskPlan = async (taskId, planName, username) => {
     return await withTransaction(async connection => {
         const task = await connection
