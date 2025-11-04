@@ -82,6 +82,8 @@ const AppPage = () => {
         }
     };
 
+    const isProjectLead = () => user?.groups?.includes("project lead");
+
     const formatDateForInput = dateString => {
         if (!dateString) return "";
         // If it's already in YYYY-MM-DD format, return as is
@@ -255,235 +257,290 @@ const AppPage = () => {
                             </tr>
                         </thead>
                         <tbody className="bg-white">
-                            {applications.map((app, index) => (
-                                <>
-                                    <tr
-                                        key={
-                                            app.isNew
-                                                ? "new-app"
-                                                : app.App_Acronym
-                                        }
-                                        className="border-b border-gray-100"
-                                    >
-                                        <td className="px-4 py-3">
-                                            <input
-                                                type="text"
-                                                value={app.App_Acronym}
-                                                onChange={e =>
-                                                    handleFieldChange(
-                                                        index,
-                                                        "App_Acronym",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                placeholder={
-                                                    app.isNew ? "Acronym" : ""
-                                                }
-                                                className={`w-full px-3 py-2 border border-gray-300 rounded-md text-sm outline-none ${
-                                                    app.isNew
-                                                        ? "focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                                                        : "bg-gray-100 cursor-not-allowed"
-                                                }`}
-                                            />
-                                        </td>
-                                        <td className="px-4 py-3">
-                                            <input
-                                                type="text"
-                                                value={app.App_Description}
-                                                onChange={e =>
-                                                    handleFieldChange(
-                                                        index,
-                                                        "App_Description",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                placeholder="Description"
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                                            />
-                                        </td>
-                                        <td className="px-4 py-3">
-                                            <input
-                                                type="date"
-                                                value={formatDateForInput(
-                                                    app.App_startDate
-                                                )}
-                                                onChange={e =>
-                                                    handleFieldChange(
-                                                        index,
-                                                        "App_startDate",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                                            />
-                                        </td>
-                                        <td className="px-4 py-3">
-                                            <input
-                                                type="date"
-                                                value={formatDateForInput(
-                                                    app.App_endDate
-                                                )}
-                                                onChange={e =>
-                                                    handleFieldChange(
-                                                        index,
-                                                        "App_endDate",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                                            />
-                                        </td>
-                                        <td className="px-4 py-3">
-                                            <MultiSelect
-                                                value={app.App_permit_Create}
-                                                onChange={value =>
-                                                    handleFieldChange(
-                                                        index,
-                                                        "App_permit_Create",
-                                                        value
-                                                    )
-                                                }
-                                                placeholder={
-                                                    app.isNew ? "Select..." : ""
-                                                }
-                                                availableGroups={
-                                                    availableGroups
-                                                }
-                                            />
-                                        </td>
-                                        <td className="px-4 py-3">
-                                            <MultiSelect
-                                                value={app.App_permit_Open}
-                                                onChange={value =>
-                                                    handleFieldChange(
-                                                        index,
-                                                        "App_permit_Open",
-                                                        value
-                                                    )
-                                                }
-                                                placeholder={
-                                                    app.isNew ? "Select..." : ""
-                                                }
-                                                availableGroups={
-                                                    availableGroups
-                                                }
-                                            />
-                                        </td>
-                                        <td className="px-4 py-3">
-                                            <MultiSelect
-                                                value={app.App_permit_toDoList}
-                                                onChange={value =>
-                                                    handleFieldChange(
-                                                        index,
-                                                        "App_permit_toDoList",
-                                                        value
-                                                    )
-                                                }
-                                                placeholder={
-                                                    app.isNew ? "Select..." : ""
-                                                }
-                                                availableGroups={
-                                                    availableGroups
-                                                }
-                                            />
-                                        </td>
-                                        <td className="px-4 py-3">
-                                            <MultiSelect
-                                                value={app.App_permit_Doing}
-                                                onChange={value =>
-                                                    handleFieldChange(
-                                                        index,
-                                                        "App_permit_Doing",
-                                                        value
-                                                    )
-                                                }
-                                                placeholder={
-                                                    app.isNew ? "Select..." : ""
-                                                }
-                                                availableGroups={
-                                                    availableGroups
-                                                }
-                                            />
-                                        </td>
-                                        <td className="px-4 py-3">
-                                            <MultiSelect
-                                                value={app.App_permit_Done}
-                                                onChange={value =>
-                                                    handleFieldChange(
-                                                        index,
-                                                        "App_permit_Done",
-                                                        value
-                                                    )
-                                                }
-                                                placeholder={
-                                                    app.isNew ? "Select..." : ""
-                                                }
-                                                availableGroups={
-                                                    availableGroups
-                                                }
-                                            />
-                                        </td>
-                                        <td className="px-4 py-3 text-center text-sm text-gray-600">
-                                            {app.App_Rnumber ?? 0}
-                                        </td>
-                                        <td className="px-4 py-3 text-center">
-                                            {app.isNew ? (
-                                                <button
-                                                    onClick={() =>
-                                                        handleSaveRow(index)
+                            {applications.map((app, index) => {
+                                // Skip the create row if user is not a project lead
+                                if (app.isNew && !isProjectLead()) {
+                                    return null;
+                                }
+
+                                const canEdit = isProjectLead();
+
+                                return (
+                                    <>
+                                        <tr
+                                            key={
+                                                app.isNew
+                                                    ? "new-app"
+                                                    : app.App_Acronym
+                                            }
+                                            className="border-b border-gray-100"
+                                        >
+                                            <td className="px-4 py-3">
+                                                <input
+                                                    type="text"
+                                                    value={app.App_Acronym}
+                                                    onChange={e =>
+                                                        handleFieldChange(
+                                                            index,
+                                                            "App_Acronym",
+                                                            e.target.value
+                                                        )
                                                     }
-                                                    className="px-6 py-2 bg-blue-500 text-white rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
-                                                >
-                                                    +
-                                                </button>
-                                            ) : (
-                                                <button
-                                                    onClick={() =>
-                                                        handleSaveRow(index)
+                                                    placeholder={
+                                                        app.isNew
+                                                            ? "Acronym"
+                                                            : ""
                                                     }
-                                                    disabled={
-                                                        !editedRows.has(index)
-                                                    }
-                                                    className={`px-8 py-2 rounded-md text-sm font-medium transition-colors ${
-                                                        editedRows.has(index)
-                                                            ? "bg-blue-500 text-white hover:bg-blue-600 cursor-pointer"
-                                                            : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                                    disabled={!app.isNew}
+                                                    className={`w-full px-3 py-2 border border-gray-300 rounded-md text-sm outline-none ${
+                                                        app.isNew && canEdit
+                                                            ? "focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                                            : "bg-gray-100 cursor-not-allowed"
                                                     }`}
-                                                >
-                                                    <svg
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        className="w-5 h-5"
-                                                        viewBox="0 0 24 24"
-                                                        fill="none"
-                                                        stroke="currentColor"
-                                                        strokeWidth="2.25"
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        aria-hidden="true"
-                                                    >
-                                                        {" "}
-                                                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />{" "}
-                                                        <polyline points="17 21 17 13 7 13 7 21" />{" "}
-                                                        <polyline points="7 3 7 8 15 8" />{" "}
-                                                    </svg>
-                                                </button>
-                                            )}
-                                        </td>
-                                    </tr>
-                                    {app.error && (
-                                        <tr>
-                                            <td
-                                                colSpan="11"
-                                                className="px-4 py-2 bg-red-50 border-b border-gray-200"
-                                            >
-                                                <div className="text-sm text-red-600">
-                                                    {app.error}
-                                                </div>
+                                                />
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                <input
+                                                    type="text"
+                                                    value={app.App_Description}
+                                                    onChange={e =>
+                                                        handleFieldChange(
+                                                            index,
+                                                            "App_Description",
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    placeholder=""
+                                                    disabled={!canEdit}
+                                                    className={`w-full px-3 py-2 border border-gray-300 rounded-md text-sm outline-none ${
+                                                        canEdit
+                                                            ? "focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                                            : "bg-gray-100 cursor-not-allowed"
+                                                    }`}
+                                                />
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                <input
+                                                    type="date"
+                                                    value={formatDateForInput(
+                                                        app.App_startDate
+                                                    )}
+                                                    onChange={e =>
+                                                        handleFieldChange(
+                                                            index,
+                                                            "App_startDate",
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    disabled={!canEdit}
+                                                    className={`w-full px-3 py-2 border border-gray-300 rounded-md text-sm outline-none ${
+                                                        canEdit
+                                                            ? "focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                                            : "bg-gray-100 cursor-not-allowed"
+                                                    }`}
+                                                />
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                <input
+                                                    type="date"
+                                                    value={formatDateForInput(
+                                                        app.App_endDate
+                                                    )}
+                                                    onChange={e =>
+                                                        handleFieldChange(
+                                                            index,
+                                                            "App_endDate",
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    disabled={!canEdit}
+                                                    className={`w-full px-3 py-2 border border-gray-300 rounded-md text-sm outline-none ${
+                                                        canEdit
+                                                            ? "focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                                            : "bg-gray-100 cursor-not-allowed"
+                                                    }`}
+                                                />
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                <MultiSelect
+                                                    value={
+                                                        app.App_permit_Create
+                                                    }
+                                                    onChange={value =>
+                                                        handleFieldChange(
+                                                            index,
+                                                            "App_permit_Create",
+                                                            value
+                                                        )
+                                                    }
+                                                    placeholder={
+                                                        app.isNew
+                                                            ? "Select..."
+                                                            : ""
+                                                    }
+                                                    availableGroups={
+                                                        availableGroups
+                                                    }
+                                                    disabled={!canEdit}
+                                                />
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                <MultiSelect
+                                                    value={app.App_permit_Open}
+                                                    onChange={value =>
+                                                        handleFieldChange(
+                                                            index,
+                                                            "App_permit_Open",
+                                                            value
+                                                        )
+                                                    }
+                                                    placeholder={
+                                                        app.isNew
+                                                            ? "Select..."
+                                                            : ""
+                                                    }
+                                                    availableGroups={
+                                                        availableGroups
+                                                    }
+                                                    disabled={!canEdit}
+                                                />
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                <MultiSelect
+                                                    value={
+                                                        app.App_permit_toDoList
+                                                    }
+                                                    onChange={value =>
+                                                        handleFieldChange(
+                                                            index,
+                                                            "App_permit_toDoList",
+                                                            value
+                                                        )
+                                                    }
+                                                    placeholder={
+                                                        app.isNew
+                                                            ? "Select..."
+                                                            : ""
+                                                    }
+                                                    availableGroups={
+                                                        availableGroups
+                                                    }
+                                                    disabled={!canEdit}
+                                                />
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                <MultiSelect
+                                                    value={app.App_permit_Doing}
+                                                    onChange={value =>
+                                                        handleFieldChange(
+                                                            index,
+                                                            "App_permit_Doing",
+                                                            value
+                                                        )
+                                                    }
+                                                    placeholder={
+                                                        app.isNew
+                                                            ? "Select..."
+                                                            : ""
+                                                    }
+                                                    availableGroups={
+                                                        availableGroups
+                                                    }
+                                                    disabled={!canEdit}
+                                                />
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                <MultiSelect
+                                                    value={app.App_permit_Done}
+                                                    onChange={value =>
+                                                        handleFieldChange(
+                                                            index,
+                                                            "App_permit_Done",
+                                                            value
+                                                        )
+                                                    }
+                                                    placeholder={
+                                                        app.isNew
+                                                            ? "Select..."
+                                                            : ""
+                                                    }
+                                                    availableGroups={
+                                                        availableGroups
+                                                    }
+                                                    disabled={!canEdit}
+                                                />
+                                            </td>
+                                            <td className="px-4 py-3 text-center text-sm text-gray-600">
+                                                {app.App_Rnumber ?? 0}
+                                            </td>
+                                            <td className="px-4 py-3 text-center">
+                                                {canEdit &&
+                                                    (app.isNew ? (
+                                                        <button
+                                                            onClick={() =>
+                                                                handleSaveRow(
+                                                                    index
+                                                                )
+                                                            }
+                                                            className="px-6 py-2 bg-blue-500 text-white rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
+                                                        >
+                                                            +
+                                                        </button>
+                                                    ) : (
+                                                        <button
+                                                            onClick={() =>
+                                                                handleSaveRow(
+                                                                    index
+                                                                )
+                                                            }
+                                                            disabled={
+                                                                !editedRows.has(
+                                                                    index
+                                                                )
+                                                            }
+                                                            className={`px-8 py-2 rounded-md text-sm font-medium transition-colors ${
+                                                                editedRows.has(
+                                                                    index
+                                                                )
+                                                                    ? "bg-blue-500 text-white hover:bg-blue-600 cursor-pointer"
+                                                                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                                            }`}
+                                                        >
+                                                            <svg
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                className="w-5 h-5"
+                                                                viewBox="0 0 24 24"
+                                                                fill="none"
+                                                                stroke="currentColor"
+                                                                strokeWidth="2.25"
+                                                                strokeLinecap="round"
+                                                                strokeLinejoin="round"
+                                                                aria-hidden="true"
+                                                            >
+                                                                {" "}
+                                                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />{" "}
+                                                                <polyline points="17 21 17 13 7 13 7 21" />{" "}
+                                                                <polyline points="7 3 7 8 15 8" />{" "}
+                                                            </svg>
+                                                        </button>
+                                                    ))}
                                             </td>
                                         </tr>
-                                    )}
-                                </>
-                            ))}
+                                        {app.error && (
+                                            <tr>
+                                                <td
+                                                    colSpan="11"
+                                                    className="px-4 py-2 bg-red-50 border-b border-gray-200"
+                                                >
+                                                    <div className="text-sm text-red-600">
+                                                        {app.error}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </>
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>
