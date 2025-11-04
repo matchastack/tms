@@ -657,6 +657,21 @@ export const getTaskById = async taskId => {
     return task;
 };
 
+export const getAllTasksByState = async state => {
+    const validStates = ["Open", "To-Do", "Doing", "Done", "Closed"];
+
+    if (!validStates.includes(state)) {
+        throw new Error(`Invalid state. Must be one of: ${validStates.join(", ")}`);
+    }
+
+    const tasks = await query(
+        "SELECT * FROM tasks WHERE Task_state = ? ORDER BY Task_createDate DESC",
+        [state]
+    );
+
+    return tasks || [];
+};
+
 export const promoteTaskState = async (
     taskId,
     username,

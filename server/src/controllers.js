@@ -361,6 +361,22 @@ export const getTask = async (req, res, next) => {
     }
 };
 
+export const getTasksByState = async (req, res, next) => {
+    try {
+        const { state } = req.params;
+        const tasks = await services.getAllTasksByState(state);
+        res.status(200).json({
+            success: true,
+            data: tasks
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
 export const promoteTask = async (req, res, next) => {
     try {
         const { task_id, notes, expected_state } = req.body;

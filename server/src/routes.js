@@ -133,6 +133,12 @@ router.get(
     controllers.getTask
 );
 
+router.get(
+    "/tasks/state/:state",
+    validations.authenticateToken,
+    controllers.getTasksByState
+);
+
 router.post(
     "/tasks/promote",
     validations.authenticateToken,
