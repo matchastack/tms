@@ -1,7 +1,24 @@
+/**
+ * @fileoverview Validation and authentication middleware for the TMS API.
+ * Contains middleware functions for JWT authentication, request validation,
+ * and role-based access control (RBAC).
+ *
+ * @requires jsonwebtoken - For JWT token verification
+ */
+
 import jwt from "jsonwebtoken";
 import { config } from "./config/config.js";
 import * as services from "./services.js";
 
+/**
+ * Check if user belongs to a specific group.
+ * Case-insensitive comparison.
+ *
+ * @private
+ * @param {Object} user - User object with groups array
+ * @param {string} groupName - Group name to check
+ * @returns {boolean} True if user belongs to the group
+ */
 const userHasGroup = (user, groupName) => {
     const userGroups = user.groups || [];
     return userGroups.some(
@@ -9,6 +26,13 @@ const userHasGroup = (user, groupName) => {
     );
 };
 
+/**
+ * Validate password meets security requirements.
+ * Requirements: 8-10 characters, at least one letter, one number, one special character.
+ *
+ * @param {string} password - Password to validate
+ * @returns {string|null} Error message if invalid, null if valid
+ */
 export const validatePassword = password => {
     const minLength = 8;
     const maxLength = 10;
@@ -37,11 +61,26 @@ export const validatePassword = password => {
     return null;
 };
 
+/**
+ * Validate email format using regex.
+ *
+ * @param {string} email - Email address to validate
+ * @returns {boolean} True if email format is valid
+ */
 export const validateEmail = email => {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return emailRegex.test(email);
 };
 
+/**
+ * Validate login request data.
+ * Middleware that checks username and password are provided.
+ *
+ * @middleware
+ * @param {express.Request} req - Express request object
+ * @param {express.Response} res - Express response object
+ * @param {express.NextFunction} next - Express next function
+ */
 export const validateLogin = (req, res, next) => {
     const { username, password } = req.body;
 
@@ -55,6 +94,15 @@ export const validateLogin = (req, res, next) => {
     next();
 };
 
+/**
+ * Validate account creation request data.
+ * Checks required fields, username length, password strength, and email format.
+ *
+ * @middleware
+ * @param {express.Request} req - Express request object
+ * @param {express.Response} res - Express response object
+ * @param {express.NextFunction} next - Express next function
+ */
 export const validateAccountCreation = (req, res, next) => {
     const { username, email, password, userGroups } = req.body;
 
@@ -90,6 +138,15 @@ export const validateAccountCreation = (req, res, next) => {
     next();
 };
 
+/**
+ * Validate account update request data.
+ * Protects root admin account and validates password and email if provided.
+ *
+ * @middleware
+ * @param {express.Request} req - Express request object
+ * @param {express.Response} res - Express response object
+ * @param {express.NextFunction} next - Express next function
+ */
 export const validateAccountUpdate = (req, res, next) => {
     const { username, email, password, userGroups, isActive, newUsername } =
         req.body;
@@ -129,6 +186,16 @@ export const validateAccountUpdate = (req, res, next) => {
     next();
 };
 
+/**
+ * Authenticate JWT token from HTTP-only cookie.
+ * Verifies token signature, checks account status, and attaches user to request.
+ *
+ * @async
+ * @middleware
+ * @param {express.Request} req - Express request object
+ * @param {express.Response} res - Express response object
+ * @param {express.NextFunction} next - Express next function
+ */
 export const authenticateToken = async (req, res, next) => {
     const token = req.cookies.accessToken;
 
@@ -179,15 +246,25 @@ export const authenticateToken = async (req, res, next) => {
 };
 
 /**
- * Generalized user group validation middleware factory
+ * Generalized user group validation middleware factory.
+ * Creates middleware that checks if authenticated user belongs to required group(s).
+ * Supports OR logic for multiple groups and optional self-access check.
+ *
  * @param {string|string[]} groups - Single group or array of groups (OR logic)
- * @param {Function} selfCheck - Optional callback(req) => boolean to check if user is accessing own resource
+ * @param {Function} [selfCheck] - Optional callback(req) => boolean to check if user is accessing own resource
  * @returns {Function} Express middleware function
  *
- * Examples:
- * - requireUserGroup('admin') - requires admin group
- * - requireUserGroup(['admin', 'project manager']) - requires admin OR project manager
- * - requireUserGroup('admin', (req) => req.body.username === req.user.username) - requires admin OR self
+ * @example
+ * // Requires admin group
+ * requireUserGroup('admin')
+ *
+ * @example
+ * // Requires admin OR project manager
+ * requireUserGroup(['admin', 'project manager'])
+ *
+ * @example
+ * // Requires admin OR accessing own resource
+ * requireUserGroup('admin', (req) => req.body.username === req.user.username)
  */
 export const requireUserGroup = (groups, selfCheck = null) => {
     return (req, res, next) => {
@@ -223,6 +300,15 @@ export const requireUserGroup = (groups, selfCheck = null) => {
     };
 };
 
+/**
+ * Validate group creation request data.
+ * Checks that groupName is provided and not empty.
+ *
+ * @middleware
+ * @param {express.Request} req - Express request object
+ * @param {express.Response} res - Express response object
+ * @param {express.NextFunction} next - Express next function
+ */
 export const validateGroupCreation = (req, res, next) => {
     const { groupName } = req.body;
     if (!groupName || !groupName.trim()) {
@@ -234,6 +320,15 @@ export const validateGroupCreation = (req, res, next) => {
     next();
 };
 
+/**
+ * Validate profile update request data.
+ * Validates email format, password strength, and current password requirement.
+ *
+ * @middleware
+ * @param {express.Request} req - Express request object
+ * @param {express.Response} res - Express response object
+ * @param {express.NextFunction} next - Express next function
+ */
 export const validateProfileUpdate = (req, res, next) => {
     const { email, currentPassword, password } = req.body;
     const errors = [];
@@ -268,6 +363,15 @@ export const validateProfileUpdate = (req, res, next) => {
     next();
 };
 
+/**
+ * Validate application creation request data.
+ * Checks acronym, description length, and permission field formats.
+ *
+ * @middleware
+ * @param {express.Request} req - Express request object
+ * @param {express.Response} res - Express response object
+ * @param {express.NextFunction} next - Express next function
+ */
 export const validateApplicationCreation = (req, res, next) => {
     const {
         App_Acronym,
@@ -312,6 +416,15 @@ export const validateApplicationCreation = (req, res, next) => {
     next();
 };
 
+/**
+ * Validate application update request data.
+ * Validates permission field formats.
+ *
+ * @middleware
+ * @param {express.Request} req - Express request object
+ * @param {express.Response} res - Express response object
+ * @param {express.NextFunction} next - Express next function
+ */
 export const validateApplicationUpdate = (req, res, next) => {
     const {
         App_permit_Create,
@@ -333,6 +446,15 @@ export const validateApplicationUpdate = (req, res, next) => {
     next();
 };
 
+/**
+ * Validate plan creation request data.
+ * Checks plan name, application acronym, and date requirements.
+ *
+ * @middleware
+ * @param {express.Request} req - Express request object
+ * @param {express.Response} res - Express response object
+ * @param {express.NextFunction} next - Express next function
+ */
 export const validatePlanCreation = (req, res, next) => {
     const { Plan_MVP_name, Plan_app_Acronym, Plan_startDate, Plan_endDate } =
         req.body;
@@ -368,6 +490,15 @@ export const validatePlanCreation = (req, res, next) => {
     next();
 };
 
+/**
+ * Validate task creation request data.
+ * Checks task name, application acronym, and description length.
+ *
+ * @middleware
+ * @param {express.Request} req - Express request object
+ * @param {express.Response} res - Express response object
+ * @param {express.NextFunction} next - Express next function
+ */
 export const validateTaskCreation = (req, res, next) => {
     const { Task_name, Task_app_Acronym, Task_description } = req.body;
 
@@ -398,6 +529,22 @@ export const validateTaskCreation = (req, res, next) => {
     next();
 };
 
+/**
+ * Factory for application-specific permission validation middleware.
+ * Checks if authenticated user belongs to groups specified in application's permission field.
+ * Used for task state transitions and creation based on App_permit_* fields.
+ *
+ * @param {string} permitField - Application permission field name (e.g., 'App_permit_Create')
+ * @returns {Function} Express middleware function
+ *
+ * @example
+ * // Require user to be in App_permit_Create groups
+ * requirePermitGroup('App_permit_Create')
+ *
+ * @example
+ * // Require user to be in App_permit_Done groups
+ * requirePermitGroup('App_permit_Done')
+ */
 export const requirePermitGroup = permitField => {
     return async (req, res, next) => {
         try {

@@ -1,3 +1,12 @@
+/**
+ * @fileoverview Business logic layer for the TMS application.
+ * Contains all service functions that handle data operations and business rules.
+ * Services interact with the database layer and implement core application logic.
+ *
+ * @requires bcryptjs - For password hashing and comparison
+ * @requires jsonwebtoken - For JWT token generation
+ */
+
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { query, withTransaction } from "./config/database.js";
@@ -5,6 +14,20 @@ import { config } from "./config/config.js";
 
 // ============= AUTH SERVICES =============
 
+/**
+ * Authenticate user with username and password.
+ * Verifies credentials, checks account status, and generates JWT token.
+ *
+ * @async
+ * @param {string} username - Username to authenticate
+ * @param {string} password - Plain text password
+ * @returns {Promise<Object>} Object containing accessToken and user data
+ * @throws {Error} If credentials are invalid or account is inactive
+ *
+ * @example
+ * const result = await loginUser("admin", "password123");
+ * // Returns: { accessToken: "jwt...", user: { username, email, groups, isActive } }
+ */
 export const loginUser = async (username, password) => {
     const user = await query("SELECT * FROM accounts WHERE username = ?", [
         username
@@ -39,6 +62,12 @@ export const loginUser = async (username, password) => {
     };
 };
 
+/**
+ * Generate JWT access token with user payload.
+ *
+ * @param {Object} payload - Token payload containing user data
+ * @returns {string} Signed JWT token
+ */
 const generateAccessToken = payload => {
     return jwt.sign(payload, config.jwtSecret, {
         expiresIn: config.jwtExpiration
@@ -47,6 +76,15 @@ const generateAccessToken = payload => {
 
 // ============= USER SERVICES =============
 
+/**
+ * Retrieve user account by username.
+ * Returns user data without password field.
+ *
+ * @async
+ * @param {string} username - Username to lookup
+ * @returns {Promise<Object>} User object with username, email, userGroups, and isActive
+ * @throws {Error} If user is not found
+ */
 export const getUserByUsername = async username => {
     const user = await query(
         "SELECT username, email, userGroups, isActive FROM accounts WHERE username = ?",
@@ -60,6 +98,19 @@ export const getUserByUsername = async username => {
     return user;
 };
 
+/**
+ * Update user profile information.
+ * Allows updating email and password. Validates email uniqueness and current password.
+ *
+ * @async
+ * @param {string} username - Username of the user to update
+ * @param {Object} profileData - Profile update data
+ * @param {string} profileData.email - New email address
+ * @param {string} [profileData.currentPassword] - Current password (required if changing password)
+ * @param {string} [profileData.password] - New password (optional)
+ * @returns {Promise<Object>} Updated user object with username and email
+ * @throws {Error} If email already exists or current password is incorrect
+ */
 export const updateUserProfile = async (username, profileData) => {
     const { email, currentPassword, password } = profileData;
     return await withTransaction(async connection => {
@@ -109,12 +160,33 @@ export const updateUserProfile = async (username, profileData) => {
 
 // ============= ADMIN SERVICES =============
 
+/**
+ * Get all user accounts.
+ * Returns all accounts without password fields.
+ *
+ * @async
+ * @returns {Promise<Array>} Array of user account objects
+ */
 export const getAllAccounts = async () => {
     return await query(
         "SELECT username, email, userGroups, isActive FROM accounts"
     );
 };
 
+/**
+ * Create a new user account.
+ * Validates username and email uniqueness, hashes password, and creates account.
+ *
+ * @async
+ * @param {Object} accountData - Account creation data
+ * @param {string} accountData.username - Unique username
+ * @param {string} accountData.email - Unique email address
+ * @param {string} accountData.password - Plain text password (will be hashed)
+ * @param {Array<string>} accountData.userGroups - Array of user group names
+ * @param {number} accountData.isActive - Account status (0 or 1)
+ * @returns {Promise<Object>} Created account object (without password)
+ * @throws {Error} If username or email already exists
+ */
 export const createAccount = async accountData => {
     const { username, email, password, userGroups, isActive } = accountData;
 
@@ -147,6 +219,20 @@ export const createAccount = async accountData => {
     });
 };
 
+/**
+ * Update an existing user account.
+ * Updates account fields with protection for root admin account.
+ *
+ * @async
+ * @param {string} username - Username of account to update
+ * @param {Object} accountData - Account update data
+ * @param {string} accountData.email - Email address
+ * @param {string} [accountData.password] - New password (optional, will be hashed)
+ * @param {Array<string>} accountData.userGroups - Array of user group names
+ * @param {number} accountData.isActive - Account status (0 or 1)
+ * @returns {Promise<Object>} Updated account object
+ * @throws {Error} If email already exists, or attempting to deactivate/remove admin from root admin
+ */
 export const updateAccount = async (username, accountData) => {
     const { email, password, userGroups, isActive } = accountData;
 
@@ -204,12 +290,28 @@ export const updateAccount = async (username, accountData) => {
     });
 };
 
+/**
+ * Get all user groups.
+ * Returns an array of group names.
+ *
+ * @async
+ * @returns {Promise<Array<string>>} Array of user group names
+ */
 export const getAllUserGroups = async () => {
     return await query("SELECT group_name FROM user_groups").then(results =>
         results.map(row => row.group_name)
     );
 };
 
+/**
+ * Create a new user group.
+ * Validates group name uniqueness.
+ *
+ * @async
+ * @param {string} groupName - Name of the group to create
+ * @returns {Promise<Object>} Created group object with groupName
+ * @throws {Error} If group already exists
+ */
 export const createGroup = async groupName => {
     return await withTransaction(async connection => {
         const existingGroups = await query(
@@ -228,6 +330,15 @@ export const createGroup = async groupName => {
     });
 };
 
+/**
+ * Check if a user belongs to a specific group.
+ * Case-insensitive group name comparison.
+ *
+ * @async
+ * @param {string} userId - Username to check
+ * @param {string} groupName - Group name to verify
+ * @returns {Promise<boolean>} True if user belongs to the group, false otherwise
+ */
 export const checkGroup = async (userId, groupName) => {
     const user = await query(
         "SELECT userGroups FROM accounts WHERE username = ?",
@@ -246,6 +357,24 @@ export const checkGroup = async (userId, groupName) => {
 
 // ============= APPLICATION SERVICES =============
 
+/**
+ * Create a new application.
+ * Creates an application with permissions and initializes running number to 0.
+ *
+ * @async
+ * @param {Object} appData - Application creation data
+ * @param {string} appData.App_Acronym - Unique application acronym
+ * @param {string} appData.App_Description - Application description
+ * @param {string} appData.App_startDate - Application start date
+ * @param {string} appData.App_endDate - Application end date
+ * @param {Array<string>} appData.App_permit_Create - Groups permitted to create tasks
+ * @param {Array<string>} appData.App_permit_Open - Groups permitted to promote Open tasks
+ * @param {Array<string>} appData.App_permit_toDoList - Groups permitted to promote To-Do tasks
+ * @param {Array<string>} appData.App_permit_Doing - Groups permitted to work on Doing tasks
+ * @param {Array<string>} appData.App_permit_Done - Groups permitted to close Done tasks
+ * @returns {Promise<Object>} Created application object
+ * @throws {Error} If application acronym already exists
+ */
 export const createApplication = async appData => {
     const {
         App_Acronym,
@@ -314,10 +443,26 @@ export const createApplication = async appData => {
     });
 };
 
+/**
+ * Get all applications.
+ * Returns all applications ordered by acronym.
+ *
+ * @async
+ * @returns {Promise<Array>} Array of application objects
+ */
 export const getAllApplications = async () => {
     return await query("SELECT * FROM applications ORDER BY App_Acronym");
 };
 
+/**
+ * Get a single application by acronym.
+ * Returns application details with all permission groups.
+ *
+ * @async
+ * @param {string} acronym - Application acronym
+ * @returns {Promise<Object>} Application object
+ * @throws {Error} If application is not found
+ */
 export const getApplicationByAcronym = async acronym => {
     const app = await query(
         "SELECT * FROM applications WHERE App_Acronym = ?",
@@ -331,6 +476,16 @@ export const getApplicationByAcronym = async acronym => {
     return app;
 };
 
+/**
+ * Update an existing application.
+ * Updates application metadata and permissions. App_Rnumber cannot be modified.
+ *
+ * @async
+ * @param {string} acronym - Application acronym to update
+ * @param {Object} appData - Application update data (same structure as createApplication)
+ * @returns {Promise<Object>} Updated application object
+ * @throws {Error} If application is not found
+ */
 export const updateApplication = async (acronym, appData) => {
     const {
         App_Description,
@@ -395,6 +550,19 @@ export const updateApplication = async (acronym, appData) => {
 
 // ============= PLAN SERVICES =============
 
+/**
+ * Create a new plan.
+ * Validates plan dates are within application date range and plan name is unique.
+ *
+ * @async
+ * @param {Object} planData - Plan creation data
+ * @param {string} planData.Plan_MVP_name - Unique plan name
+ * @param {string} planData.Plan_startDate - Plan start date
+ * @param {string} planData.Plan_endDate - Plan end date
+ * @param {string} planData.Plan_app_Acronym - Associated application acronym
+ * @returns {Promise<Object>} Created plan object
+ * @throws {Error} If plan name exists, application not found, or dates are invalid
+ */
 export const createPlan = async planData => {
     const { Plan_MVP_name, Plan_startDate, Plan_endDate, Plan_app_Acronym } =
         planData;
@@ -478,6 +646,14 @@ export const createPlan = async planData => {
     });
 };
 
+/**
+ * Get all plans for an application.
+ * Returns plans ordered by start date.
+ *
+ * @async
+ * @param {string} appAcronym - Application acronym
+ * @returns {Promise<Array>} Array of plan objects
+ */
 export const getPlansByApp = async appAcronym => {
     return await query(
         "SELECT * FROM plans WHERE Plan_app_Acronym = ? ORDER BY Plan_startDate",
@@ -485,6 +661,15 @@ export const getPlansByApp = async appAcronym => {
     );
 };
 
+/**
+ * Get a single plan by name.
+ * Returns plan details including associated application.
+ *
+ * @async
+ * @param {string} planName - Plan name
+ * @returns {Promise<Object>} Plan object
+ * @throws {Error} If plan is not found
+ */
 export const getPlanByName = async planName => {
     const plan = await query("SELECT * FROM plans WHERE Plan_MVP_name = ?", [
         planName
@@ -499,7 +684,17 @@ export const getPlanByName = async planName => {
 
 // ============= TASK SERVICES =============
 
-// Helper: Generate Task_id
+/**
+ * Generate unique task ID.
+ * Increments application's running number and returns formatted task ID.
+ * Format: {App_Acronym}_{Rnumber}
+ *
+ * @async
+ * @private
+ * @param {string} appAcronym - Application acronym
+ * @param {Object} connection - Database connection (from transaction)
+ * @returns {Promise<string>} Generated task ID (e.g., "PROJ_1")
+ */
 const generateTaskId = async (appAcronym, connection) => {
     const app = await connection
         .execute("SELECT App_Rnumber FROM applications WHERE App_Acronym = ?", [
@@ -517,7 +712,19 @@ const generateTaskId = async (appAcronym, connection) => {
     return `${appAcronym}_${newRnumber}`;
 };
 
-// Helper: Append audit note
+/**
+ * Append audit trail note with timestamp.
+ * Formats notes with Singapore timezone timestamp and auto-generates transition messages.
+ * Format: [DD-MM-YYYY HH:mm] State - username\nnote text\n
+ *
+ * @private
+ * @param {string} currentNotes - Existing notes string
+ * @param {string} username - Username performing the action
+ * @param {string} state - Current task state
+ * @param {string} note - User-provided note (optional)
+ * @param {string} [previousState] - Previous state for auto-generating transition message
+ * @returns {string} Updated notes with new entry appended
+ */
 const appendAuditNote = (
     currentNotes,
     username,
@@ -549,6 +756,21 @@ const appendAuditNote = (
     return (currentNotes || "") + newNote;
 };
 
+/**
+ * Create a new task.
+ * Creates task in Open state with auto-generated ID and audit trail.
+ *
+ * @async
+ * @param {Object} taskData - Task creation data
+ * @param {string} taskData.Task_name - Unique task name
+ * @param {string} taskData.Task_description - Task description
+ * @param {string} [taskData.Task_plan] - Optional plan name
+ * @param {string} taskData.Task_app_Acronym - Application acronym
+ * @param {string} [taskData.notes] - Optional creation notes
+ * @param {string} username - Username of task creator
+ * @returns {Promise<Object>} Created task object
+ * @throws {Error} If task name exists, application not found, or plan is invalid
+ */
 export const createTask = async (taskData, username) => {
     const { Task_name, Task_description, Task_plan, Task_app_Acronym, notes } =
         taskData;
@@ -627,6 +849,14 @@ export const createTask = async (taskData, username) => {
     });
 };
 
+/**
+ * Get all tasks for an application.
+ * Returns tasks ordered by creation date (newest first).
+ *
+ * @async
+ * @param {string} appAcronym - Application acronym
+ * @returns {Promise<Array>} Array of task objects
+ */
 export const getTasksByApp = async appAcronym => {
     const tasks = await query(
         "SELECT * FROM tasks WHERE Task_app_Acronym = ? ORDER BY Task_createDate DESC",
@@ -636,6 +866,15 @@ export const getTasksByApp = async appAcronym => {
     return tasks || [];
 };
 
+/**
+ * Get tasks filtered by application and state.
+ * Returns tasks ordered by creation date (newest first).
+ *
+ * @async
+ * @param {string} appAcronym - Application acronym
+ * @param {string} state - Task state (Open, To-Do, Doing, Done, Closed)
+ * @returns {Promise<Array>} Array of task objects matching the state
+ */
 export const getTasksByState = async (appAcronym, state) => {
     const tasks = await query(
         "SELECT * FROM tasks WHERE Task_app_Acronym = ? AND Task_state = ? ORDER BY Task_createDate DESC",
@@ -645,6 +884,15 @@ export const getTasksByState = async (appAcronym, state) => {
     return tasks || [];
 };
 
+/**
+ * Get a single task by ID.
+ * Returns complete task details including notes.
+ *
+ * @async
+ * @param {string} taskId - Task ID
+ * @returns {Promise<Object>} Task object
+ * @throws {Error} If task is not found
+ */
 export const getTaskById = async taskId => {
     const task = await query("SELECT * FROM tasks WHERE Task_id = ?", [
         taskId
@@ -657,6 +905,20 @@ export const getTaskById = async taskId => {
     return task;
 };
 
+/**
+ * Promote task to next state in workflow.
+ * Workflow: Open → To-Do → Doing → Done → Closed
+ * Uses pessimistic locking (FOR UPDATE) and optimistic validation (expected state).
+ * Task_owner is set to current user when promoting To-Do → Doing.
+ *
+ * @async
+ * @param {string} taskId - Task ID
+ * @param {string} username - Username performing promotion
+ * @param {string} notes - User notes for the promotion
+ * @param {string} [expectedState] - Expected current state for race condition prevention
+ * @returns {Promise<Object>} Updated task object
+ * @throws {Error} If task not found, state changed, or already in final state
+ */
 export const promoteTaskState = async (
     taskId,
     username,
@@ -730,6 +992,20 @@ export const promoteTaskState = async (
     });
 };
 
+/**
+ * Demote task to previous state in workflow.
+ * Allowed: Done → Doing, Doing → To-Do
+ * Uses pessimistic locking (FOR UPDATE) and optimistic validation (expected state).
+ * Task_owner is set to null when demoting Doing → To-Do.
+ *
+ * @async
+ * @param {string} taskId - Task ID
+ * @param {string} username - Username performing demotion
+ * @param {string} notes - User notes for the demotion
+ * @param {string} [expectedState] - Expected current state for race condition prevention
+ * @returns {Promise<Object>} Updated task object
+ * @throws {Error} If task not found, state changed, or cannot demote from current state
+ */
 export const demoteTaskState = async (
     taskId,
     username,
@@ -798,6 +1074,19 @@ export const demoteTaskState = async (
     });
 };
 
+/**
+ * Update task's assigned plan.
+ * Plan can only be changed when task is in Open or Done state.
+ * Requires App_permit_Open permission (checked in middleware).
+ * Validates plan belongs to same application.
+ *
+ * @async
+ * @param {string} taskId - Task ID
+ * @param {string} planName - New plan name (or null to remove plan)
+ * @param {string} username - Username performing the update
+ * @returns {Promise<Object>} Updated task object
+ * @throws {Error} If task not found, plan invalid, or state doesn't allow plan change
+ */
 export const updateTaskPlan = async (taskId, planName, username) => {
     return await withTransaction(async connection => {
         const task = await connection
@@ -886,6 +1175,17 @@ export const updateTaskPlan = async (taskId, planName, username) => {
     });
 };
 
+/**
+ * Add a note to a task.
+ * Notes can be added to tasks in any state except Closed.
+ *
+ * @async
+ * @param {string} taskId - Task ID
+ * @param {string} note - Note text to add
+ * @param {string} username - Username adding the note
+ * @returns {Promise<Object>} Updated task object
+ * @throws {Error} If task not found or task is in Closed state
+ */
 export const addTaskNote = async (taskId, note, username) => {
     return await withTransaction(async connection => {
         const task = await connection

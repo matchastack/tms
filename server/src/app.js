@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Express application configuration and middleware setup.
+ * Configures CORS, JSON parsing, cookie handling, and routes for the TMS API.
+ */
+
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -17,6 +22,12 @@ app.use(cookieParser());
 
 app.use("/api", routes);
 
+/**
+ * Health check endpoint.
+ * Returns the server status and current timestamp.
+ * @route GET /api/health
+ * @returns {Object} JSON object with status and timestamp
+ */
 app.get("/api/health", (req, res) => {
     res.json({ status: "ok", timestamp: new Date().toUTCString() });
 });

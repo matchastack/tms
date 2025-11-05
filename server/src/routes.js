@@ -1,3 +1,15 @@
+/**
+ * @fileoverview API route definitions for the TMS application.
+ * Defines all HTTP endpoints with their middleware chains (authentication, validation, authorization).
+ * Routes are organized into sections: Auth, User, Admin, Application, Plan, and Task.
+ *
+ * Middleware execution order for protected routes:
+ * 1. Authentication (authenticateToken) - Verifies JWT token
+ * 2. Validation (validate*) - Validates request data
+ * 3. Authorization (requireUserGroup/requirePermitGroup) - Checks user permissions
+ * 4. Controller - Handles the request and returns response
+ */
+
 import express from "express";
 import * as controllers from "./controllers.js";
 import * as validations from "./validations.js";

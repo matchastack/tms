@@ -1,8 +1,29 @@
+/**
+ * @fileoverview HTTP request handlers (controllers) for the TMS API.
+ * Contains all controller functions that handle incoming requests and return responses.
+ * Controllers extract data from requests, call service layer functions, and format responses.
+ *
+ * @requires nodemailer - For sending email notifications
+ */
+
 import nodemailer from "nodemailer";
 import * as services from "./services.js";
 
 // ============= AUTH CONTROLLERS =============
 
+/**
+ * Handle user login request.
+ * Validates credentials, generates JWT token, and sets HTTP-only cookie.
+ *
+ * @async
+ * @param {express.Request} req - Express request object with username and password in body
+ * @param {express.Response} res - Express response object
+ * @param {express.NextFunction} next - Express next middleware function
+ * @returns {Promise<void>} JSON response with user data and success status
+ *
+ * @route POST /api/auth/login
+ * @access Public
+ */
 export const login = async (req, res, next) => {
     try {
         const { username, password } = req.body;
@@ -28,6 +49,17 @@ export const login = async (req, res, next) => {
     }
 };
 
+/**
+ * Handle user logout request.
+ * Clears the JWT authentication cookie.
+ *
+ * @param {express.Request} req - Express request object
+ * @param {express.Response} res - Express response object
+ * @returns {void} JSON response with success message
+ *
+ * @route POST /api/auth/logout
+ * @access Protected (requires authentication)
+ */
 export const logout = (req, res) => {
     res.clearCookie("accessToken", {
         httpOnly: true,
@@ -43,6 +75,18 @@ export const logout = (req, res) => {
 
 // ============= USER CONTROLLERS =============
 
+/**
+ * Get current authenticated user's profile.
+ * Returns username, email, and user groups for the logged-in user.
+ *
+ * @async
+ * @param {express.Request} req - Express request object with authenticated user in req.user
+ * @param {express.Response} res - Express response object
+ * @returns {Promise<void>} JSON response with user profile data
+ *
+ * @route GET /api/profile
+ * @access Protected (requires authentication)
+ */
 export const getCurrentUser = async (req, res) => {
     try {
         const username = req.user.username;
@@ -63,6 +107,19 @@ export const getCurrentUser = async (req, res) => {
     }
 };
 
+/**
+ * Update current authenticated user's profile.
+ * Allows users to update their email and password.
+ *
+ * @async
+ * @param {express.Request} req - Express request object with email, currentPassword, and password in body
+ * @param {express.Response} res - Express response object
+ * @param {express.NextFunction} next - Express next middleware function
+ * @returns {Promise<void>} JSON response with updated user data
+ *
+ * @route PUT /api/profile
+ * @access Protected (requires authentication)
+ */
 export const updateCurrentUser = async (req, res, next) => {
     try {
         const username = req.user.username;
@@ -89,6 +146,19 @@ export const updateCurrentUser = async (req, res, next) => {
 
 // ============= ADMIN CONTROLLERS =============
 
+/**
+ * Get all user accounts.
+ * Returns a list of all user accounts in the system.
+ *
+ * @async
+ * @param {express.Request} req - Express request object
+ * @param {express.Response} res - Express response object
+ * @param {express.NextFunction} next - Express next middleware function
+ * @returns {Promise<void>} JSON response with array of user accounts
+ *
+ * @route GET /api/accounts
+ * @access Protected (requires admin role)
+ */
 export const getAccounts = async (req, res, next) => {
     try {
         const accounts = await services.getAllAccounts();
@@ -105,6 +175,19 @@ export const getAccounts = async (req, res, next) => {
     }
 };
 
+/**
+ * Create a new user account.
+ * Creates a new account with username, email, password, user groups, and active status.
+ *
+ * @async
+ * @param {express.Request} req - Express request object with account data in body
+ * @param {express.Response} res - Express response object
+ * @param {express.NextFunction} next - Express next middleware function
+ * @returns {Promise<void>} JSON response with created account data
+ *
+ * @route POST /api/accounts
+ * @access Protected (requires admin role)
+ */
 export const createAccount = async (req, res, next) => {
     try {
         const { username, email, password, userGroups, isActive } = req.body;
@@ -130,6 +213,20 @@ export const createAccount = async (req, res, next) => {
     }
 };
 
+/**
+ * Update an existing user account.
+ * Updates account fields including email, password, user groups, and active status.
+ * Protects root admin account from being deactivated or losing admin privileges.
+ *
+ * @async
+ * @param {express.Request} req - Express request object with account update data in body
+ * @param {express.Response} res - Express response object
+ * @param {express.NextFunction} next - Express next middleware function
+ * @returns {Promise<void>} JSON response with updated account data
+ *
+ * @route PUT /api/accounts
+ * @access Protected (requires admin role)
+ */
 export const updateAccount = async (req, res, next) => {
     try {
         const { username, email, password, userGroups, isActive, newUsername } =
@@ -156,6 +253,19 @@ export const updateAccount = async (req, res, next) => {
     }
 };
 
+/**
+ * Get all user groups.
+ * Returns a list of all available user groups in the system.
+ *
+ * @async
+ * @param {express.Request} req - Express request object
+ * @param {express.Response} res - Express response object
+ * @param {express.NextFunction} next - Express next middleware function
+ * @returns {Promise<void>} JSON response with array of user group names
+ *
+ * @route GET /api/user_groups
+ * @access Protected (requires authentication)
+ */
 export const getUserGroups = async (req, res, next) => {
     try {
         const groups = await services.getAllUserGroups();
@@ -172,6 +282,19 @@ export const getUserGroups = async (req, res, next) => {
     }
 };
 
+/**
+ * Create a new user group.
+ * Creates a new user group with the specified name.
+ *
+ * @async
+ * @param {express.Request} req - Express request object with groupName in body
+ * @param {express.Response} res - Express response object
+ * @param {express.NextFunction} next - Express next middleware function
+ * @returns {Promise<void>} JSON response with created group data
+ *
+ * @route POST /api/user_groups
+ * @access Protected (requires admin role)
+ */
 export const createGroup = async (req, res, next) => {
     try {
         const { groupName } = req.body;
@@ -191,6 +314,19 @@ export const createGroup = async (req, res, next) => {
 
 // ============= APPLICATION CONTROLLERS =============
 
+/**
+ * Create a new application.
+ * Creates a new TMS application with permissions and metadata.
+ *
+ * @async
+ * @param {express.Request} req - Express request object with application data in body
+ * @param {express.Response} res - Express response object
+ * @param {express.NextFunction} next - Express next middleware function
+ * @returns {Promise<void>} JSON response with created application data
+ *
+ * @route POST /api/applications
+ * @access Protected (requires project lead role)
+ */
 export const createApplication = async (req, res, next) => {
     try {
         const newApp = await services.createApplication(req.body);
@@ -207,6 +343,19 @@ export const createApplication = async (req, res, next) => {
     }
 };
 
+/**
+ * Get all applications.
+ * Returns a list of all applications in the system.
+ *
+ * @async
+ * @param {express.Request} req - Express request object
+ * @param {express.Response} res - Express response object
+ * @param {express.NextFunction} next - Express next middleware function
+ * @returns {Promise<void>} JSON response with array of applications
+ *
+ * @route GET /api/applications
+ * @access Protected (requires authentication)
+ */
 export const getApplications = async (req, res, next) => {
     try {
         const apps = await services.getAllApplications();
@@ -219,6 +368,19 @@ export const getApplications = async (req, res, next) => {
     }
 };
 
+/**
+ * Get a single application by acronym.
+ * Returns detailed information about a specific application.
+ *
+ * @async
+ * @param {express.Request} req - Express request object with acronym in params
+ * @param {express.Response} res - Express response object
+ * @param {express.NextFunction} next - Express next middleware function
+ * @returns {Promise<void>} JSON response with application data
+ *
+ * @route GET /api/applications/:acronym
+ * @access Protected (requires authentication)
+ */
 export const getApplicationByAcronym = async (req, res, next) => {
     try {
         const { acronym } = req.params;
@@ -235,6 +397,19 @@ export const getApplicationByAcronym = async (req, res, next) => {
     }
 };
 
+/**
+ * Update an existing application.
+ * Updates application metadata and permissions.
+ *
+ * @async
+ * @param {express.Request} req - Express request object with acronym in params and update data in body
+ * @param {express.Response} res - Express response object
+ * @param {express.NextFunction} next - Express next middleware function
+ * @returns {Promise<void>} JSON response with updated application data
+ *
+ * @route PUT /api/applications/:acronym
+ * @access Protected (requires project lead role)
+ */
 export const updateApplication = async (req, res, next) => {
     try {
         const { acronym } = req.params;
@@ -254,6 +429,19 @@ export const updateApplication = async (req, res, next) => {
 
 // ============= PLAN CONTROLLERS =============
 
+/**
+ * Create a new plan.
+ * Creates a new plan associated with an application.
+ *
+ * @async
+ * @param {express.Request} req - Express request object with plan data in body
+ * @param {express.Response} res - Express response object
+ * @param {express.NextFunction} next - Express next middleware function
+ * @returns {Promise<void>} JSON response with created plan data
+ *
+ * @route POST /api/plans
+ * @access Protected (requires project manager role)
+ */
 export const createPlan = async (req, res, next) => {
     try {
         const newPlan = await services.createPlan(req.body);
@@ -270,6 +458,19 @@ export const createPlan = async (req, res, next) => {
     }
 };
 
+/**
+ * Get all plans for an application.
+ * Returns a list of plans associated with a specific application.
+ *
+ * @async
+ * @param {express.Request} req - Express request object with app_acronym in params
+ * @param {express.Response} res - Express response object
+ * @param {express.NextFunction} next - Express next middleware function
+ * @returns {Promise<void>} JSON response with array of plans
+ *
+ * @route GET /api/plans/:app_acronym
+ * @access Protected (requires authentication)
+ */
 export const getPlans = async (req, res, next) => {
     try {
         const { app_acronym } = req.params;
@@ -286,6 +487,19 @@ export const getPlans = async (req, res, next) => {
     }
 };
 
+/**
+ * Get a single plan by name.
+ * Returns detailed information about a specific plan.
+ *
+ * @async
+ * @param {express.Request} req - Express request object with name in params
+ * @param {express.Response} res - Express response object
+ * @param {express.NextFunction} next - Express next middleware function
+ * @returns {Promise<void>} JSON response with plan data
+ *
+ * @route GET /api/plan/:name
+ * @access Protected (requires authentication)
+ */
 export const getPlan = async (req, res, next) => {
     try {
         const { name } = req.params;
@@ -304,6 +518,19 @@ export const getPlan = async (req, res, next) => {
 
 // ============= TASK CONTROLLERS =============
 
+/**
+ * Create a new task.
+ * Creates a new task in the Open state with auto-generated task ID.
+ *
+ * @async
+ * @param {express.Request} req - Express request object with task data in body
+ * @param {express.Response} res - Express response object
+ * @param {express.NextFunction} next - Express next middleware function
+ * @returns {Promise<void>} JSON response with created task data
+ *
+ * @route POST /api/tasks
+ * @access Protected (requires App_permit_Create permission)
+ */
 export const createTask = async (req, res, next) => {
     try {
         const username = req.user.username;
@@ -321,6 +548,19 @@ export const createTask = async (req, res, next) => {
     }
 };
 
+/**
+ * Get tasks for an application.
+ * Returns tasks filtered by application and optionally by state.
+ *
+ * @async
+ * @param {express.Request} req - Express request object with app_acronym in params and optional state in query
+ * @param {express.Response} res - Express response object
+ * @param {express.NextFunction} next - Express next middleware function
+ * @returns {Promise<void>} JSON response with array of tasks
+ *
+ * @route GET /api/tasks/:app_acronym?state=<state>
+ * @access Protected (requires authentication)
+ */
 export const getTasks = async (req, res, next) => {
     try {
         const { app_acronym } = req.params;
@@ -345,6 +585,19 @@ export const getTasks = async (req, res, next) => {
     }
 };
 
+/**
+ * Get a single task by ID.
+ * Returns detailed information about a specific task.
+ *
+ * @async
+ * @param {express.Request} req - Express request object with task_id in params
+ * @param {express.Response} res - Express response object
+ * @param {express.NextFunction} next - Express next middleware function
+ * @returns {Promise<void>} JSON response with task data
+ *
+ * @route GET /api/task/:task_id
+ * @access Protected (requires authentication)
+ */
 export const getTask = async (req, res, next) => {
     try {
         const { task_id } = req.params;
@@ -361,6 +614,20 @@ export const getTask = async (req, res, next) => {
     }
 };
 
+/**
+ * Promote task to next state.
+ * Advances task through workflow: Open → To-Do → Doing → Done → Closed.
+ * Sends email notification when task reaches "Done" state.
+ *
+ * @async
+ * @param {express.Request} req - Express request object with task_id, notes, and expected_state in body
+ * @param {express.Response} res - Express response object
+ * @param {express.NextFunction} next - Express next middleware function
+ * @returns {Promise<void>} JSON response with updated task data
+ *
+ * @route POST /api/tasks/promote
+ * @access Protected (requires state-specific permission)
+ */
 export const promoteTask = async (req, res, next) => {
     try {
         const { task_id, notes, expected_state } = req.body;
@@ -454,6 +721,19 @@ export const promoteTask = async (req, res, next) => {
     }
 };
 
+/**
+ * Demote task to previous state.
+ * Moves task backward in workflow: Done → Doing or Doing → To-Do.
+ *
+ * @async
+ * @param {express.Request} req - Express request object with task_id, notes, and expected_state in body
+ * @param {express.Response} res - Express response object
+ * @param {express.NextFunction} next - Express next middleware function
+ * @returns {Promise<void>} JSON response with updated task data
+ *
+ * @route POST /api/tasks/demote
+ * @access Protected (requires state-specific permission)
+ */
 export const demoteTask = async (req, res, next) => {
     try {
         const { task_id, notes, expected_state } = req.body;
@@ -477,6 +757,19 @@ export const demoteTask = async (req, res, next) => {
     }
 };
 
+/**
+ * Update task details.
+ * Allows updating task plan (Open/Done state only) and adding notes.
+ *
+ * @async
+ * @param {express.Request} req - Express request object with task_id, plan_name, and notes in body
+ * @param {express.Response} res - Express response object
+ * @param {express.NextFunction} next - Express next middleware function
+ * @returns {Promise<void>} JSON response with updated task data
+ *
+ * @route PUT /api/tasks
+ * @access Protected (requires authentication, plan changes require App_permit_Open)
+ */
 export const updateTask = async (req, res, next) => {
     try {
         const { task_id, plan_name, notes } = req.body;
