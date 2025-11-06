@@ -5,56 +5,63 @@ A full-stack task management application with role-based access control, Kanban-
 ## Features
 
 ### User Management
-- JWT-based authentication with HTTP-only cookies
-- Role-based access control (RBAC) via user groups
-- User profile management
-- Admin panel for account management
+
+-   JWT-based authentication with HTTP-only cookies
+-   Role-based access control (RBAC) via user groups
+-   User profile management
+-   Admin panel for account management
 
 ### Application Management
-- Create and manage multiple applications/projects
-- Configure granular permissions per application
-- Track task counts and project timelines
-- Application-specific Kanban workflows
+
+-   Create and manage multiple applications/projects
+-   Configure granular permissions per application
+-   Track task counts and project timelines
+-   Application-specific Kanban workflows
 
 ### Task Management
-- 5-state Kanban workflow: **Open → To-Do → Doing → Done → Closed**
-- Permission-based state transitions
-- Plan assignment and tracking
-- Append-only audit trail with automatic timestamping
-- Email notifications for task reviews
-- Unified Kanban board showing tasks across all applications
+
+-   5-state Kanban workflow: **Open → To-Do → Doing → Done → Closed**
+-   Permission-based state transitions
+-   Plan assignment and tracking
+-   Append-only audit trail with automatic timestamping
+-   Email notifications for task reviews
+-   Unified Kanban board showing tasks across all applications
 
 ### Plan Management
-- Create sprint/release plans per application
-- Date range validation against application timeline
-- Link tasks to plans for better organization
+
+-   Create sprint/release plans per application
+-   Date range validation against application timeline
+-   Link tasks to plans for better organization
 
 ## Tech Stack
 
 ### Frontend
-- **React 19** - UI library
-- **Vite** - Build tool and dev server
-- **React Router** - Client-side routing
-- **Tailwind CSS 4** - Utility-first styling
-- **Axios** - HTTP client
+
+-   **React 19** - UI library
+-   **Vite** - Build tool and dev server
+-   **React Router** - Client-side routing
+-   **Tailwind CSS 4** - Utility-first styling
+-   **Axios** - HTTP client
 
 ### Backend
-- **Node.js** - Runtime environment
-- **Express 4** - Web framework
-- **JWT** - Authentication tokens
-- **Bcrypt** - Password hashing
-- **Nodemailer** - Email notifications
+
+-   **Node.js** - Runtime environment
+-   **Express 4** - Web framework
+-   **JWT** - Authentication tokens
+-   **Bcrypt** - Password hashing
+-   **Nodemailer** - Email notifications
 
 ### Database
-- **MySQL 8+** - Relational database
-- Connection pooling with mysql2
-- Parameterized queries for SQL injection prevention
+
+-   **MySQL 8+** - Relational database
+-   Connection pooling with mysql2
+-   Parameterized queries for SQL injection prevention
 
 ## Prerequisites
 
-- **Node.js** 18+ and npm
-- **MySQL** 8.0+
-- **Git**
+-   **Node.js** 18+ and npm
+-   **MySQL** 8.0+
+-   **Git**
 
 ## Installation
 
@@ -74,10 +81,11 @@ mysql -u root -p < database/init.sql
 ```
 
 This creates:
-- Database schema (`nodelogin`)
-- Default admin account (username: `admin`, email: `admin@m.com`)
-- Sample user groups (admin, project lead, project manager, dev team)
-- 3 sample applications with plans and tasks
+
+-   Database schema (`nodelogin`)
+-   Default admin account (username: `admin`, email: `admin@m.com`)
+-   Sample user groups (admin, project lead, project manager, dev team)
+-   3 sample applications with plans and tasks
 
 ### 3. Backend Setup
 
@@ -120,28 +128,34 @@ API_URL=http://localhost:8080/api
 ### Development Mode
 
 **Terminal 1 - Backend:**
+
 ```bash
 cd server
 npm run dev
 ```
+
 Server runs on http://localhost:8080 (or port specified in .env)
 
 **Terminal 2 - Frontend:**
+
 ```bash
 cd client
 npm run dev
 ```
+
 Client runs on http://localhost:3000
 
 ### Production Mode
 
 **Backend:**
+
 ```bash
 cd server
 npm start
 ```
 
 **Frontend:**
+
 ```bash
 cd client
 npm run build
@@ -151,9 +165,10 @@ npm run preview
 ## Default Login Credentials
 
 After running the database initialization:
-- **Username:** admin
-- **Email:** admin@m.com
-- **Password:** (Set during database initialization)
+
+-   **Username:** admin
+-   **Email:** admin@m.com
+-   **Password:** (Set during database initialization)
 
 ## Project Structure
 
@@ -211,67 +226,75 @@ Users can perform actions if they belong to **any** of the groups in the permiss
 ### Task Workflow
 
 **Promotion Flow:**
+
 ```
 Create Task → [Open] → Release → [To-Do] → Take → [Doing]
           → Submit Review → [Done] → Approve → [Closed]
 ```
 
 **Demotion Flow:**
+
 ```
 [Doing] → Drop → [To-Do]
 [Done] → Reject → [Doing]
 ```
 
 **Business Rules:**
-- Tasks start in **Open** state with no owner
-- **Task_owner** is set only when "Taking Task" (To-Do → Doing)
-- Plans can only be changed in **Open** or **Done** states
-- Plans are required before releasing from Open to To-Do
-- Email sent to `App_permit_Done` group when task reaches Done state
-- All state transitions append audit entries to Task_notes
-- Closed tasks are read-only
+
+-   Tasks start in **Open** state with no owner
+-   **Task_owner** is set only when "Taking Task" (To-Do → Doing)
+-   Plans can only be changed in **Open** or **Done** states
+-   Plans are required before releasing from Open to To-Do
+-   Email sent to `App_permit_Done` group when task reaches Done state
+-   All state transitions append audit entries to Task_notes
+-   Closed tasks are read-only
 
 ### Security Features
 
-- JWT tokens in HTTP-only cookies (prevents XSS)
-- Bcrypt password hashing (configurable rounds)
-- Parameterized SQL queries (prevents SQL injection)
-- CORS configured for localhost only
-- Transaction support with pessimistic locking
-- Race condition prevention with optimistic validation
-- Root admin protection (cannot be disabled or lose admin role)
+-   JWT tokens in HTTP-only cookies (prevents XSS)
+-   Bcrypt password hashing (configurable rounds)
+-   Parameterized SQL queries (prevents SQL injection)
+-   CORS configured for localhost only
+-   Transaction support with pessimistic locking
+-   Race condition prevention with optimistic validation
+-   Root admin protection (cannot be disabled or lose admin role)
 
 ## API Endpoints
 
 ### Authentication
-- `POST /api/auth/login` - User login
-- `POST /api/auth/logout` - User logout
+
+-   `POST /api/auth/login` - User login
+-   `POST /api/auth/logout` - User logout
 
 ### User Management
-- `GET /api/profile` - Get current user profile
-- `PUT /api/profile` - Update current user profile
-- `GET /api/accounts` - Get all accounts (admin only)
-- `POST /api/accounts` - Create account (admin only)
-- `PUT /api/accounts` - Update account
+
+-   `GET /api/profile` - Get current user profile
+-   `PUT /api/profile` - Update current user profile
+-   `GET /api/accounts` - Get all accounts (admin only)
+-   `POST /api/accounts` - Create account (admin only)
+-   `PUT /api/accounts` - Update account
 
 ### Applications
-- `GET /api/applications` - Get all applications
-- `GET /api/applications/:acronym` - Get specific application
-- `POST /api/applications` - Create application (project lead + admin)
-- `PUT /api/applications/:acronym` - Update application (project lead + admin)
+
+-   `GET /api/applications` - Get all applications
+-   `GET /api/applications/:acronym` - Get specific application
+-   `POST /api/applications` - Create application (project lead + admin)
+-   `PUT /api/applications/:acronym` - Update application (project lead + admin)
 
 ### Plans
-- `GET /api/plans/:app_acronym` - Get plans for application
-- `POST /api/plans` - Create plan
-- `PUT /api/plan/:name` - Update plan
+
+-   `GET /api/plans/:app_acronym` - Get plans for application
+-   `POST /api/plans` - Create plan
+-   `PUT /api/plan/:name` - Update plan
 
 ### Tasks
-- `GET /api/tasks/:app_acronym` - Get tasks for application
-- `GET /api/task/:task_id` - Get single task
-- `POST /api/tasks` - Create task
-- `POST /api/tasks/promote` - Promote task to next state
-- `POST /api/tasks/demote` - Demote task to previous state
-- `PUT /api/tasks` - Update task plan
+
+-   `GET /api/tasks/:app_acronym` - Get tasks for application
+-   `GET /api/task/:task_id` - Get single task
+-   `POST /api/tasks` - Create task
+-   `POST /api/tasks/promote` - Promote task to next state
+-   `POST /api/tasks/demote` - Demote task to previous state
+-   `PUT /api/tasks` - Update task plan
 
 ## Development
 
