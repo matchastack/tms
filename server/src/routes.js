@@ -133,6 +133,14 @@ router.post(
     controllers.createTask
 );
 
+router.post(
+    "/CreateTask",
+    validations.authenticateToken,
+    validations.validateTaskCreation,
+    validations.requirePermitGroup("App_permit_Create"),
+    controllers.createTask
+);
+
 router.get(
     "/tasks/:app_acronym",
     validations.authenticateToken,
@@ -151,6 +159,12 @@ router.get(
     controllers.getTasksByState
 );
 
+router.get(
+    "/GetTaskByState/:state",
+    validations.authenticateToken,
+    controllers.getTasksByState
+);
+
 router.post(
     "/tasks/promote",
     validations.authenticateToken,
@@ -158,7 +172,7 @@ router.post(
 );
 
 router.post(
-    "/tasks/promote2done",
+    "/PromoteTask2Done",
     validations.authenticateToken,
     controllers.PromoteTask2Done
 );
