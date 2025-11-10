@@ -32,4 +32,9 @@ app.get("/api/health", (req, res) => {
     res.json({ status: "ok", timestamp: new Date().toUTCString() });
 });
 
+app.use((req, res, next) => {
+    res.status(400).json({ success: false, message: "U_1" });
+    next();
+});
+
 export default app;
