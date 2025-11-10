@@ -202,7 +202,7 @@ export const authenticateToken = async (req, res, next) => {
     if (!token) {
         return res.status(401).json({
             success: false,
-            message: "Access token required"
+            message: "IAM_1"
         });
     }
 
@@ -215,7 +215,7 @@ export const authenticateToken = async (req, res, next) => {
         if (!user.isActive) {
             return res.status(403).json({
                 success: false,
-                message: "Account is deactivated"
+                message: "IAM_2"
             });
         }
 
@@ -229,18 +229,18 @@ export const authenticateToken = async (req, res, next) => {
         if (error.name === "TokenExpiredError") {
             return res.status(401).json({
                 success: false,
-                message: "Token expired"
+                message: "IAM_1"
             });
         }
         if (error.message === "User not found") {
             return res.status(401).json({
                 success: false,
-                message: "User not found"
+                message: "IAM_1"
             });
         }
         return res.status(403).json({
             success: false,
-            message: "Invalid token"
+            message: "IAM_1"
         });
     }
 };
@@ -505,21 +505,21 @@ export const validateTaskCreation = (req, res, next) => {
     if (!Task_app_Acronym || !Task_app_Acronym.trim()) {
         return res.status(400).json({
             success: false,
-            message: "Task_app_Acronym is required"
+            message: "P_2"
         });
     }
 
     if (!Task_name || !Task_name.trim()) {
         return res.status(400).json({
             success: false,
-            message: "Task name is required"
+            message: "P_3"
         });
     }
 
     if (Task_description && Task_description.length > 255) {
         return res.status(400).json({
             success: false,
-            message: "Description cannot exceed 255 characters"
+            message: "P_4"
         });
     }
 
@@ -556,14 +556,6 @@ export const requirePermitGroup = permitField => {
                 appAcronym = task.Task_app_Acronym;
             }
 
-            if (!appAcronym) {
-                return res.status(400).json({
-                    success: false,
-                    message:
-                        "Require Permit Error: Application acronym is required"
-                });
-            }
-
             // Get application to check permissions
             const app = await services.getApplicationByAcronym(appAcronym);
             const requiredGroups = app[permitField];
@@ -575,8 +567,7 @@ export const requirePermitGroup = permitField => {
             ) {
                 return res.status(500).json({
                     success: false,
-                    message:
-                        "Permission groups not configured for this operation"
+                    message: "IAM_2"
                 });
             }
 
@@ -592,9 +583,7 @@ export const requirePermitGroup = permitField => {
             if (!hasPermission) {
                 return res.status(403).json({
                     success: false,
-                    message: `Permission denied. Required groups: ${requiredGroups.join(
-                        ", "
-                    )}`
+                    message: "IAM_2"
                 });
             }
 

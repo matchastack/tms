@@ -784,7 +784,7 @@ export const createTask = async (taskData, username) => {
             .then(([results]) => results[0]);
 
         if (!app) {
-            throw new Error("Application not found");
+            throw new Error("TR_1");
         }
 
         // Check if task name already exists
@@ -795,7 +795,7 @@ export const createTask = async (taskData, username) => {
             .then(([results]) => results[0]);
 
         if (existing) {
-            throw new Error("Task name already exists");
+            throw new Error("P_3");
         }
 
         // Validate plan if provided
@@ -808,9 +808,7 @@ export const createTask = async (taskData, username) => {
                 .then(([results]) => results[0]);
 
             if (!plan) {
-                throw new Error(
-                    "Plan not found or does not belong to this application"
-                );
+                throw new Error("TR_2");
             }
         }
 

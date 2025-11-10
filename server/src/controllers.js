@@ -537,7 +537,7 @@ export const createTask = async (req, res, next) => {
         const newTask = await services.createTask(req.body, username);
         res.status(201).json({
             success: true,
-            message: "Task created successfully",
+            message: "S_1",
             data: newTask
         });
     } catch (error) {
