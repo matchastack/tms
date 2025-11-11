@@ -835,15 +835,25 @@ export const PromoteTask2Done = async (req, res, next) => {
             console.error("Failed to send email notification:", emailError);
         }
 
+        // Success response
         res.status(200).json({
-            success: true,
-            message: "Task promoted to Done successfully",
-            data: updatedTask
+            status: "S_1"
         });
     } catch (error) {
-        res.status(400).json({
-            success: false,
-            message: error.message
+        // Map service errors to status codes
+        if (error.message === "Task not found") {
+            return res.status(400).json({
+                status: "TR_1"
+            });
+        }
+        if (error.message.includes('must be in "Doing" state')) {
+            return res.status(400).json({
+                status: "TR_2"
+            });
+        }
+        // Catch-all for unspecified errors
+        return res.status(400).json({
+            status: "UE"
         });
     }
 };

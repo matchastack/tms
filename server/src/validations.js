@@ -503,8 +503,8 @@ export const validateCreateTaskRequest = (req, res, next) => {
     }
 
     // Check Content-Type header
-    const contentType = req.get('Content-Type');
-    if (!contentType || !contentType.includes('application/json')) {
+    const contentType = req.get("Content-Type");
+    if (!contentType || !contentType.includes("application/json")) {
         return res.status(400).json({
             status: "P_1"
         });
@@ -589,6 +589,34 @@ export const validateGetTaskByStateRequest = (req, res, next) => {
     if (Object.keys(req.query).length > 0) {
         return res.status(400).json({
             status: "U_1"
+        });
+    }
+
+    next();
+};
+
+/**
+ * Validate PromoteTask2Done API request.
+ * Checks for malformed URLs and validates request body.
+ *
+ * @middleware
+ * @param {express.Request} req - Express request object
+ * @param {express.Response} res - Express response object
+ * @param {express.NextFunction} next - Express next function
+ */
+export const validatePromoteTask2DoneRequest = (req, res, next) => {
+    // Check for query parameters (malformed URL)
+    if (Object.keys(req.query).length > 0) {
+        return res.status(400).json({
+            status: "U_1"
+        });
+    }
+
+    // Check if task_id is provided in body
+    const { task_id } = req.body;
+    if (!task_id || !task_id.trim()) {
+        return res.status(400).json({
+            status: "TR_1"
         });
     }
 

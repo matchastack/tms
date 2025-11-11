@@ -175,7 +175,9 @@ router.post(
 
 router.post(
     "/PromoteTask2Done",
+    validations.validatePromoteTask2DoneRequest,
     validations.authenticateToken,
+    validations.requirePermitGroup("App_permit_Doing"),
     controllers.PromoteTask2Done
 );
 
