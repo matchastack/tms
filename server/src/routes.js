@@ -135,11 +135,19 @@ router.post(
 
 router.post(
     "/CreateTask",
+    validations.validateCreateTaskRequest,
     validations.authenticateToken,
     validations.validateTaskCreation,
     validations.requirePermitGroup("App_permit_Create"),
     controllers.createTask
 );
+
+// Catch-all for non-POST methods on /CreateTask (return U_1)
+router.all("/CreateTask", (req, res) => {
+    return res.status(400).json({
+        status: "U_1"
+    });
+});
 
 router.get(
     "/tasks/:app_acronym",

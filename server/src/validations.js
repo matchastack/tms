@@ -201,8 +201,7 @@ export const authenticateToken = async (req, res, next) => {
 
     if (!token) {
         return res.status(401).json({
-            success: false,
-            message: "IAM_1"
+            status: "IAM_1"
         });
     }
 
@@ -213,9 +212,8 @@ export const authenticateToken = async (req, res, next) => {
         const user = await services.getUserByUsername(decoded.username);
 
         if (!user.isActive) {
-            return res.status(403).json({
-                success: false,
-                message: "IAM_2"
+            return res.status(401).json({
+                status: "IAM_1"
             });
         }
 
@@ -228,19 +226,16 @@ export const authenticateToken = async (req, res, next) => {
     } catch (error) {
         if (error.name === "TokenExpiredError") {
             return res.status(401).json({
-                success: false,
-                message: "IAM_1"
+                status: "IAM_1"
             });
         }
         if (error.message === "User not found") {
             return res.status(401).json({
-                success: false,
-                message: "IAM_1"
+                status: "IAM_1"
             });
         }
-        return res.status(403).json({
-            success: false,
-            message: "IAM_1"
+        return res.status(401).json({
+            status: "IAM_1"
         });
     }
 };
@@ -491,6 +486,34 @@ export const validatePlanCreation = (req, res, next) => {
 };
 
 /**
+ * Validate CreateTask API request method and content-type.
+ * Specific validation for the /CreateTask endpoint.
+ *
+ * @middleware
+ * @param {express.Request} req - Express request object
+ * @param {express.Response} res - Express response object
+ * @param {express.NextFunction} next - Express next function
+ */
+export const validateCreateTaskRequest = (req, res, next) => {
+    // Check if URL has query parameters (malformed URL)
+    if (Object.keys(req.query).length > 0) {
+        return res.status(400).json({
+            status: "U_1"
+        });
+    }
+
+    // Check Content-Type header
+    const contentType = req.get('Content-Type');
+    if (!contentType || !contentType.includes('application/json')) {
+        return res.status(400).json({
+            status: "P_1"
+        });
+    }
+
+    next();
+};
+
+/**
  * Validate task creation request data.
  * Checks task name, application acronym, and description length.
  *
@@ -502,24 +525,30 @@ export const validatePlanCreation = (req, res, next) => {
 export const validateTaskCreation = (req, res, next) => {
     const { Task_name, Task_app_Acronym, Task_description } = req.body;
 
+    // Check for missing required fields (P_2)
     if (!Task_app_Acronym || !Task_app_Acronym.trim()) {
         return res.status(400).json({
-            success: false,
-            message: "P_2"
+            status: "P_2"
         });
     }
 
     if (!Task_name || !Task_name.trim()) {
         return res.status(400).json({
-            success: false,
-            message: "P_3"
+            status: "P_2"
         });
     }
 
+    // Check Task_name length (P_3)
+    if (Task_name.length > 50) {
+        return res.status(400).json({
+            status: "P_3"
+        });
+    }
+
+    // Check Task_description length (P_4)
     if (Task_description && Task_description.length > 255) {
         return res.status(400).json({
-            success: false,
-            message: "P_4"
+            status: "P_4"
         });
     }
 
@@ -565,9 +594,8 @@ export const requirePermitGroup = permitField => {
                 !Array.isArray(requiredGroups) ||
                 requiredGroups.length === 0
             ) {
-                return res.status(500).json({
-                    success: false,
-                    message: "IAM_2"
+                return res.status(403).json({
+                    status: "IAM_2"
                 });
             }
 
@@ -582,16 +610,20 @@ export const requirePermitGroup = permitField => {
 
             if (!hasPermission) {
                 return res.status(403).json({
-                    success: false,
-                    message: "IAM_2"
+                    status: "IAM_2"
                 });
             }
 
             next();
         } catch (error) {
-            return res.status(500).json({
-                success: false,
-                message: error.message
+            // If application not found, return TR_1
+            if (error.message === "Application not found") {
+                return res.status(400).json({
+                    status: "TR_1"
+                });
+            }
+            return res.status(400).json({
+                status: "UE"
             });
         }
     };

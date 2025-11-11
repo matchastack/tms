@@ -535,15 +535,30 @@ export const createTask = async (req, res, next) => {
     try {
         const username = req.user.username;
         const newTask = await services.createTask(req.body, username);
-        res.status(201).json({
-            success: true,
-            message: "S_1",
+        res.status(200).json({
+            status: "S_1",
             data: newTask
         });
     } catch (error) {
-        res.status(400).json({
-            success: false,
-            message: error.message
+        // Map service errors to status codes
+        if (error.message === "TR_1") {
+            return res.status(400).json({
+                status: "TR_1"
+            });
+        }
+        if (error.message === "P_3") {
+            return res.status(400).json({
+                status: "P_3"
+            });
+        }
+        if (error.message === "TR_2") {
+            return res.status(400).json({
+                status: "TR_2"
+            });
+        }
+        // Catch-all for unspecified errors
+        return res.status(400).json({
+            status: "UE"
         });
     }
 };
