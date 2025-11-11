@@ -638,9 +638,15 @@ export const getTasksByState = async (req, res, next) => {
             data: tasks
         });
     } catch (error) {
-        res.status(400).json({
-            success: false,
-            message: error.message
+        // Map service errors to status codes
+        if (error.message && error.message.includes("Invalid state")) {
+            return res.status(400).json({
+                status: "P_1"
+            });
+        }
+        // Catch-all for unspecified errors
+        return res.status(400).json({
+            status: "UE"
         });
     }
 };

@@ -170,6 +170,7 @@ router.get(
 router.get(
     "/GetTaskByState/:state",
     validations.authenticateToken,
+    validations.validateGetTaskByStateRequest,
     controllers.getTasksByState
 );
 

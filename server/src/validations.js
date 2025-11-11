@@ -559,6 +559,43 @@ export const validateTaskCreation = (req, res, next) => {
 };
 
 /**
+ * Validate GetTaskByState API request.
+ * Validates Task_state parameter and checks for malformed URLs.
+ *
+ * @middleware
+ * @param {express.Request} req - Express request object
+ * @param {express.Response} res - Express response object
+ * @param {express.NextFunction} next - Express next function
+ */
+export const validateGetTaskByStateRequest = (req, res, next) => {
+    const { state } = req.params;
+    const validStates = ["Open", "To-Do", "Doing", "Done", "Closed"];
+
+    // Check if state parameter is missing
+    if (!state) {
+        return res.status(400).json({
+            status: "P_1"
+        });
+    }
+
+    // Check if state is valid
+    if (!validStates.includes(state)) {
+        return res.status(400).json({
+            status: "P_1"
+        });
+    }
+
+    // Check for query parameters (malformed URL)
+    if (Object.keys(req.query).length > 0) {
+        return res.status(400).json({
+            status: "U_1"
+        });
+    }
+
+    next();
+};
+
+/**
  * Factory for application-specific permission validation middleware.
  * Checks if authenticated user belongs to groups specified in application's permission field.
  * Used for task state transitions and creation based on App_permit_* fields.
