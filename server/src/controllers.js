@@ -764,7 +764,7 @@ export const PromoteTask2Done = async (req, res, next) => {
         const username = req.user.username;
         const updatedTask = await services.promoteTask2Done(
             task_id,
-            username,
+            app_acronym,
             notes
         );
 

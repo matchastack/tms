@@ -2,3 +2,8 @@
 .claude/
 CLAUDE.md
 .env
+
+## simulation env
+devenv/
+internet-enabled/
+uat/
